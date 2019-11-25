@@ -1,19 +1,22 @@
 #include <vector>
 #include "TH1D.h"
 #include "TF1.h"
-using namespace std;
+using std::vector;
+using std::cout;
+using std::endl;
 class WaveformCsI{
- public:
+public:
   UInt_t mNWave;
- public:
+public:
   WaveformCsI(UInt_t nWave){mNWave=nWave;}
-  Double_t waveformSignal(Double_t *x,Double_t *par);//waveform of multiple wave w/0 background
-  Double_t waveform(Double_t *x,Double_t *par);//waveform of multiple wave w/ background
+  Double_t waveformSingle(Double_t *x,Double_t *par);//waveform of single wave no background
+  Double_t waveformDouble(Double_t *x,Double_t *par);//waveform with pile-up signals
+  Double_t waveformTriple(Double_t *x,Double_t *par);//waveform with pile-up signals
+  Double_t waveformOverrange(Double_t *x,Double_t *par);//waveform of overrange signals
   Double_t waveformCut(Double_t *x,Double_t *par);//waveform of multiple wave w/ background
-  Double_t waveformSingleSignal(Double_t *x,Double_t *par);//waveform of single wave no background
 };
 class SingleCsI{
- private:
+private:
   UInt_t mRunNo;
   UInt_t mEventNo;
   UInt_t mIndexCsI;
@@ -24,12 +27,12 @@ class SingleCsI{
   vector<Double_t> mListEnergy;
   char mName[7];
   vector<Double_t> mListLocalMax;
- private:
+private:
   Double_t findChi2(TH1D*);
   void tryFit(TH1D*);
   void findLocalMax(TH1D*);
   void drawWaves(TH1D* h1);
- public:
+public:
   SingleCsI(){}
   ~SingleCsI(){}
   SingleCsI(UInt_t runNo){mRunNo=runNo;}

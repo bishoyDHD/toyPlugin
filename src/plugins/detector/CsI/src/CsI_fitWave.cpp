@@ -47,7 +47,7 @@ Double_t waveform(Double_t *x,Double_t *par){
 }
 Double_t findSteepestSlope(Double_t *par){
 
-
+  return 0;
 }
 Long_t Det_CsI::process_fit(){
   if(treeRaw->isBad<0){
