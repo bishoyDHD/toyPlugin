@@ -12,6 +12,7 @@ public:
   Double_t waveformSingle(Double_t *x,Double_t *par);//waveform of single wave no background
   Double_t waveformDouble(Double_t *x,Double_t *par);//waveform with pile-up signals
   Double_t waveformTriple(Double_t *x,Double_t *par);//waveform with pile-up signals
+  Double_t waveformQuad(Double_t *x,Double_t *par);//waveform with pile-up signals
   Double_t waveformOverrange(Double_t *x,Double_t *par);//waveform of overrange signals
   Double_t waveformCut(Double_t *x,Double_t *par);//waveform of multiple wave w/ background
 };
@@ -38,11 +39,11 @@ public:
   SingleCsI(UInt_t runNo){mRunNo=runNo;}
   SingleCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;}
   SingleCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
-  void setRunNo(UInt_t runNo){mRunNo=runNo;}
-  void setEventNo(UInt_t eventNo){mEventNo=eventNo;}
-  void setIndex(UInt_t index){mIndexCsI=index;}
-  void setCsI(UInt_t index){mIndexCsI=index;}
-  void addData(UShort_t sample){mListData.push_back(sample);}
+  inline void setRunNo(UInt_t runNo){mRunNo=runNo;}
+  inline void setEventNo(UInt_t eventNo){mEventNo=eventNo;}
+  inline void setIndex(UInt_t index){mIndexCsI=index;}
+  inline void setCsI(UInt_t index){mIndexCsI=index;}
+  inline void addData(UShort_t sample){mListData.push_back(sample);}
   void setData(const vector<UShort_t>&);
   UInt_t numberWave() const{
     return mNWave;

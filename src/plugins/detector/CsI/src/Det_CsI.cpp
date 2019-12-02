@@ -6,17 +6,17 @@
 #include <iostream>
 using namespace std;
 
-Det_CsI::Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_):Plugin(in_,out_,inf_,outf_,p_)
-{
+Det_CsI::Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_):Plugin(in_,out_,inf_,outf_,p_){
   // Set defaults for various options
   //treeFit=0;
-  setIdCsI(mapCsI);
+  //setIdCsI(mapCsI);
+  std::cout<<" -- Checking the hell outta this thing!\n";
 };
 
 
-Det_CsI::~Det_CsI()
-{
+Det_CsI::~Det_CsI(){
 };
+
 Long_t Det_CsI::setIdCsI(map<IdCsI,UInt_t> & map){
   char fb[2]={'f','b'};
   char ud[2]={'u','d'};
@@ -147,6 +147,9 @@ Long_t Det_CsI::startup()
 
   loadGeo(); // Load geometry for phi reconstruction
   */
+  getBranchObject("vf48",(TObject **) &treeRaw);
+  //gStyle->SetOptStat(0);
+
   return 0;
 };
 

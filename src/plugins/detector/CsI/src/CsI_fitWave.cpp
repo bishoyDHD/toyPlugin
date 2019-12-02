@@ -1,6 +1,6 @@
 #include <Det_CsI.h>
 #include <singleCsI.h>
-#include<cmath>
+#include <cmath>
 #include <TMath.h>
 #include <fstream>
 #include <iostream>
@@ -12,8 +12,7 @@
 #include <TLine.h>
 #include <TStyle.h>
 using namespace std;
-Long_t Det_CsI::set_goodEvents(int run, int event)
-{
+Long_t Det_CsI::set_goodEvents(int run, int event){
   cout<<"set good events..."<<endl;
   return 0;
 };
@@ -29,11 +28,12 @@ Long_t Det_CsI::startup_fit(){
   getBranchObject("vf48",(TObject **) &treeRaw);
   gROOT->SetBatch(kTRUE);
   gStyle->SetOptStat(0);
+  std::cout<<" -- Hell Ya! Let's get it started right here!!\n";
   return 0;
 }
 Double_t firstDerive(Double_t *x,Double_t *par){
 
-
+  return 0;
 }
 Double_t waveform(Double_t *x,Double_t *par){
   //  if(x[0]<1 && x[0]>250) return 0;
@@ -57,13 +57,40 @@ Long_t Det_CsI::process_fit(){
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
+    char* p=(char*)&(treeRaw->nameModule[iCh]);
+    int moduleName=(p[3]-'0')*10+(p[2]-'0')-1;
+    std::string nameModule;
+    nameModule+=(*p);
+    p++;
+    nameModule+=*p;
+    p++;
+    nameModule+=*p;
+    p++;
+    nameModule+=*p;
+    std::string nameCsI;
+    p=(char*)&(treeRaw->nameCsI[iCh]);
+    int indexClock=(p[3]-'0')*10+(p[2]-'0')-1;
+    //std::cout<< "\n Index clock 11: "<<indexClock<<endl;
+    p+=3;
+    nameCsI+=(*p);
+    p--;
+    nameCsI+=*p;
+    p--;
+    nameCsI+=*p;
+    p--;
+    nameCsI+=*p;
+    if(p[1]=='0' || p[0]=='0'){
+      std::cout<<"..... Got one!!\n";
+    }
+    //std::cout<< " Gap config FB is  : " <<p[1]<<std::endl;
+    //std::cout<< " Gap config UD is  : " <<p[0]<<std::endl;
 
     IdCsI myIndex(treeRaw->nameCsI[iCh],treeRaw->indexCsI[iCh]);
     UInt_t iCsI=mapCsI[myIndex];
     //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
     SingleCsI myCsI(treeRaw->runNo,myEvent,iCsI);
     myCsI.setData(treeRaw->data[iCh]);
-    myCsI.fit();
+    //myCsI.fit();
   }
   return 0;
 }
