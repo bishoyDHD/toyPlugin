@@ -43,7 +43,6 @@ Double_t waveform(Double_t *x,Double_t *par){
   Double_t value=termFirst*termSecond*termThird+par[6];
   if(value>1023.0) value=1023.0;
   return value;
-
 }
 Double_t findSteepestSlope(Double_t *par){
 
@@ -79,18 +78,26 @@ Long_t Det_CsI::process_fit(){
     nameCsI+=*p;
     p--;
     nameCsI+=*p;
+    iFB=0;
+    if(p[1]=='b' || p[1]=='B') iFB=1;
+    iUD=0;
+    if(p[0]=='d' || p[0]=='D') iUD=1;
     if(p[1]=='0' || p[0]=='0'){
       std::cout<<"..... Got one!!\n";
     }
+    #pragma omp parallel num_threads(8)
+    iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
     //std::cout<< " Gap config FB is  : " <<p[1]<<std::endl;
     //std::cout<< " Gap config UD is  : " <<p[0]<<std::endl;
 
     IdCsI myIndex(treeRaw->nameCsI[iCh],treeRaw->indexCsI[iCh]);
     UInt_t iCsI=mapCsI[myIndex];
     //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
-    SingleCsI myCsI(treeRaw->runNo,myEvent,iCsI);
+    SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
+    //std::cout<<" top U/D || F/B :"<<p[0]<<", "<<p[1]<<std::endl;
+    myCsI.nameCsI(iClock,iFB,iUD,iModule);
     myCsI.setData(treeRaw->data[iCh]);
-    //myCsI.fit();
+    myCsI.fit();
   }
   return 0;
 }

@@ -14,21 +14,18 @@
 #include <utility>
 #include <map>
 typedef std::pair<UInt_t,UInt_t> IdCsI;
-class Det_CsI:public Plugin
-{
- private:
-
+class Det_CsI:public Plugin{
+private:
   //CRTFitCsI *treeFit;			/// Output tree for CSI data
   CRTRawCsI *treeRaw;			/// Input tree with CSI raw data
   //
   // Detector parameters set in init file
   //
-
   // constants 
-
   std::map<IdCsI,UInt_t> mapCsI;
+  UInt_t iClock,iFB,iUD,iModule;
 
- public:
+public:
   Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_);
   virtual ~Det_CsI();
 

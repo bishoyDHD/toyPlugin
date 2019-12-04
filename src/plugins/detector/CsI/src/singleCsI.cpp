@@ -9,7 +9,7 @@
 #include <TSpectrum.h>
 using std::exp;
 Double_t WaveformCsI::waveformSingle(Double_t *x,Double_t *par){
-  if(x[0]<par[1]) return 0;
+  //if(x[0]<par[1]) return 0;
   double den=1-exp(-(x[0]-par[1])/par[6]);
   double num=(par[0]/den)*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
              ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
@@ -17,7 +17,7 @@ Double_t WaveformCsI::waveformSingle(Double_t *x,Double_t *par){
   return num+par[8];
 }
 Double_t WaveformCsI::waveformDouble(Double_t *x,Double_t* par){
-  if(x[0]<par[1]) return 0;
+  //if(x[0]<par[1]) return 0;
   double den1=1-exp(-1*(x[0]-par[1])/par[6]);
   double den2=1-exp(-1*(x[0]-par[9])/par[6]);
   double frac=par[0]*2*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
@@ -29,6 +29,7 @@ Double_t WaveformCsI::waveformDouble(Double_t *x,Double_t* par){
   return frac+par[8];
 }
 Double_t WaveformCsI::waveformTriple(Double_t *x,Double_t* par){
+  //if(x[0]<par[1]) return 0;
   double den1=1-exp(-1*(x[0]-par[1])/par[6]);
   double den2=1-exp(-1*(x[0]-par[9])/par[6]);
   double den3=1-exp(-1*(x[0]-par[12])/par[6]);
@@ -43,8 +44,28 @@ Double_t WaveformCsI::waveformTriple(Double_t *x,Double_t* par){
               par[5]*(x[0]-par[12])/(par[7])*exp(1-(x[0]-par[12])/(par[7])))/(den3);
   return frac+par[8];
 }
+Double_t WaveformCsI::waveformQuad(Double_t *x,Double_t* par){
+  //if(x[0]<par[1]) return 0;
+  double den1=1-exp(-1*(x[0]-par[1])/par[6]);
+  double den2=1-exp(-1*(x[0]-par[9])/par[6]);
+  double den3=1-exp(-1*(x[0]-par[12])/par[6]);
+  double den4=1-exp(-1*(x[0]-par[14])/par[6]);
+  double frac=par[0]*2*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
+              ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
+              par[5]*(x[0]-par[1])/(par[7])*exp(1-(x[0]-par[1])/(par[7])))/(den1)+
+              par[10]*2*TMath::Freq((x[0]-par[9]-par[2])/par[3])*
+              ((x[0]-par[9])/par[4]*exp(1-(x[0]-par[9])/par[7])+
+              par[5]*(x[0]-par[9])/(par[7])*exp(1-(x[0]-par[9])/(par[7])))/(den2)+
+              par[11]*2*TMath::Freq((x[0]-par[12]-par[2])/par[3])*
+              ((x[0]-par[12])/par[4]*exp(1-(x[0]-par[12])/par[7])+
+              par[5]*(x[0]-par[12])/(par[7])*exp(1-(x[0]-par[12])/(par[7])))/(den3)+
+              par[13]*2*TMath::Freq((x[0]-par[14]-par[2])/par[3])*
+              ((x[0]-par[14])/par[4]*exp(1-(x[0]-par[14])/par[7])+
+              par[5]*(x[0]-par[14])/(par[7])*exp(1-(x[0]-par[14])/(par[7])))/(den4);    
+  return frac+par[8];
+}
 Double_t WaveformCsI::waveformOverrange(Double_t *x,Double_t* par){
-  if(x[0]<par[1]) return 0;
+  //if(x[0]<par[1]) return 0;
   double den=1-exp(-(x[0]-par[1])/par[6]);
   double num=par[0]*2*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
              ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
@@ -55,6 +76,7 @@ Double_t WaveformCsI::waveformCut(Double_t *x,Double_t* par){
   //Double_t value=waveform(x,par);
   //if(value>1023.0) value=1023.0;
   //return value;
+  return 0;
 }
 void SingleCsI::setData(const vector<UShort_t>& listD){
   for(unsigned int iS=0,nS=listD.size();iS<nS;iS++){
@@ -69,7 +91,6 @@ static Double_t waveformPure(Double_t *x,Double_t *par){
   Double_t value=termFirst*termSecond*termThird;
   return value;
 }
-
 static Double_t findZero(Double_t *par){
   Double_t x=par[6];
   Double_t stepSize=0.01;
@@ -102,7 +123,6 @@ static Double_t findTime(Double_t *par){
     x+=stepSize;
     if(x>250) return 250;
   }
-
 }
 static Double_t findEnergy(Double_t *par){
   Double_t xLow=par[1];
@@ -128,11 +148,8 @@ static Double_t findPeak(Double_t *par){
     }
     x+=stepSize;
   }
-
 }
-
 static Double_t fillEnergy(Double_t *par,unsigned int nEvent,TH1D* h1){
-
   Double_t xLow=par[1];
   Double_t xHigh=findZero(par);
   Double_t xPeak=findPeak(par);
@@ -143,8 +160,13 @@ static Double_t fillEnergy(Double_t *par,unsigned int nEvent,TH1D* h1){
   }
   return h1->Integral("width");
 }
-
-
+char* SingleCsI::nameCsI(const UInt_t& iClock, const UInt_t& iFB,const UInt_t& iUD,const UInt_t& iModule){
+  char ifb[3]="fb";
+  char iud[3]="ud";
+  sprintf(mName,"%i%c%c%i",iClock,ifb[iFB],iud[iUD],iModule);
+  //std::cout<<" checking the name: "<<mName<<std::endl;
+  return mName;
+}
 char* SingleCsI::nameCsI(unsigned int index){
   if(index<1){
     sprintf(mName,"0000");
@@ -159,21 +181,42 @@ char* SingleCsI::nameCsI(unsigned int index){
   sprintf(mName,"%i%c%c%i",iClock,NameFB[iFB],NameUD[iUD],iPaddle+1);
   return mName;
 }
-
 bool SingleCsI::fit(){
+  //std::cout<<"|| entering into fitting function..... success! \n";
   static unsigned int count=0;
   char name[256];
-  cout<<"processing "<<mIndexCsI<<" "<<nameCsI(mIndexCsI)<<endl;
-  sprintf(name,"wave_run%d_%dCsI_%s_%u",mRunNo,mEventNo,nameCsI(mIndexCsI),count);
+  //cout<<"processing "<<mIndexCsI<<" "<<nameCsI(mIndexCsI)<<endl;
+  cout<<"processing "<<mIndexCsI<<" "<<mName<<endl;
+  std::cout<<" This is the add data method, size: "<<mListData.size()<<std::endl;
+  sprintf(name,"wave_run%d_%dCsI_%s_%u",mRunNo,mEventNo,mName,count);
+  std::cout<<"  name of histogram... checking here: "<<name<<std::endl;
+  //sprintf(name,"wave_run%d_%dCsI_%s_%u",mRunNo,mEventNo,nameCsI(mIndexCsI),count);
   char title[256];
   sprintf(title,"fAdc waveform");
-  TH1D* h1=new TH1D(name,title,250,0.5,250.5);
+  shared_ptr<TH1D> h1(new TH1D(name,title,250,0.5,250.5));
+  //TH1D* h1=new TH1D(name,title,250,0.5,250.5);
   for(UInt_t iData=0,nData=mListData.size();iData<nData;iData++){
     h1->SetBinContent(iData+1,mListData[iData]);
     h1->SetBinError(iData+1,1.1);
   }
-  mNWave=1;
-  tryFit(h1);
+  Double_t xmax=h1->GetBinLowEdge(h1->GetMaximumBin());
+  Double_t yped=h1->GetBinContent(h1->FindBin(xmax));
+  // check for type of waveform (single, double, triple etc)
+  unique_ptr<TSpectrum> s(new TSpectrum(4));
+  Int_t nfound=s->Search(h1.get(),2,"",0.10);
+  double* xpeaks=new double();
+  xpeaks=s->GetPositionX();
+  std::sort(xpeaks,xpeaks+nfound);
+  std::cout<<" Maximum x value & peaks "<<xmax<<" & ";
+  if(nfound>=1){
+    for(int n=0; n<nfound; n++){
+      std::cout<<xpeaks[n]<<" ";
+    }
+    std::cout<<std::endl;
+  }
+  mNWave=nfound;
+  tryFit(h1,xpeaks,200,yped);
+  /*
   Double_t chi2Reduced=findChi2(h1);
   cout<<chi2Reduced<<endl;
   if(chi2Reduced>80){
@@ -183,7 +226,6 @@ bool SingleCsI::fit(){
   cout<<chi2Reduced<<endl;
 
   }
-  /*
   for(mNWave=1;mNWave<2;mNWave++){
     tryFit(h1);
     Double_t chi2Reduced=findChi2(h1);
@@ -193,12 +235,11 @@ bool SingleCsI::fit(){
     }
   }
   */
-  drawWaves(h1);
+  if(mEventNo % 1000==0)
+    drawWaves(h1);
 
   return true;
   /*
-
-
 
   Double_t par[8];
   for(int i=0;i<8;i++){
@@ -228,7 +269,7 @@ bool SingleCsI::fit(){
   pad2->cd();
   Double_t ymin = pad1->GetFrame()->GetY1();
   Double_t ymax = pad1->GetFrame()->GetY2();
-  Double_t dy = (ymax-ymin)/0.8; //10 per cent margins top and bottom                                                                                                                           
+  Double_t dy = (ymax-ymin)/0.8; //10 per cent margins top and bottom
   Double_t xmin = pad1->GetFrame()->GetX1();
   Double_t xmax = pad1->GetFrame()->GetX2();
   Double_t dx = (xmax-xmin)/0.8; //10 per cent margins left and right
@@ -239,7 +280,8 @@ bool SingleCsI::fit(){
   pad2->Update();
   */
 }
-void SingleCsI::findLocalMax(TH1D* h1){
+//void SingleCsI::findLocalMax(TH1D* h1){
+void SingleCsI::findLocalMax(shared_ptr<TH1D>h1){
   TF1* f1=h1->GetFunction("waveCut");
   int nBin=h1->GetNbinsX();
   double maxValue=0;
@@ -254,22 +296,36 @@ void SingleCsI::findLocalMax(TH1D* h1){
   }
   mListLocalMax.push_back(newPeak);
 }
-void SingleCsI::tryFit(TH1D* h1){
+//void SingleCsI::tryFit(TH1D* h1){
+void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax){
   const unsigned int NPar=mNWave*7+1;
-  WaveformCsI* myWave=new WaveformCsI(mNWave);
-  TF1* f1=new TF1("waveCut",myWave,&WaveformCsI::waveformCut,1,250,NPar);//"WaveformCsI","waveformCut");
+  shared_ptr<WaveformCsI> myWave(new WaveformCsI(mNWave));
   Double_t par[NPar];
   if(mNWave==1){
-    f1->SetParameters(5035,26.69,0.1782,12.280,32.91,12.28,h1->GetBinCenter(h1->GetMaximumBin()),72.79);    
+    shared_ptr<TF1> f1(new TF1("waveCut",myWave,&WaveformCsI::waveformSingle,1,250,NPar));//"WaveformCsI","waveformCut"));
+    for(int n=0; n<9; n+=1){
+      //double m=param[n];
+      f1->SetParameter(n,param[n]);
+      //f1->SetParLimits(n,parmin(n),parlim(n));
+    }
+    f1->SetParameter(0,ymax);
+    f1->SetParLimits(0,ymax-61.7,ymax+971.7);
+    f1->SetParameter(1,xval[0]);
+    f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
+    f1->SetParameter(8,yped);
+    f1->SetParLimits(8,yped-161.7,yped+171.7);
     f1->SetLineStyle(6);
     f1->SetLineColor(1);
     f1->SetLineWidth(3);
-    h1->Fit(f1,"Q");
+    h1->Fit(f1.get(),"0");
     for(unsigned int i=0;i<NPar;i++){
       mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
     }
-  }
+    std::cout<<" max from fitting |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+    std::cout<<" max from fitting |--> "<<f1->GetMaximumX()<<std::endl;
+  }/*
   else{
+    shared_ptr<TF1> f1(new TF1("waveCut",myWave,&WaveformCsI::waveformSingle,1,250,NPar));//"WaveformCsI","waveformCut"));
     findLocalMax(h1);
     f1->SetParameter(0,5035);
     f1->SetParameter(1,26.69);
@@ -286,15 +342,17 @@ void SingleCsI::tryFit(TH1D* h1){
     f1->SetLineStyle(6);
     f1->SetLineColor(1);
     f1->SetLineWidth(3);
-    h1->Fit(f1,"Q");
+    h1->Fit(f1.get(),"Q");
     for(unsigned int i=0;i<NPar;i++){
       mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
     }
-  }
+  }*/
 }
-void SingleCsI::drawWaves(TH1D* h1){
+//void SingleCsI::drawWaves(TH1D* h1){
+void SingleCsI::drawWaves(shared_ptr<TH1D> h1){
   char name[256];
-  sprintf(name,"canvas_run%d_%dCsI_%s",mRunNo,mEventNo,nameCsI(mIndexCsI));
+  //sprintf(name,"canvas_run%d_%dCsI_%s",mRunNo,mEventNo,nameCsI(mIndexCsI));
+  sprintf(name,"canvas_run%d_%dCsI_%s",mRunNo,mEventNo,mName);
   TCanvas* c1=new TCanvas(name,name,1200,900);
 
   if(h1!=0){
@@ -304,6 +362,7 @@ void SingleCsI::drawWaves(TH1D* h1){
     h1->SetMarkerStyle(2);
     h1->SetMarkerSize(1.2);
     h1->Draw();
+    /*
     WaveformCsI* myWave=new WaveformCsI(mNWave);
     TF1* f2=new TF1("waveform",myWave,&WaveformCsI::waveformSingle,1,250,mNWave*7+1,"WaveformCsI","waveform");
     Double_t par[mNWave*7+1];
@@ -339,7 +398,7 @@ void SingleCsI::drawWaves(TH1D* h1){
     pad2->cd();
     Double_t ymin = pad1->GetFrame()->GetY1();
     Double_t ymax = pad1->GetFrame()->GetY2();
-    Double_t dy = (ymax-ymin)/0.8; //10 per cent margins top and bottom                                                                                                                           
+    Double_t dy = (ymax-ymin)/0.8; //10 per cent margins top and bottom 
     Double_t xmin = pad1->GetFrame()->GetX1();
     Double_t xmax = pad1->GetFrame()->GetX2();
     Double_t dx = (xmax-xmin)/0.8; //10 per cent margins left and right
@@ -360,15 +419,14 @@ void SingleCsI::drawWaves(TH1D* h1){
       h1Energy->SetLineColorAlpha(0,0.2);
       //      h1Energy->Draw("][same");
       pad2->Update();
-    }
-
+    }*/
   }
-
   c1->Write();
-  sprintf(name,"wave_run%d_%dCsI_%s.png",mRunNo,mEventNo,nameCsI(mIndexCsI));
-  c1->SaveAs(name);
+  //sprintf(name,"wave_run%d_%dCsI_%s.png",mRunNo,mEventNo,nameCsI(mIndexCsI));
+  //c1->SaveAs(name);
 }
-Double_t SingleCsI::findChi2(TH1D* h1){
+//Double_t SingleCsI::findChi2(TH1D* h1){
+Double_t SingleCsI::findChi2(shared_ptr<TH1D> h1){
   unsigned int iLow=1;
   unsigned int iUp=h1->GetNbinsX();
   TF1* funFit=h1->GetFunction("waveCut");
@@ -380,7 +438,6 @@ Double_t SingleCsI::findChi2(TH1D* h1){
     Double_t value=funFit->Eval(x);
     Double_t thisChi2=(value-y)*(value-y)/error/error;
     chi2+=thisChi2;
-
   }
   chi2/=(iUp-1-h1->GetFunction("waveCut")->GetNpar());
   return chi2;
