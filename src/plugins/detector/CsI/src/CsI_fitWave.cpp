@@ -1,6 +1,4 @@
 #include <Det_CsI.h>
-#include <singleCsI.h>
-#include <cmath>
 #include <TMath.h>
 #include <fstream>
 #include <iostream>
@@ -187,6 +185,8 @@ Long_t Det_CsI::process_fit(){
       if(treeRaw->indexCsI[iCh]==16) pcal=.22;
       myCsI.setpCalib(pcal);
       myCsI.fit();
+      if(myCsI.getClustCsI())
+        std::cout<<" ********** "<<myCsI.getR()<<" || "<<myCsI.getTheta()<<std::endl;
     }// end of signal CsI if-loop
   }
   return 0;

@@ -99,6 +99,7 @@ private:
   vector<Double_t> mListLocalMax;
 private:
   int clusCrys;
+  bool clus_csi;
   std::vector<double> crysE;
   std::map<std::pair<double,double>,double> csiph;
   std::map<std::pair<double,double>,double> csiR;
@@ -113,6 +114,7 @@ private:
   void drawWaves(TH1D* h1);
   void drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1);
   double mapPhi,pcal,Theta,acos,energy;
+  double lmax,lmin;
   int moduleNo,thetaIndex,phiIndex;
   std::pair<double,double> angles;
   TH2D* h2ang;
@@ -155,9 +157,17 @@ public:
   inline void setIndexTheta(int iTheta){thetaIndex=iTheta;}
   inline void setIndexPhi(UInt_t iPhi){phiIndex=iPhi;}
   void calcThetaPhi(double);
+  inline void dumbFn(){std::cout<<" -----> Hola 7 phezulu ===== "<<wtheta<<", "<<wphi<<std::endl;}
   void setAngles(int module,int channel,int yy,int zz);
   inline void setpCalib(double calib){pcal=calib/1000.;}
   void setData(const vector<UShort_t>&);
+  // cluster vars
+  bool getClustCsI(){return clus_csi;}
+  Double_t getTheta(){return wtheta;}
+  Double_t getPhi(){return wphi;}
+  Double_t getEdep(){return energy;}
+  Double_t getR(){return wr;}
+  Double_t getZ(){return wz;}
   UInt_t numberWave() const{
     return mNWave;
   }

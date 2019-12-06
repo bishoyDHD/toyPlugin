@@ -6,6 +6,7 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TF1.h"
+#include <singleCsI.h>
 #include "csitree.h"
 #include <iostream>
 #include <fstream>
@@ -24,6 +25,7 @@ private:
   // Detector parameters set in init file
   //
   // constants 
+  ClusterCsI myClust;
   std::map<IdCsI,UInt_t> mapCsI;
   std::ifstream parfile;
   UInt_t iClock,iFB,iUD,iModule;

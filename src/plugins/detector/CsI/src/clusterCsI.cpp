@@ -65,6 +65,7 @@ bool ClusterCsI::fit(){
   xpeaks=s->GetPositionX();
   std::sort(xpeaks,xpeaks+nfound);
   mNWave=nfound;
+  clus_csi=false;
   if(nfound==3){
     if(std::abs(xpeaks[2]-xpeaks[1]<35)) mNWave=2;
   }
@@ -149,6 +150,7 @@ void ClusterCsI::findLocalMax(shared_ptr<TH1D>h1){
 }
 //void ClusterCsI::tryFit(TH1D* h1,double* xval,double yped,double ymax){
 void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax){
+  clus_csi=false;
   shared_ptr<WaveformCsI> myWave(new WaveformCsI(mNWave));
   double ymax2, ymax3;
   unsigned int NPar=9;
@@ -203,13 +205,21 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
+      if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
+	if(!clus_csi)
+          clus_csi=true;
+        lmax=f1->GetMaximum(),lmin=f1->GetMinimum();
+        energy=(lmax-lmin)*pcal;
+	calcThetaPhi(energy);
+        //if(mEventNo % 100==0)
+          drawWaves(h1);
+        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      }
       for(unsigned int i=0;i<NPar;i++){
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
       }
-      //if(mEventNo % 100==0)
-        drawWaves(h1);
-      std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
-      std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
       break;
     case 13:
       NPar=11;
@@ -269,7 +279,7 @@ void ClusterCsI::calcThetaPhi(double Edep){
   wphi=90.-mapPhi; // world phi
   if(wphi<0) wphi=360.+wphi;
   angles=std::make_pair(wtheta,wphi);
-  h2ang->Fill(wtheta,wphi);
+  //h2ang->Fill(wtheta,wphi);
   cout<< " *** World Angles  "<<wtheta<<", "<<wphi<<endl;
   
 }
