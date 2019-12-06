@@ -2,7 +2,7 @@
 <cooker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation='recipe.xsd'>
 
-<init>/${HOME}/.cooker/shared/init/CsI.xml</init>
+<init>init/trekAll.xml</init>
 
 <source>vf48_hdw</source> <!-- the source tree name-->
 <destination>csi_cali</destination> <!-- the destination tree name-->
