@@ -99,11 +99,9 @@ void Det_CsI::readFiles(){
 }
 Long_t Det_CsI::angleCsI(int id, int module, int channel, int yy, int zz){
   //std::cout<<"\n --- "<<id<<"-"<<module<<"-"<<channel<<"-"<<yy<<"-"<<zz<<" ---\n";
-  ClusterCsI myCsI;
-  myCsI.setAngles(module,channel,yy,zz);
-  //phiCsI[module][channel]=yy;
-  //thetaCsI[module][channel]=zz;
-  //std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
+  phiCsI[module][channel]=yy;
+  thetaCsI[module][channel]=zz;
+  std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
 
   return 0;
 }
@@ -150,11 +148,10 @@ Long_t Det_CsI::process_fit(){
     iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
     //std::cout<< " Gap config FB is  : " <<p[1]<<std::endl;
     //std::cout<< " Gap config UD is  : " <<p[0]<<std::endl;
-
+    // start of signal CsI if-loop
     if(!(treeRaw->indexCsI[iCh]==16 && iFB==0 && iUD==0) ||
        !(indexClock==0 || indexClock==2 || indexClock==4 ||
          indexClock==6 || indexClock==8 || indexClock==10)){
-      if(treeRaw->indexCsI[iCh]==16) pcal=.22/1000.;
       IdCsI myIndex(treeRaw->nameCsI[iCh],treeRaw->indexCsI[iCh]);
       UInt_t iCsI=mapCsI[myIndex];
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
@@ -179,8 +176,16 @@ Long_t Det_CsI::process_fit(){
       std::cout<<" naming TKO module:  "<<nameModule<<std::endl;
       ClusterCsI myCsI(treeRaw->runNo,myEvent,iModule);
       //std::cout<<" top U/D || F/B :"<<p[0]<<", "<<p[1]<<std::endl;
+      std::cout<<" checking the hell outta this shit:"<<thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]]<<std::endl;
+      int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
+      int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       myCsI.nameCsI(iClock,iFB,iUD,iModule);
       myCsI.setData(treeRaw->data[iCh]);
+      myCsI.setIndexTheta(thetaIndex);
+      myCsI.setIndexPhi(phiIndex);
+      pcal=calibpar[indexClock][iFB][iUD][iModule];
+      if(treeRaw->indexCsI[iCh]==16) pcal=.22;
+      myCsI.setpCalib(pcal);
       myCsI.fit();
     }// end of signal CsI if-loop
   }

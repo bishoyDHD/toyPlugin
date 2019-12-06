@@ -40,7 +40,6 @@ bool ClusterCsI::fit(){
   char name[256];
   //cout<<"processing "<<mIndexCsI<<" "<<nameCsI(mIndexCsI)<<endl;
   cout<<"processing "<<mIndexCsI<<" "<<mName<<endl;
-  std::cout<<" This is the add data method, size: "<<mListData.size()<<std::endl;
   sprintf(name,"wave_run%d_%dCsI_%s_%u",mRunNo,mEventNo,mName,count);
   std::cout<<"  name of histogram... checking here: "<<name<<std::endl;
   //sprintf(name,"wave_run%d_%dCsI_%s_%u",mRunNo,mEventNo,nameCsI(mIndexCsI),count);
@@ -250,6 +249,29 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
       break;
   }// end of switch statement
+}
+/*
+void ClusterCsI::setAngles(int module,int channel,int yy,int zz){               
+    //std::cout<<" cluster crystal init var--> \n";
+    phiCsI[module][channel]=yy;
+    thetaCsI[module][channel]=zz;
+    std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
+}*/
+void ClusterCsI::calcThetaPhi(double Edep){
+  mapPhi=2*180*(phiIndex-0.5)/48.; // from mapping init file
+  wz=crysZ[thetaIndex-1];
+  wr=crysr[thetaIndex-1];
+  Theta=crysZ[thetaIndex-1]/std::sqrt(std::pow(crysZ[thetaIndex-1],2)+
+        std::pow(crysr[thetaIndex-1],2));
+  acos=TMath::ACos(Theta);
+  wtheta=TMath::RadToDeg()*acos; // convert to deg.
+  //wtheta=round(wtheta); // make sure to obtain 2 dp
+  wphi=90.-mapPhi; // world phi
+  if(wphi<0) wphi=360.+wphi;
+  angles=std::make_pair(wtheta,wphi);
+  h2ang->Fill(wtheta,wphi);
+  cout<< " *** World Angles  "<<wtheta<<", "<<wphi<<endl;
+  
 }
 //void ClusterCsI::drawWaves(TH1D* h1){
 void ClusterCsI::drawWaves(shared_ptr<TH1D> h1){

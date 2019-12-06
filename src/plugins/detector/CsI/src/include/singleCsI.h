@@ -89,6 +89,7 @@ private:
   UInt_t mRunNo;
   UInt_t mEventNo;
   UInt_t mIndexCsI;
+  UInt_t ichan;
   UInt_t mNWave;
   Double_t mPar[36];
   vector<Double_t> mListData;
@@ -97,6 +98,12 @@ private:
   char mName[7];
   vector<Double_t> mListLocalMax;
 private:
+  int clusCrys;
+  std::vector<double> crysE;
+  std::map<std::pair<double,double>,double> csiph;
+  std::map<std::pair<double,double>,double> csiR;
+  std::map<std::pair<double,double>,double> csiZ;
+  std::map<std::pair<double,double>,bool> csiClus;
   Double_t findChi2(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>,double* xval,double yped,double ymax);
@@ -105,8 +112,10 @@ private:
   void drawWaves(shared_ptr<TH1D> h1);
   void drawWaves(TH1D* h1);
   void drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1);
-  double mapPhi,pcal;
-  int moduleNo;
+  double mapPhi,pcal,Theta,acos,energy;
+  int moduleNo,thetaIndex,phiIndex;
+  std::pair<double,double> angles;
+  TH2D* h2ang;
   // indices start at zero now
   int thetaCsI[16][48];
   int phiCsI[16][48];
@@ -143,14 +152,11 @@ public:
   inline void setIndex(UInt_t index){mIndexCsI=index;}
   inline void setCsI(UInt_t index){mIndexCsI=index;}
   inline void addData(UShort_t sample){mListData.push_back(sample);}
-  inline void setModuleNo(int mNum){moduleNo=mNum;}
-  inline void setAngles(int module,int channel,int yy,int zz){
-    std::cout<<" cluster crystal init var--> \n";
-    phiCsI[module][channel]=yy;
-    thetaCsI[module][channel]=zz;
-    std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
-  }
-  inline void setpCalib(double calib){pcal=calib;}
+  inline void setIndexTheta(int iTheta){thetaIndex=iTheta;}
+  inline void setIndexPhi(UInt_t iPhi){phiIndex=iPhi;}
+  void calcThetaPhi(double);
+  void setAngles(int module,int channel,int yy,int zz);
+  inline void setpCalib(double calib){pcal=calib/1000.;}
   void setData(const vector<UShort_t>&);
   UInt_t numberWave() const{
     return mNWave;
