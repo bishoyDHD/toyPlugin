@@ -1,9 +1,14 @@
 #ifndef __SingleCsI_H
 #define __SingleCsI_H 1
 #include <memory>
+#include <map>
 #include <vector>
 #include <TH1D.h>
+#include <TH2D.h>
 #include <TF1.h>
+#include <numeric>
+#include <TMath.h>
+#define _USE_MATH_DEFINES
 using std::vector;
 using std::cout;
 using std::endl;
@@ -23,6 +28,9 @@ public:
 };
 class SingleCsI{
 private:
+  // cluster map
+  std::map<std::pair<double,double>,double> csiClust;
+  std::map<std::pair<double,double>,bool> csiCheck;
   UInt_t mRunNo;
   UInt_t mEventNo;
   UInt_t mIndexCsI;
@@ -97,6 +105,24 @@ private:
   void drawWaves(shared_ptr<TH1D> h1);
   void drawWaves(TH1D* h1);
   void drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1);
+  double mapPhi,pcal;
+  int moduleNo;
+  // indices start at zero now
+  int thetaCsI[16][48];
+  int phiCsI[16][48];
+  // angles to be used by the clusterFinder table
+  double otheta, ophi, wtheta, wphi, wz, wr;
+  // crystal center Z:
+  double crysZ[20]={-48.3449, -42.0302, -36.5676, -31.5834, -26.851,
+                    -20.9203, -15.7210, -10.9616, -6.46940, -2.1341,
+                    2.1341, 6.46940, 10.9616, 15.7210, 20.9203,
+                    26.851, 31.5834, 36.5676, 42.0302, 48.3449};
+  // crystal center r:
+  double crysr[20]={16.4109, 20.727, 24.4337, 27.6979, 30.6177,
+                    31.3094, 31.879, 32.2917, 32.5240, 32.5595,
+                    32.5595, 32.5240, 32.2917, 31.879, 31.3094,
+                    30.6177, 27.6979, 24.4337, 20.727, 16.4109};
+
   // Parameters for the waveform fitting function
   double param[31]={1000, 35.76, 26.68, 19.85, 15.83, 0.065, 2.255, 31.21,120,
                     120.5, 800, 700., 200.1, 17.1, 0.065, 2.255, 31.21,
@@ -117,6 +143,14 @@ public:
   inline void setIndex(UInt_t index){mIndexCsI=index;}
   inline void setCsI(UInt_t index){mIndexCsI=index;}
   inline void addData(UShort_t sample){mListData.push_back(sample);}
+  inline void setModuleNo(int mNum){moduleNo=mNum;}
+  inline void setAngles(int module,int channel,int yy,int zz){
+    std::cout<<" cluster crystal init var--> \n";
+    phiCsI[module][channel]=yy;
+    thetaCsI[module][channel]=zz;
+    std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
+  }
+  inline void setpCalib(double calib){pcal=calib;}
   void setData(const vector<UShort_t>&);
   UInt_t numberWave() const{
     return mNWave;

@@ -99,9 +99,11 @@ void Det_CsI::readFiles(){
 }
 Long_t Det_CsI::angleCsI(int id, int module, int channel, int yy, int zz){
   //std::cout<<"\n --- "<<id<<"-"<<module<<"-"<<channel<<"-"<<yy<<"-"<<zz<<" ---\n";
-  phiCsI[module][channel]=yy;
-  thetaCsI[module][channel]=zz;
-  std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
+  ClusterCsI myCsI;
+  myCsI.setAngles(module,channel,yy,zz);
+  //phiCsI[module][channel]=yy;
+  //thetaCsI[module][channel]=zz;
+  //std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
 
   return 0;
 }
@@ -142,6 +144,7 @@ Long_t Det_CsI::process_fit(){
     if(p[0]=='d' || p[0]=='D') iUD=1;
     if(p[1]=='0' || p[0]=='0'){
       std::cout<<"..... Got one!!\n";
+      return 0;
     }
     #pragma omp parallel num_threads(8)
     iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
@@ -179,7 +182,7 @@ Long_t Det_CsI::process_fit(){
       myCsI.nameCsI(iClock,iFB,iUD,iModule);
       myCsI.setData(treeRaw->data[iCh]);
       myCsI.fit();
-    }// end of non-timing/reference signal if-loop
+    }// end of signal CsI if-loop
   }
   return 0;
 }
