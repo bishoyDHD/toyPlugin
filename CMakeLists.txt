@@ -11,15 +11,11 @@ FIND_PACKAGE(ROOT REQUIRED)
 FIND_PACKAGE(CLHEP REQUIRED)
 FIND_PACKAGE(GSL REQUIRED)
 
-#FIND_PACKAGE(GENFIT) #Can uncomment for later use of GenFit or Tongtong's Kalman Filter
-
 #FIND_PACKAGE(FTGL REQUIRED)
 #FIND_PACKAGE(Geant4 REQUIRED COMPONENTS qt ui_tcsh)
 
 # searches for needed packages
 set(Boost_ADDITIONAL_VERSIONS "1.41" "1.47.0" "1.60" "1.62")
-#set(BOOST_INCLUDEDIR "/usr/include/")
-#set(BOOST_INCLUDEDIR "$ENV{HOME}/Boost/boost_1_60_0/")
 
 set (BUILD_WITHMPI off CACHE bool "Enable MPI for parallel processing (normally off)")
 
@@ -35,6 +31,7 @@ MESSAGE(STATUS "${Boost_LIBRARIES}" )
 
 FIND_PACKAGE( OpenMP)
 
+FIND_PACKAGE(Minuit2)
 
 # Set path to custom cmake modules for this project
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
@@ -98,7 +95,3 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -W -pipe -fPIC -DPIC")
 
 add_subdirectory(external)
 add_subdirectory(src)
-
-
-
-
