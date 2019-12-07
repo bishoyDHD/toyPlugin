@@ -60,7 +60,7 @@ bool ClusterCsI::fit(){
     //h1->SetBinContent(iData,mListData[iData]);
   }
   Double_t xmax=h1->GetBinLowEdge(h1->GetMaximumBin());
-  if(xmax<=57 || xmax>=68) return false;
+  if(xmax<=58 || xmax>=67) return false;
   Double_t xmin=h1->GetBinLowEdge(h1->GetMinimumBin());
   Double_t ymax=h1->GetBinContent(h1->FindBin(xmax));
   Double_t yped=h1->GetBinContent(h1->FindBin(xmin));

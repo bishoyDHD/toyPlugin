@@ -192,6 +192,7 @@ Long_t Det_CsI::process_fit(){
       int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       myCsI.nameCsI(iClock,iFB,iUD,iModule);
+      myCsI.setClustCsI(false);
       myCsI.setData(treeRaw->data[iCh]);
       myCsI.setIndexTheta(thetaIndex);
       myCsI.setIndexPhi(phiIndex);
@@ -210,6 +211,7 @@ Long_t Det_CsI::process_fit(){
 	csiEdep.push_back(myCsI.getEdep());
 	csiTheta.push_back(myCsI.getTheta());
 	csiPhi.push_back(myCsI.getPhi());
+	//if(myCsI.getTheta()<16.2) std::abort();
 	h2ang->Fill(myCsI.getTheta(),myCsI.getPhi());
       }
       myCsI.setClustCsI(false);
