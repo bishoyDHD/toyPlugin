@@ -18,7 +18,7 @@
 
 
 <defineHistograms>
- <CsI>histos</CsI>
+ <CsI>histos_fit</CsI>
 </defineHistograms>
 
 <!-- These functions will be called at the beginning -->
