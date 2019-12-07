@@ -17,13 +17,15 @@ std::size_t findClusters::get_nthIndex(const std::vector<double> &vect,std::size
   );
   return indexes[k];
 }
-void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,const std::vector<double> &csiE,std::vector<double> csiTheta,std::vector<double> csiPhi,std::map<std::pair<double,double>,bool> check){
+void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,const std::vector<double> &csiE,std::vector<double> csiTheta,std::vector<double> csiPhi,std::map<std::pair<double,double>,double> csiR,std::map<std::pair<double,double>,double> csiZ,std::map<std::pair<double,double>,bool> check){
   std::cout<<" size of Ecsi is "<<csiClust.size()<<"\n";
   csiCheck.insert(check.begin(),check.end());
   numOfsingleClus=0; numOfClus=0;
   singleEne.clear();       clusEne.clear();
   singTheta.clear();       clusThetaE.clear();
   singPhi.clear();         clusPhiE.clear();
+  clusEr.clear();          clusEz.clear();
+  singR.clear();           singZ.clear();
   for(std::size_t mm=0; mm !=csiE.size(); mm++){
     const std::size_t index=get_nthIndex(csiE, mm);
     std::cout<<"  the greater index --> "<<index;// <<std::endl;
@@ -87,7 +89,7 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
     Eclus=0.;
     clusZ=0.; clusR=0.;
     thetaE=0; phiE=0;
-    //z_w=0; r_w=0;
+    z_w=0; r_w=0;
     //rtheta=0; rphi=0;
     // For backward double counting elimination
     if(!csiCheck[tppair]){
@@ -113,8 +115,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP1];
           thetaE=thetaE+csiClust[angP1]*(std::get<0>(angP1));
           phiE  =phiE  +csiClust[angP1]*(std::get<1>(angP1));
-          //clusZ=clusZ  +csiClust[angP1]*csiZ[angP1];
-          //clusR=clusR  +csiClust[angP1]*csiR[angP1];
+          clusZ=clusZ  +csiClust[angP1]*csiZ[angP1];
+          clusR=clusR  +csiClust[angP1]*csiR[angP1];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP1]=false;
         }else{
@@ -129,8 +131,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP2];
           thetaE=thetaE+csiClust[angP2]*(std::get<0>(angP2));
           phiE  =phiE  +csiClust[angP2]*(std::get<1>(angP2));
-          //clusZ=clusZ  +csiClust[angP2]*csiZ[angP2];
-          //clusR=clusR  +csiClust[angP2]*csiR[angP2];
+          clusZ=clusZ  +csiClust[angP2]*csiZ[angP2];
+          clusR=clusR  +csiClust[angP2]*csiR[angP2];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP2]=false;
         }else{
@@ -145,8 +147,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP3];
           thetaE=thetaE+csiClust[angP3]*(std::get<0>(angP3));
           phiE  =phiE  +csiClust[angP3]*(std::get<1>(angP3));
-          //clusZ=clusZ  +csiClust[angP3]*csiZ[angP3];
-          //clusR=clusR  +csiClust[angP3]*csiR[angP3];
+          clusZ=clusZ  +csiClust[angP3]*csiZ[angP3];
+          clusR=clusR  +csiClust[angP3]*csiR[angP3];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP3]=false;
         }else{
@@ -161,8 +163,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP4];
           thetaE=thetaE+csiClust[angP4]*(std::get<0>(angP4));
           phiE  =phiE  +csiClust[angP4]*(std::get<1>(angP4));
-          //clusZ=clusZ  +csiClust[angP4]*csiZ[angP4];
-          //clusR=clusR  +csiClust[angP4]*csiR[angP4];
+          clusZ=clusZ  +csiClust[angP4]*csiZ[angP4];
+          clusR=clusR  +csiClust[angP4]*csiR[angP4];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP4]=false;
         }else{
@@ -177,8 +179,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP5];
           thetaE=thetaE+csiClust[angP5]*(std::get<0>(angP5));
           phiE  =phiE  +csiClust[angP5]*(std::get<1>(angP5));
-          //clusZ=clusZ  +csiClust[angP5]*csiZ[angP5];
-          //clusR=clusR  +csiClust[angP5]*csiR[angP5];
+          clusZ=clusZ  +csiClust[angP5]*csiZ[angP5];
+          clusR=clusR  +csiClust[angP5]*csiR[angP5];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP5]=false;
         }else{
@@ -193,8 +195,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP6];
           thetaE=thetaE+csiClust[angP6]*(std::get<0>(angP6));
           phiE  =phiE  +csiClust[angP6]*(std::get<1>(angP6));
-          //clusZ=clusZ  +csiClust[angP6]*csiZ[angP6];
-          //clusR=clusR  +csiClust[angP6]*csiR[angP6];
+          clusZ=clusZ  +csiClust[angP6]*csiZ[angP6];
+          clusR=clusR  +csiClust[angP6]*csiR[angP6];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP6]=false;
         }else{
@@ -209,8 +211,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP7];
           thetaE=thetaE+csiClust[angP7]*(std::get<0>(angP7));
           phiE  =phiE  +csiClust[angP7]*(std::get<1>(angP7));
-          //clusZ=clusZ  +csiClust[angP7]*csiZ[angP7];
-          //clusR=clusR  +csiClust[angP7]*csiR[angP7];
+          clusZ=clusZ  +csiClust[angP7]*csiZ[angP7];
+          clusR=clusR  +csiClust[angP7]*csiR[angP7];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP7]=false;
         }else{
@@ -225,8 +227,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angP8];
           thetaE=thetaE+csiClust[angP8]*(std::get<0>(angP8));
           phiE  =phiE  +csiClust[angP8]*(std::get<1>(angP8));
-          //clusZ=clusZ  +csiClust[angP8]*csiZ[angP8];
-          //clusR=clusR  +csiClust[angP8]*csiR[angP8];
+          clusZ=clusZ  +csiClust[angP8]*csiZ[angP8];
+          clusR=clusR  +csiClust[angP8]*csiR[angP8];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angP8]=false;
         }else{
@@ -241,8 +243,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE1];
           thetaE=thetaE+csiClust[angE1]*(std::get<0>(angE1));
           phiE  =phiE  +csiClust[angE1]*(std::get<1>(angE1));
-          //clusZ=clusZ  +csiClust[angE1]*csiZ[angE1];
-          //clusR=clusR  +csiClust[angE1]*csiR[angE1];
+          clusZ=clusZ  +csiClust[angE1]*csiZ[angE1];
+          clusR=clusR  +csiClust[angE1]*csiR[angE1];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE1]=false;
         }else{
@@ -257,8 +259,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE2];
           thetaE=thetaE+csiClust[angE2]*(std::get<0>(angE2));
           phiE  =phiE  +csiClust[angE2]*(std::get<1>(angE2));
-          //clusZ=clusZ  +csiClust[angE2]*csiZ[angE2];
-          //clusR=clusR  +csiClust[angE2]*csiR[angE2];
+          clusZ=clusZ  +csiClust[angE2]*csiZ[angE2];
+          clusR=clusR  +csiClust[angE2]*csiR[angE2];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE2]=false;
         }else{
@@ -273,8 +275,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE3];
           thetaE=thetaE+csiClust[angE3]*(std::get<0>(angE3));
           phiE  =phiE  +csiClust[angE3]*(std::get<1>(angE3));
-          //clusZ=clusZ  +csiClust[angE3]*csiZ[angE3];
-          //clusR=clusR  +csiClust[angE3]*csiR[angE3];
+          clusZ=clusZ  +csiClust[angE3]*csiZ[angE3];
+          clusR=clusR  +csiClust[angE3]*csiR[angE3];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE3]=false;
         }else{
@@ -291,8 +293,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE5];
           thetaE=thetaE+csiClust[angE5]*(std::get<0>(angE5));
           phiE  =phiE  +csiClust[angE5]*(std::get<1>(angE5));
-          //clusZ=clusZ  +csiClust[angE5]*csiZ[angE5];
-          //clusR=clusR  +csiClust[angE5]*csiR[angE5];
+          clusZ=clusZ  +csiClust[angE5]*csiZ[angE5];
+          clusR=clusR  +csiClust[angE5]*csiR[angE5];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE5]=false;
         }else{
@@ -307,8 +309,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE6];
           thetaE=thetaE+csiClust[angE6]*(std::get<0>(angE6));
           phiE  =phiE  +csiClust[angE6]*(std::get<1>(angE6));
-          //clusZ=clusZ  +csiClust[angE6]*csiZ[angE6];
-          //clusR=clusR  +csiClust[angE6]*csiR[angE6];
+          clusZ=clusZ  +csiClust[angE6]*csiZ[angE6];
+          clusR=clusR  +csiClust[angE6]*csiR[angE6];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE6]=false;
         }else{
@@ -323,8 +325,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE7];
           thetaE=thetaE+csiClust[angE7]*(std::get<0>(angE7));
           phiE  =phiE  +csiClust[angE7]*(std::get<1>(angE7));
-          //clusZ=clusZ  +csiClust[angE7]*csiZ[angE7];
-          //clusR=clusR  +csiClust[angE7]*csiR[angE7];
+          clusZ=clusZ  +csiClust[angE7]*csiZ[angE7];
+          clusR=clusR  +csiClust[angE7]*csiR[angE7];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE7]=false;
         }else{
@@ -339,8 +341,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE9];
           thetaE=thetaE+csiClust[angE9]*(std::get<0>(angE9));
           phiE  =phiE  +csiClust[angE9]*(std::get<1>(angE9));
-          //clusZ=clusZ  +csiClust[angE9]*csiZ[angE9];
-          //clusR=clusR  +csiClust[angE9]*csiR[angE9];
+          clusZ=clusZ  +csiClust[angE9]*csiZ[angE9];
+          clusR=clusR  +csiClust[angE9]*csiR[angE9];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE9]=false;
         }else{
@@ -355,8 +357,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angE10];
           thetaE=thetaE+csiClust[angE10]*(std::get<0>(angE10));
           phiE  =phiE  +csiClust[angE10]*(std::get<1>(angE10));
-          //clusZ=clusZ  +csiClust[angE10]*csiZ[angE10];
-          //clusR=clusR  +csiClust[angE10]*csiR[angE10];
+          clusZ=clusZ  +csiClust[angE10]*csiZ[angE10];
+          clusR=clusR  +csiClust[angE10]*csiR[angE10];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angE10]=false;
         }else{
@@ -372,8 +374,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angR1];
           thetaE=thetaE+csiClust[angR1]*(std::get<0>(angR1));
           phiE  =phiE  +csiClust[angR1]*(std::get<1>(angR1));
-          //clusZ=clusZ  +csiClust[angR1]*csiZ[angR1];
-          //clusR=clusR  +csiClust[angR1]*csiR[angR1];
+          clusZ=clusZ  +csiClust[angR1]*csiZ[angR1];
+          clusR=clusR  +csiClust[angR1]*csiR[angR1];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angR1]=false;
         }else{
@@ -388,8 +390,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angR2];
           thetaE=thetaE+csiClust[angR2]*(std::get<0>(angR2));
           phiE  =phiE  +csiClust[angR2]*(std::get<1>(angR2));
-          //clusZ=clusZ  +csiClust[angR2]*csiZ[angR2];
-          //clusR=clusR  +csiClust[angR2]*csiR[angR2];
+          clusZ=clusZ  +csiClust[angR2]*csiZ[angR2];
+          clusR=clusR  +csiClust[angR2]*csiR[angR2];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angR2]=false;
         }else{
@@ -404,8 +406,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angR3];
           thetaE=thetaE+csiClust[angR3]*(std::get<0>(angR3));
           phiE  =phiE  +csiClust[angR3]*(std::get<1>(angR3));
-          //clusZ=clusZ  +csiClust[angR3]*csiZ[angR3];
-          //clusR=clusR  +csiClust[angR3]*csiR[angR3];
+          clusZ=clusZ  +csiClust[angR3]*csiZ[angR3];
+          clusR=clusR  +csiClust[angR3]*csiR[angR3];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angR3]=false;
         }else{
@@ -420,8 +422,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angR4];
           thetaE=thetaE+csiClust[angR4]*(std::get<0>(angR4));
           phiE  =phiE  +csiClust[angR4]*(std::get<1>(angR4));
-          //clusZ=clusZ  +csiClust[angR4]*csiZ[angR4];
-          //clusR=clusR  +csiClust[angR4]*csiR[angR4];
+          clusZ=clusZ  +csiClust[angR4]*csiZ[angR4];
+          clusR=clusR  +csiClust[angR4]*csiR[angR4];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angR4]=false;
         }else{
@@ -436,8 +438,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angR5];
           thetaE=thetaE+csiClust[angR5]*(std::get<0>(angR5));
           phiE  =phiE  +csiClust[angR5]*(std::get<1>(angR5));
-          //clusZ=clusZ  +csiClust[angR5]*csiZ[angR5];
-          //clusR=clusR  +csiClust[angR5]*csiR[angR5];
+          clusZ=clusZ  +csiClust[angR5]*csiZ[angR5];
+          clusR=clusR  +csiClust[angR5]*csiR[angR5];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angR5]=false;
         }else{
@@ -452,8 +454,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
           Eclus=Eclus+csiClust[angR6];
           thetaE=thetaE+csiClust[angR6]*(std::get<0>(angR6));
           phiE  =phiE  +csiClust[angR6]*(std::get<1>(angR6));
-          //clusZ=clusZ  +csiClust[angR6]*csiZ[angR6];
-          //clusR=clusR  +csiClust[angR6]*csiR[angR6];
+          clusZ=clusZ  +csiClust[angR6]*csiZ[angR6];
+          clusR=clusR  +csiClust[angR6]*csiR[angR6];
           std::cout<<" This crystal is now removed from the list: "<<std::endl;
           csiCheck[angR6]=false;
         }else{
@@ -470,8 +472,8 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
       Eclus=Eclus+csiClust[tppair];
       thetaE=thetaE+csiClust[tppair]*(std::get<0>(tppair));
       phiE  =phiE  +csiClust[tppair]*(std::get<1>(tppair));
-      //clusZ=clusZ  +csiClust[tppair]*csiZ[tppair];
-      //clusR=clusR  +csiClust[tppair]*csiR[tppair];
+      clusZ=clusZ  +csiClust[tppair]*csiZ[tppair];
+      clusR=clusR  +csiClust[tppair]*csiR[tppair];
       std::cout<<" -->  pulse-heignt for central crystal: "<<csiClust[tppair];
       std::cout<<" ["<<std::get<0>(tppair)<<", "<<std::get<1>(tppair)<<"] \n";
       std::cout<<" >>>  Cluster energy is ------------->: "<<Eclus<<" [GeV]";
@@ -484,6 +486,10 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
       clusEne.push_back(Eclus);
       clusThetaE.push_back(rtheta);
       clusPhiE.push_back(rphi);
+      z_w=clusZ/Eclus;
+      r_w=clusR/Eclus;
+      clusEz.push_back(z_w);
+      clusEr.push_back(r_w);
       //h2ang->Fill(rtheta,rphi);
       //h2deg->Fill(rtheta*180./M_PI,rphi*180/M_PI);
     }
@@ -494,6 +500,10 @@ void findClusters::clusters(std::map<std::pair<double,double>,double> csiClust,c
       singTheta.push_back(rtheta);
       singPhi.push_back(rphi);
       singleEne.push_back(Eclus);
+      z_w=clusZ/Eclus;
+      r_w=clusR/Eclus;
+      singZ.push_back(z_w);
+      singR.push_back(r_w);
       //h2ang->Fill(rtheta,rphi);
       //h2deg->Fill(rtheta*180./M_PI,rphi*180/M_PI);
       //h1sclus->Fill(1);

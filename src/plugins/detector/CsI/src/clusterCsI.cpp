@@ -103,7 +103,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
   unsigned int NPar=9;
   shared_ptr<TF1> f1(new TF1("waveCut",myWave,&WaveformCsI::waveformSingle,1,250,NPar));//"WaveformCsI","waveformCut"));
   switch(mNWave){
-    case 11:
+    case 1:
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
       for(int n=0; n<9; n+=1){
         f1->SetParameter(n,param[n]);
@@ -120,13 +120,21 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
+      if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
+	if(!clus_csi)
+          clus_csi=true;
+        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+        energy=(lmax-lmin)*pcal;
+	calcThetaPhi(energy);
+        if(mEventNo % 1000==0)
+          drawWaves(h1);
+        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      }
       for(unsigned int i=0;i<NPar;i++){
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
       }
-      if(mEventNo % 100==0)
-        drawWaves(h1);
-      std::cout<<" cluster Fitting |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
-      std::cout<<" cluster Fitting |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
       break;
     case 2:
       NPar=11;
@@ -155,21 +163,20 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
 	if(!clus_csi)
           clus_csi=true;
-        lmax=f1->GetMaximum(),lmin=f1->GetMinimum();
+        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin)*pcal;
 	calcThetaPhi(energy);
-        //if(mEventNo % 100==0)
+        if(mEventNo % 1000==0)
           drawWaves(h1);
-        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
-        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
         //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
       }
       for(unsigned int i=0;i<NPar;i++){
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
       }
       break;
-    case 13:
-      NPar=11;
+    case 3:
+      NPar=13;
       f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));//"WaveformCsI","waveformCut"));
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
       for(UInt_t n=0; n<NPar+1; n+=1){
@@ -197,13 +204,17 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
-      for(unsigned int i=0;i<NPar;i++){
-        mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
+      if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
+	if(!clus_csi)
+          clus_csi=true;
+        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+        energy=(lmax-lmin)*pcal;
+	calcThetaPhi(energy);
+        if(mEventNo % 1000==0)
+          drawWaves(h1);
+        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
       }
-      //if(mEventNo % 100==0)
-        drawWaves(h1);
-      std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
-      std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
       break;
   }// end of switch statement
 }

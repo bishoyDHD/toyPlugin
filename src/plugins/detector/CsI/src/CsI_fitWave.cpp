@@ -20,6 +20,7 @@ Long_t Det_CsI::histos_fit(){
   h2ChargeVSCsI=dH2("TimeVSCsI","fitted charge;CsI;time",768,0.5,768.5,2500,0.0,250000.0);
   h1MaxDiff=dH1("MaxDiff","max difference in a fit;diff",100,0.0,1000.0);
   h2DiffVSCsI=dH2("DiffVSCsI","max difference;CsI;diff",768,0.5,768.5,100,0.0,1000.0); 
+  h2ang=dH2("h2deg", "Angular distribution #phi vs #theta deg", 24.0,0.,180., 48.0,0.,360.);
   return 0;
 }
 Long_t Det_CsI::startup_fit(){
@@ -29,7 +30,9 @@ Long_t Det_CsI::startup_fit(){
   gROOT->SetBatch(kTRUE);
   gStyle->SetOptStat(0);
   fclusters=new findClusters();
+  scoring=new clusterScore();
   readFiles();
+  scoring->init();
   return 0;
 }
 Double_t firstDerive(Double_t *x,Double_t *par){
@@ -71,13 +74,17 @@ void Det_CsI::initVar(){
   treeClus->cpid1phiE=dummy;     treeClus->kM2=dummy;
   treeClus->cpid2thetaE=dummy;   treeClus->cpid1E=dummy;
   treeClus->cpid2phiE=dummy;     treeClus->cpid2E=dummy;
-  csiph.clear();   phval.clear();   csiClus.clear();
+  csiph.clear();   phval.clear();   crysChk.clear();
   csiR.clear();    csiZ.clear();
   clusEne.clear(); singleEne.clear();
   singZ.clear();   singR.clear();
   singTheta.clear(); singPhi.clear();
+  clusThetaE.clear(); clusPhiE.clear();
+  clusEz.clear();     clusEr.clear();
+  csiEdep.clear();    csiPhi.clear();
+  csiTheta.clear();
   clus_csi=false;
-  //E2clust=-1000;
+  E2clust=-1000;
 }
 // Method to read in external files such as calibration par's
 void Det_CsI::readFiles(){
@@ -197,21 +204,205 @@ Long_t Det_CsI::process_fit(){
         std::cout<<" ********** "<<myCsI.getR()<<" || "<<myCsI.getTheta()<<std::endl;
 	auto angles=std::make_pair(myCsI.getTheta(),myCsI.getPhi());
 	csiph[angles]=myCsI.getEdep();
-        csiClus[angles]=true;
+        crysChk[angles]=true;
         csiR[angles]=myCsI.getR();
         csiZ[angles]=myCsI.getZ();
-	singleEne.push_back(myCsI.getEdep());
-	singZ.push_back(myCsI.getZ());
-	singR.push_back(myCsI.getR());
-	singTheta.push_back(myCsI.getTheta());
-	singPhi.push_back(myCsI.getPhi());
+	csiEdep.push_back(myCsI.getEdep());
+	csiTheta.push_back(myCsI.getTheta());
+	csiPhi.push_back(myCsI.getPhi());
+	h2ang->Fill(myCsI.getTheta(),myCsI.getPhi());
       }
       myCsI.setClustCsI(false);
     }// end of signal CsI if-loop
   }
   if(clus_csi){
-    // find clusters here!!
-    fclusters->clusters(csiph,singleEne,singTheta,singPhi,csiClus);
+    // find clusters and perform cluster scoring and analysis
+    // find clusters
+    fclusters->clusters(csiph,csiEdep,csiTheta,csiPhi,csiR,csiZ,crysChk);
+    multiCrys=fclusters->getMultiCrysClust();
+    singleCrys=fclusters->getSingleCrysClust();
+    // obtain Multi-cluster E, theta & phi
+    clusEne=fclusters->getMultiE();
+    clusThetaE=fclusters->getMultiTheta();
+    clusPhiE=fclusters->getMultiPhi();
+    clusEz=fclusters->getMultiZ();
+    clusEr=fclusters->getMultiR();
+    // obtain single cluster E, theta & phi
+    singleEne=fclusters->getSingleE();
+    singTheta=fclusters->getSingleTheta();
+    singPhi=fclusters->getSinglePhi();
+    singZ=fclusters->getSingleZ();
+    singR=fclusters->getSingleR();
+    TLorentzVector prim1lv,prim2lv;
+    TLorentzVector kaon;
+    TVector3 prim1vec3,prim2vec3,gv1;
+    double opAngle,prim2px,prim2py,prim2pz;
+    scoring->setScoreMass(0.09);
+    if(multiCrys==2 && singleCrys==0){
+      std::cout<<"  This is only 2 multiCrys ---|\n";
+      scoring->init();
+      //scoring->clusterEval(clusEne,clusThetaE,clusPhiE);
+      scoring->clusterEval(clusEne,clusEr,clusEz,clusThetaE,clusPhiE);
+      pr2px=scoring->getprPx();   pr2py=scoring->getprPy();  pr2pz=scoring->getprPz();
+      E2clust=scoring->getE();
+      // cluster PID 1:
+      scoring->setCpid(1); //NOTE: must always set this
+      cl1px=scoring->getclPx();
+      cl1py=scoring->getclPy();
+      cl1pz=scoring->getclPz();
+      cl1E=scoring->getclE();
+      cl1theta=scoring->getclTheta();
+      cl1phi=scoring->getclPhi();
+      std::cout<<" **** g1px is => "<<scoring->getclPx()<<"\n";
+      // cluster PID 1:
+      scoring->setCpid(2);
+      cl2px=scoring->getclPx();
+      cl2py=scoring->getclPy();
+      cl2pz=scoring->getclPz();
+      cl2E=scoring->getclE();
+      cl2theta=scoring->getclTheta();
+      cl2phi=scoring->getclPhi();
+      clustM=scoring->getClustM();
+      std::cout<<" **** g1px is => "<<scoring->getclPx()<<"\n";
+      opAngle=scoring->getOpAngleClust();
+      prim2lv=scoring->getprimLV();
+      //ThreeVector for angular analysis
+      prim1vec3.SetXYZ(pr1px,pr1py,pr1pz);
+      prim2vec3.SetXYZ(pr2px,pr2py,pr2pz);
+    }else
+    if(multiCrys==0 && singleCrys==2){
+      std::cout<<"  This is only 2 singleCrys ---|\n";
+      scoring->init();
+      //scoring->clusterEval(singleEne,singTheta,singPhi);
+      scoring->clusterEval(singleEne,singR,singZ,singTheta,singPhi);
+      pr2px=scoring->getprPx();   pr2py=scoring->getprPy();  pr2pz=scoring->getprPz();
+      E2clust=scoring->getE();
+      // cluster PID 1:
+      scoring->setCpid(1); //NOTE: must always set this
+      cl1px=scoring->getclPx();
+      cl1py=scoring->getclPy();
+      cl1pz=scoring->getclPz();
+      cl1E=scoring->getclE();
+      cl1theta=scoring->getclTheta();
+      cl1phi=scoring->getclPhi();
+      std::cout<<" **** g1px is => "<<scoring->getclPx()<<"\n";
+      // cluster PID 1:
+      scoring->setCpid(2);
+      cl2px=scoring->getclPx();
+      cl2py=scoring->getclPy();
+      cl2pz=scoring->getclPz();
+      cl2E=scoring->getclE();
+      cl2theta=scoring->getclTheta();
+      cl2phi=scoring->getclPhi();
+      clustM=scoring->getClustM();
+      std::cout<<" **** g1px is => "<<scoring->getclPx()<<"\n";
+      opAngle=scoring->getOpAngleClust();
+      prim2lv=scoring->getprimLV();
+      //ThreeVector for angular analysis
+      prim1vec3.SetXYZ(pr1px,pr1py,pr1pz);
+      prim2vec3.SetXYZ(pr2px,pr2py,pr2pz);
+      //if(std::cos(prim1vec3.Angle(prim2vec3))>-.5) goto exitFilltree;
+      //if(prim2lv.M()<0.04 || prim2lv.M()>.160) goto exitFilltree;
+    }else
+    if(multiCrys<=3 && singleCrys<=3){
+      if(((multiCrys==1 && singleCrys==0)||(multiCrys==0 && singleCrys==1))){
+        scoring->init(); 
+        goto exitFill;
+      }else
+      if(multiCrys==3 && singleCrys==0){
+        scoring->init();
+        std::cout<<"  This is only 3 multi-Crys ---|\n";
+        //scoring->clusterEval(clusEne,clusThetaE,clusPhiE);
+	scoring->clusterEval(clusEne,clusEr,clusEz,clusThetaE,clusPhiE);
+      }else
+      if(multiCrys==0 && singleCrys==3){
+        scoring->init();
+        std::cout<<"  This is only 3 singleCrys ---|\n";
+        //scoring->clusterEval(singleEne,singTheta,singPhi);
+	scoring->clusterEval(singleEne,singR,singZ,singTheta,singPhi);
+      }else{
+        scoring->init();
+        std::cout<<"  This is only combined ---|\n";
+        //scoring->clusterEval(clusEne,singleEne,clusThetaE,clusPhiE,singTheta,singPhi);
+	scoring->clusterEval(clusEne,singleEne,clusEr,clusEz,clusThetaE,clusPhiE,singR,singZ,singTheta,singPhi);
+      }
+      pr2px=scoring->getprPx();   pr2py=scoring->getprPy();  pr2pz=scoring->getprPz();
+      E2clust=scoring->getE();
+      // cluster PID 1:
+      scoring->setCpid(1); //NOTE: must always set this
+      cl1px=scoring->getclPx();
+      cl1py=scoring->getclPy();
+      cl1pz=scoring->getclPz();
+      cl1E=scoring->getclE();
+      cl1theta=scoring->getclTheta();
+      cl1phi=scoring->getclPhi();
+      std::cout<<" **** g1px is => "<<scoring->getclPx()<<"\n";
+      // cluster PID 1:
+      scoring->setCpid(2);
+      cl2px=scoring->getclPx();
+      cl2py=scoring->getclPy();
+      cl2pz=scoring->getclPz();
+      cl2E=scoring->getclE();
+      cl2theta=scoring->getclTheta();
+      cl2phi=scoring->getclPhi();
+      clustM=scoring->getClustM();
+      std::cout<<" **** g1px is => "<<scoring->getclPx()<<"\n";
+      opAngle=scoring->getOpAngleClust();
+      prim2lv=scoring->getprimLV();
+      //ThreeVector for angular analysis
+      prim1vec3.SetXYZ(pr1px,pr1py,pr1pz);
+      prim2vec3.SetXYZ(pr2px,pr2py,pr2pz);
+      //if(std::cos(prim1vec3.Angle(prim2vec3))>-.5) goto exitFilltree;
+      // set variables for multiple clusters
+      //if(prim2lv.M()<0.09 || prim2lv.M()>.180) goto exitFilltree;
+      //if(E2clust<0.100 || E2clust>.300) goto exitFilltree;
+    }// End of multiCrys clusters
+    /****************************************************
+     *     Fill tree Variables
+     ****************************************************/
+    // K+ Lorentz vector info. from pi+ and pi0
+    prim1lv.SetPxPyPzE(pr1px, pr1py, pr1pz,pr1Etot);
+    kaon=prim1lv+prim2lv;
+    // Fill tree var
+    treeClus->E_prim2=E2clust;
+    treeClus->cpid1Px=cl1px;       treeClus->cpid2Px=cl2px;      treeClus->prim2px=prim2lv.Px();
+    treeClus->cpid1Py=cl1py;       treeClus->cpid2Py=cl2py;      treeClus->prim2py=prim2lv.Py();
+    treeClus->cpid1Pz=cl1pz;       treeClus->cpid2Pz=cl2pz;      treeClus->prim2pz=prim2lv.Pz();
+    // position variables:
+    treeClus->cpid1x=cl1x;       treeClus->cpid2x=cl2x;
+    treeClus->cpid1y=cl1y;       treeClus->cpid2y=cl2y;
+    treeClus->cpid1z=cl1z;       treeClus->cpid2z=cl2z;
+    treeClus->cpid1r=cl1r;       treeClus->cpid2r=cl2r;
+    // pi+ pi0
+    treeClus->prim1px=pr1px;
+    treeClus->prim1py=pr1py;
+    treeClus->prim1pz=pr1pz;
+    treeClus->clCosTheta=opAngle;
+    treeClus->prCosTheta=std::cos(prim1vec3.Angle(prim2vec3));
+    treeClus->M_prim2=prim2lv.M();
+    treeClus->prim2M2=prim2lv.M2();
+    treeClus->M_k=kaon.M();
+    treeClus->kM2=kaon.M2();
+    treeClus->cpid1E=cl1E;
+    treeClus->cpid2E=cl2E;
+    treeClus->cpid1thetaE=cl1theta;
+    treeClus->cpid2thetaE=cl2theta;
+    treeClus->cpid1phiE=cl1phi;
+    treeClus->cpid2phiE=cl2phi;
+    treeClus->clusterM=clustM;
+    std::cout<<"\n  piPecking total Cluster Energy:  "<<E2clust<<endl;
+    std::cout<<"\n  Angular1 checking (centriod)   ("<<cl1theta<<", "<<cl1phi<<")\n";
+    std::cout<<"\n  Angular2 checking (centriod)   ("<<cl2theta<<", "<<cl2phi<<")\n";
+    std::cout<<"\n  Checking pi0 InvMass:      "<<prim2lv.M()<<endl;
+    std::cout<<"\n  Checking cos(theta):       "<<opAngle<<std::endl;
+    std::cout<<"\n  Checking vertex opening    "<<std::cos(prim1vec3.Angle(prim2vec3))<<endl;
+    std::cout<<"\n  Cluster multiplicity:      "<<clustM<<endl;
+    treeClus->channel=(singleCrys+multiCrys);
+    exitFill:
+    std::cout<<" ........ singleCrys "<<singleCrys<<std::endl;
+    std::cout<<" ........ Multi-Crys "<<multiCrys<<std::endl;
+    std::cout<<"... End reached! Outta here! \n";
+    std::cout<<" ***************************************************************************\n";
   }
   return 0;
 }

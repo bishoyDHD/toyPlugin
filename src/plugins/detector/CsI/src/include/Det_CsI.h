@@ -8,6 +8,7 @@
 #include "TF1.h"
 #include <singleCsI.h>
 #include "findClusters.h"
+#include "clusterScore.h"
 #include "csitree.h"
 #include <iostream>
 #include <fstream>
@@ -27,25 +28,39 @@ private:
   //
   // constants 
   findClusters* fclusters;
+  clusterScore* scoring;
   std::map<IdCsI,UInt_t> mapCsI;
   std::ifstream parfile;
   UInt_t iClock,iFB,iUD,iModule;
   double calibpar[12][2][2][16];
   double mapPhi,pcal;
-  int moduleNo;
-  int clusCrys;
+  int moduleNo, clusCrys,clustM;;
+  int multiCrys, singleCrys;
   bool clus_csi;
   std::vector<double> crysE,phval;
   std::map<std::pair<double,double>,double> csiph;
   std::map<std::pair<double,double>,double> csiR;
   std::map<std::pair<double,double>,double> csiZ;
-  std::map<std::pair<double,double>,bool> csiClus;
+  std::map<std::pair<double,double>,bool> crysChk;
   std::vector<double> clusEne,singleEne,singZ,singR,singTheta,singPhi;
+  std::vector<double> clusThetaE, clusPhiE, clusEz, clusEr;
+  std::vector<double> csiEdep, csiPhi, csiTheta;
   // indices start at zero now
   int thetaCsI[16][48];
   int phiCsI[16][48];
   // angles to be used by the clusterFinder table
   double otheta, ophi, wtheta, wphi, wz, wr;
+  double pr2px, pr2py, pr2pz;
+  double cl1px, cl1py, cl1pz;
+  double cl2px, cl2py, cl2pz;
+  double cl1x,  cl1y,  cl1z, cl1r;
+  double cl2x,  cl2y,  cl2z, cl2r;
+  double cl1E,cl2E,cl1theta, cl2theta;
+  double cl1phi, cl2phi;
+  double pr1px, pr1py, pr1pz;
+  double pr2x, pr2y, pr2z;
+  double pr1Etot;
+  double E2clust=0;
 
 public:
   Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_);
@@ -70,7 +85,7 @@ public:
   Long_t angleCsI(int id, int module, int channel, int yy, int zz);
   //histograms for fit
 
-  TH2D* h2TimeVSCsI;
+  TH2D* h2TimeVSCsI,*h2ang;
   TH2D* h2ChargeVSCsI;
   TH1D* h1MaxDiff;
   TH2D* h2DiffVSCsI;

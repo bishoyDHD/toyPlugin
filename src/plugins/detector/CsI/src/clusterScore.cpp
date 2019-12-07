@@ -64,6 +64,8 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
   mergeVect(Wz,z2);                   mergeVect(theta,theta2);
   // manyCrysPhi and singleCrysPhi
   mergeVect(phi,phi2);
+  // set Cluster multiplicity
+  setClustM(mCrys.size());
   // push cluster variables to container
   for(UInt_t i=0; i<mCrys.size(); i++){
     // cluster storage:
@@ -198,6 +200,8 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
   // ========================================
   //energy=(eneCrys[0]+eneCrys[1]);
   //std::cout<<" ... new energy eval.: "<<energy<<std::endl;
+  // set Cluster multiplicity
+  setClustM(eneCrys.size());
   for(UInt_t i=0; i<eneCrys.size(); i++){
     // cluster storage:
     px=eneCrys[i]*std::sin(theta[i])*std::cos(phi[i]);
