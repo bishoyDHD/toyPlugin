@@ -206,6 +206,7 @@ Long_t Det_CsI::process_fit(){
 	singTheta.push_back(myCsI.getTheta());
 	singPhi.push_back(myCsI.getPhi());
       }
+      myCsI.setClustCsI(false);
     }// end of signal CsI if-loop
   }
   if(clus_csi){

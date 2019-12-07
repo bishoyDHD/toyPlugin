@@ -97,7 +97,7 @@ void ClusterCsI::findLocalMax(shared_ptr<TH1D>h1){
 }
 //void ClusterCsI::tryFit(TH1D* h1,double* xval,double yped,double ymax){
 void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax){
-  clus_csi=false;
+  clus_csi=false; // really just in case
   shared_ptr<WaveformCsI> myWave(new WaveformCsI(mNWave));
   double ymax2, ymax3;
   unsigned int NPar=9;

@@ -166,6 +166,7 @@ public:
   void setData(const vector<UShort_t>&);
   // cluster vars
   bool getClustCsI(){return clus_csi;}
+  inline void setClustCsI(bool val){clus_csi=val;}
   Double_t getTheta(){return wtheta;}
   Double_t getPhi(){return wphi;}
   Double_t getEdep(){return energy;}
