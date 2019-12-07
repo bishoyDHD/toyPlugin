@@ -240,6 +240,7 @@ Long_t Det_CsI::process_fit(){
     TVector3 prim1vec3,prim2vec3,gv1;
     double opAngle,prim2px,prim2py,prim2pz;
     scoring->setScoreMass(0.09);
+    if(multiCrys>4 || singleCrys>4) return 0;
     if(multiCrys==2 && singleCrys==0){
       std::cout<<"  This is only 2 multiCrys ---|\n";
       scoring->init();
