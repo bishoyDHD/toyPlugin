@@ -28,6 +28,7 @@ Long_t Det_CsI::startup_fit(){
   makeBranch("treeClus",(TObject **) &treeClus);
   gROOT->SetBatch(kTRUE);
   gStyle->SetOptStat(0);
+  fclusters=new findClusters();
   readFiles();
   return 0;
 }
@@ -70,6 +71,12 @@ void Det_CsI::initVar(){
   treeClus->cpid1phiE=dummy;     treeClus->kM2=dummy;
   treeClus->cpid2thetaE=dummy;   treeClus->cpid1E=dummy;
   treeClus->cpid2phiE=dummy;     treeClus->cpid2E=dummy;
+  csiph.clear();   phval.clear();   csiClus.clear();
+  csiR.clear();    csiZ.clear();
+  clusEne.clear(); singleEne.clear();
+  singZ.clear();   singR.clear();
+  singTheta.clear(); singPhi.clear();
+  clus_csi=false;
   //E2clust=-1000;
 }
 // Method to read in external files such as calibration par's
@@ -185,9 +192,25 @@ Long_t Det_CsI::process_fit(){
       if(treeRaw->indexCsI[iCh]==16) pcal=.22;
       myCsI.setpCalib(pcal);
       myCsI.fit();
-      if(myCsI.getClustCsI())
+      if(myCsI.getClustCsI()){
+	clus_csi=true;
         std::cout<<" ********** "<<myCsI.getR()<<" || "<<myCsI.getTheta()<<std::endl;
+	auto angles=std::make_pair(myCsI.getTheta(),myCsI.getPhi());
+	csiph[angles]=myCsI.getEdep();
+        csiClus[angles]=true;
+        csiR[angles]=myCsI.getR();
+        csiZ[angles]=myCsI.getZ();
+	singleEne.push_back(myCsI.getEdep());
+	singZ.push_back(myCsI.getZ());
+	singR.push_back(myCsI.getR());
+	singTheta.push_back(myCsI.getTheta());
+	singPhi.push_back(myCsI.getPhi());
+      }
     }// end of signal CsI if-loop
+  }
+  if(clus_csi){
+    // find clusters here!!
+    fclusters->clusters(csiph,singleEne,singTheta,singPhi,csiClus);
   }
   return 0;
 }
