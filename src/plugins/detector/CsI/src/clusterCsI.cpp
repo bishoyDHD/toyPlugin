@@ -34,6 +34,13 @@ char* ClusterCsI::nameCsI(unsigned int index){
   sprintf(mName,"%i%c%c%i",iClock,NameFB[iFB],NameUD[iUD],iPaddle+1);
   return mName;
 }
+Double_t ClusterCsI::round(double var){
+  // type cast to int in order to obtain integer var
+  // then divide by 100 or the value is set to correct decimal points
+  // Useful upto 1e4 higher than this is basically a no-no
+  double value=(int)(var*100+.5);
+  return (double)value/100;
+}
 bool ClusterCsI::fit(){
   //std::cout<<"|| entering into fitting function..... success! \n";
   static unsigned int count=0;
@@ -65,72 +72,12 @@ bool ClusterCsI::fit(){
   xpeaks=s->GetPositionX();
   std::sort(xpeaks,xpeaks+nfound);
   mNWave=nfound;
-  clus_csi=false;
   if(nfound==3){
     if(std::abs(xpeaks[2]-xpeaks[1]<35)) mNWave=2;
   }
   tryFit(h1,xpeaks,yped,ymax);
-  /*
-  Double_t chi2Reduced=findChi2(h1);
-  cout<<chi2Reduced<<endl;
-  if(chi2Reduced>80){
-    mNWave=2;
-    tryFit(h1);
-  Double_t chi2Reduced=findChi2(h1);
-  cout<<chi2Reduced<<endl;
-
-  }
-  for(mNWave=1;mNWave<2;mNWave++){
-    tryFit(h1);
-    Double_t chi2Reduced=findChi2(h1);
-    if(chi2Reduced<100){
-      cout<<chi2Reduced<<endl;
-      break;
-    }
-  }
-  */
 
   return true;
-  /*
-
-  Double_t par[8];
-  for(int i=0;i<8;i++){
-    par[i]=h1->GetFunction("wave")->GetParameter(i);
-  }
-  Double_t time=findTime(par);
-  TLine* line=new TLine(time,0,time,1000);
-  Double_t peak=findPeak(par);
-  Double_t valuePeak=waveformSingle(&peak,par);
-  TLine* line2=new TLine(peak,0,peak,valuePeak);
-  line2->SetLineColor(kRed);
-  line->Draw("same");
-  line2->Draw("same");
-  Double_t energy=findEnergy(par);
-  sprintf(name,"energy_run%d_%dCsI_%s",mRunNo,mEventNo,nameCsI(mIndexCsI));
-  TH1D* h1Energy=new TH1D(name,"energy",5000,par[1],findZero(par));
-  Double_t mySum=fillEnergy(par,int(10000000),h1Energy);
-  cout<<mySum<<" "<<energy<<endl;
-  h1Energy->Scale(energy/mySum);
-  h1Energy->SetFillColor(1);
-  h1Energy->SetFillStyle(3003);
-  pad1->Update();
-  c1->cd();
-  TPad *pad2 = new TPad("pad2","",0,0,1,1);
-  pad2->SetFillStyle(4000); //will be transparent
-  pad2->Draw();
-  pad2->cd();
-  Double_t ymin = pad1->GetFrame()->GetY1();
-  Double_t ymax = pad1->GetFrame()->GetY2();
-  Double_t dy = (ymax-ymin)/0.8; //10 per cent margins top and bottom
-  Double_t xmin = pad1->GetFrame()->GetX1();
-  Double_t xmax = pad1->GetFrame()->GetX2();
-  Double_t dx = (xmax-xmin)/0.8; //10 per cent margins left and right
-  pad2->Range(xmin-0.1*dx,ymin-0.1*dy-par[7],xmax+0.1*dx,ymax+0.1*dy-par[7]);
-
-  h1Energy->SetLineColorAlpha(0,0.2);
-  h1Energy->Draw("][same");
-  pad2->Update();
-  */
 }
 //void ClusterCsI::findLocalMax(TH1D* h1){
 void ClusterCsI::findLocalMax(shared_ptr<TH1D>h1){
@@ -260,13 +207,6 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       break;
   }// end of switch statement
 }
-/*
-void ClusterCsI::setAngles(int module,int channel,int yy,int zz){               
-    //std::cout<<" cluster crystal init var--> \n";
-    phiCsI[module][channel]=yy;
-    thetaCsI[module][channel]=zz;
-    std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
-}*/
 void ClusterCsI::calcThetaPhi(double Edep){
   mapPhi=2*180*(phiIndex-0.5)/48.; // from mapping init file
   wz=crysZ[thetaIndex-1];
@@ -275,13 +215,12 @@ void ClusterCsI::calcThetaPhi(double Edep){
         std::pow(crysr[thetaIndex-1],2));
   acos=TMath::ACos(Theta);
   wtheta=TMath::RadToDeg()*acos; // convert to deg.
-  //wtheta=round(wtheta); // make sure to obtain 2 dp
+  wtheta=round(wtheta); // make sure to obtain 2 dp
   wphi=90.-mapPhi; // world phi
   if(wphi<0) wphi=360.+wphi;
   angles=std::make_pair(wtheta,wphi);
   //h2ang->Fill(wtheta,wphi);
   cout<< " *** World Angles  "<<wtheta<<", "<<wphi<<endl;
-  
 }
 //void ClusterCsI::drawWaves(TH1D* h1){
 void ClusterCsI::drawWaves(shared_ptr<TH1D> h1){

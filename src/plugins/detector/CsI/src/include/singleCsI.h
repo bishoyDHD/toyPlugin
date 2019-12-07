@@ -6,6 +6,8 @@
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TF1.h>
+#include <algorithm>
+#include <utility>
 #include <numeric>
 #include <TMath.h>
 #define _USE_MATH_DEFINES
@@ -106,6 +108,7 @@ private:
   std::map<std::pair<double,double>,double> csiZ;
   std::map<std::pair<double,double>,bool> csiClus;
   Double_t findChi2(shared_ptr<TH1D>);
+  Double_t round(double val);
   void tryFit(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>,double* xval,double yped,double ymax);
   void tryFit(TH1D*,double* xval,double yped,double ymax);

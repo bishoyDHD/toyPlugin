@@ -138,7 +138,7 @@ Long_t Det_CsI::process_fit(){
     if(p[1]=='b' || p[1]=='B') iFB=1;
     iUD=0;
     if(p[0]=='d' || p[0]=='D') iUD=1;
-    if(p[1]=='0' || p[0]=='0'){
+    if(p[1]=='\0' || p[0]=='\0'){
       std::cout<<"..... Got one!!\n";
       return 0;
     }
