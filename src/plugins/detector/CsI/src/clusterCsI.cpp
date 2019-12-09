@@ -72,6 +72,11 @@ bool ClusterCsI::fit(){
   xpeaks=s->GetPositionX();
   std::sort(xpeaks,xpeaks+nfound);
   mNWave=nfound;
+  if(ymax==1023){
+    mNWave=5;
+    // needs some TLC: will fix soon!
+    return false;
+  }
   if(nfound==3){
     if(std::abs(xpeaks[2]-xpeaks[1]<35)) mNWave=2;
   }
@@ -103,7 +108,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
   unsigned int NPar=9;
   shared_ptr<TF1> f1(new TF1("waveCut",myWave,&WaveformCsI::waveformSingle,1,250,NPar));//"WaveformCsI","waveformCut"));
   switch(mNWave){
-    case 1:
+    case 11:
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
       for(int n=0; n<9; n+=1){
         f1->SetParameter(n,param[n]);
@@ -136,7 +141,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
       }
       break;
-    case 2:
+    case 21:
       NPar=11;
       f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));//"WaveformCsI","waveformCut"));
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
@@ -175,7 +180,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
       }
       break;
-    case 3:
+    case 31:
       NPar=13;
       f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));//"WaveformCsI","waveformCut"));
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
@@ -214,6 +219,44 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
         //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      }
+      break;
+    case 5:
+      NPar=10;
+      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformOverrange,1,250,NPar));//"WaveformCsI","waveformCut"));
+      //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
+      for(UInt_t n=0; n<NPar+1; n+=1){
+        f1->SetParameter(n,param[n]);
+        f1->SetParLimits(n,parLowlim[n],parUplim[n]);
+      }
+      ymax2=h1->GetBinContent(h1->FindBin(xval[1]));
+      f1->SetParameter(0,ymax*6.5);
+      f1->SetParLimits(0,ymax-61.7,ymax+4971.7);
+      f1->SetParameter(1,xval[0]+40.1);
+      f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
+      f1->SetParameter(8,yped);
+      f1->SetParLimits(8,yped-161.7,yped+11.7);
+      f1->SetParameter(9,xval[1]-15.1);
+      f1->SetParLimits(9,xval[1]-61.7,xval[1]+17.7);
+      f1->SetParameter(10,ymax2);
+      f1->SetParLimits(10,ymax2-7.7,ymax2+7.7);
+      f1->SetLineStyle(6);
+      f1->SetLineColor(1);
+      f1->SetLineWidth(3);
+      h1->Fit("waveCut","Q");
+      if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
+	if(!clus_csi)
+          clus_csi=true;
+        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+        energy=(lmax-lmin)*pcal;
+	calcThetaPhi(energy);
+        //if(mEventNo % 1000==0)
+          drawWaves(h1);
+        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      }
+      for(unsigned int i=0;i<NPar;i++){
+        mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
       }
       break;
   }// end of switch statement

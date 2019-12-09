@@ -10,6 +10,7 @@
 #include "findClusters.h"
 #include "clusterScore.h"
 #include "csitree.h"
+#include "multiTree.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -23,6 +24,7 @@ private:
   //CRTFitCsI *treeFit;			/// Output tree for CSI data
   CRTRawCsI *treeRaw;			/// Input tree with CSI raw data
   CRTClusterCsI *treeClus;			/// Input tree with CSI raw data
+  targetE36* treetgt;
   //
   // Detector parameters set in init file
   //

@@ -25,6 +25,7 @@ Long_t Det_CsI::histos_fit(){
 }
 Long_t Det_CsI::startup_fit(){
   getBranchObject("vf48",(TObject **) &treeRaw);
+  getBranchObject("tgtInfo",(TObject **) &treetgt);
   treeClus=new CRTClusterCsI();
   makeBranch("treeClus",(TObject **) &treeClus);
   gROOT->SetBatch(kTRUE);
@@ -123,6 +124,8 @@ Long_t Det_CsI::process_fit(){
     return 0;
   }
   initVar();
+  // make sure that this is a good gap event
+  if(treetgt->TOF1Gap<=0 || treetgt->TOF2Gap<=0) return 0;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
@@ -188,7 +191,7 @@ Long_t Det_CsI::process_fit(){
       std::cout<<" naming TKO module:  "<<nameModule<<std::endl;
       ClusterCsI myCsI(treeRaw->runNo,myEvent,iModule);
       //std::cout<<" top U/D || F/B :"<<p[0]<<", "<<p[1]<<std::endl;
-      std::cout<<" checking the hell outta this shit:"<<thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]]<<std::endl;
+      //std::cout<<" checking the hell outta this shit:"<<thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]]<<std::endl;
       int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       myCsI.nameCsI(iClock,iFB,iUD,iModule);
@@ -240,7 +243,8 @@ Long_t Det_CsI::process_fit(){
     TVector3 prim1vec3,prim2vec3,gv1;
     double opAngle,prim2px,prim2py,prim2pz;
     scoring->setScoreMass(0.09);
-    if((multiCrys+singleCrys>=4)) goto exitFill;
+    if((multiCrys==4 || singleCrys==4)) goto exitFill;
+    //if((multiCrys+singleCrys>=4)) goto exitFill;
     if(multiCrys==2 && singleCrys==0){
       std::cout<<"  This is only 2 multiCrys ---|\n";
       scoring->init();
