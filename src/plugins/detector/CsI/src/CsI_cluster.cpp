@@ -124,6 +124,11 @@ Long_t Det_CsI::process_fit(){
     return 0;
   }
   initVar();
+  if(treetgt->run != treeRaw->runNo){
+    std::cout<<" Oops you are comparing to different runs \n";
+    std::cout<<" ***Bailing*** Bailing*** \n";
+    std::abort();
+  }
   // make sure that this is a good gap event
   if(treetgt->TOF1Gap<=0 || treetgt->TOF2Gap<=0) return 0;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
