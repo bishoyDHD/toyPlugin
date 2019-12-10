@@ -1,602 +1,292 @@
 #include <covfefe.h>
-
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include "TVector2.h"
-#include "StrawTubehittree.h"
-#include "StrawTubetree.h"
-#include "Trackhittree.h"
 #include "TH2.h"
 #include "TF1.h"
 #include "TRandom3.h"
 #include "TMath.h"
-
+#include <TCanvas.h>
 #include <stdio.h>
 #include <math.h>
-//#include "~/cooker/external/cminpack/cminpack.h"
-#include "../../../../../external/cminpack/cminpack.h"
 
-int fcn(void *p, int m, int n, const double *x, double *fvec, int iflag);
-
-covfefe::covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p):Plugin(in,out,inf_,outf_,p)
-{
+covfefe::covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p):Plugin(in,out,inf_,outf_,p){
+  calibcsi=0;
+  h1time[12][2][2][16]=NULL;
+  h1cali[12][2][2][16]=NULL;
+  calibHist=NULL;
+  Ecorr=NULL;
+  integHist=NULL;
+  intEn=NULL;
+  phdis=NULL;
+  hkmu2=NULL;
+  std::cout<<" checking this shit \n";
 };
 
-covfefe::~covfefe()
-{
-};
-
-
-TVector2 getStrawPos(int id)
-{
-  // ask gdml or something, for now, make it up.
-  
-  TVector2 res;
-  int side, plane, straw_in_plane;
-  STT_internal_to_logic(id,&side,&plane,&straw_in_plane);
-  double tube_diameter = 10;
-  double distance_between_planes = 8.7;
-  double pitch=10.1; //10.1 mm spacing
-  double zoffset=0;
-  
-  if (side==2)
-  {
-    double pos=straw_in_plane*pitch+(plane % 2)*pitch/2;
-    res.Set(pos,zoffset+plane*distance_between_planes);
-  }
-
-  if(side == 1)
-  {
-    if(plane < 5) //these planes are vertical
-    {
-      //zoffset = 300;
-      double pos = straw_in_plane*pitch +(plane % 2)*pitch/2;//original plus
-      res.Set(pos,zoffset+plane*distance_between_planes);
-
-    }
-    // else if(plane >4 && plane<10)
-    // {
-    //   //zoffset = 380;
-    //   double pos = straw_in_plane*pitch +(plane%2)*pitch/2;
-    //   res.Set(pos,zoffset+plane*distance_between_planes);
-    // }
-  }
-  return res;
-}
-//Used by TMinuit Minimizer
-void mychi2(Int_t &npar, Double_t *gin, Double_t &f, Double_t *par, Int_t iflag)
-{
-  double thechi2 = 0.;
-  const TVector2 off(80,20);
-  double numhits = 0;
-
-  // for(auto hit:STT->hits)
-  // {
-  //   int side, plane, straw_in_plane;
-  //   STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-  //   auto pos=getStrawPos(hit.id)-off;
-  //   if (side==1 && plane <5&& STT->hits.size()>3 && hit.dist>0.6 && plane!=0)
-  //   {
-  //     double slope = par[0];
-  //     double intercept = par[1];
-  //     double lineX = (pos.X()/slope+pos.Y()- intercept)/(slope+1/slope);//this is given by solving equation for two perpendicular intersecting lines 
-  //     double lineY = par[0]*lineX+par[1];
-  //     double res = sqrt(pow(pos.X()-lineX,2)+pow(pos.Y()-lineY,2))-hit.dist;
-  //     thechi2 = thechi2 + pow(res,2)/pow(0.15,2);
-  //     numhits++;
-  //   }
-    
-  // }
-  f = thechi2/(numhits-2);
-  //return;
-};
-
-
-Long_t covfefe::startup()
-{
-  STT = NULL;
-  getOutBranchObject("StrawTubeHits",(TObject **) &STT);
-  if(!STT) getBranchObject("StrawTubeHits",(TObject **) &STT); 
-  if(!STT) debug(0,"Could not find STT hits in file\n");
-
-  Tracks = new TrackHits;
-  makeBranch("TrackHits",(TObject **) &Tracks);
-
-  hough=dH2("hough","hough",180,-0.5,179.5,401,-200,200);
-  circ=dH2("circ","circ",401,0,400,401,-40,40);
-  line=dH2("line","line",151,100,250,401,-40,40);
-  lineprime=dH2("line prime","line prime",151,100,250,401,-40,40);
-
-  both=dH2("Tracks","Tracks;Pos X (mm);Pos Z (mm)",151,100,250,401,-40,40);
-  hitresidual=dH1("Hit Residual","Hit Residual; Residual (mm);counts",401,-10,10);
-  hitchisq=dH1("Hit Chi Squared","Hit Chi Squared",401,-40,40);
-  //strawresidual=dH1("Straw Residual","Straw Residual",401,-40,40);
-  //strawchisq=dH1("Straw Chi Squared","Straw Chi Squared",401,-40,40);
-  straws=dH2("Plane","Plane",51,150,200,41,-20,20);
-  Angle=dH1("Angle","Angle",180,-0.5,179.5);
-  chiVangle=dH2("Chi sq V Angle","Chi sq V angle;angle (degree);chisq",180,-0.5,179.5,500,0,500);
-  chiVangleprime=dH2("Chi sq V Angle prime","Chi sq V angle prime;angle (degree);chisq",180,-0.5,179.5,500,0,500);
-  
-  return 0;
-  
-};
-
-
-
-//CMin Stuff below
-
-// int fcn(void *p, int m, int n, const double *x, double *fvec, int iflag)
-// {
-	
-// 	//fcn is the name of the user-supplied subroutine which calculates
-// 	//the functions. fcn should be written as follows:
-
-// 	//subroutine fcn(m,n,x,fvec,iflag)
-// 	//integer m, n, iflag
-// 	//double precision x(n), fvec(m)
-
-// 	//calculate the functions at x and return this vector in fvec
-
-// 	//return
-
-// 		double numhits = 0;
-// 		double chisq = 0;
-// 		double res = 0;
-//   	const TVector2 off(80,20);
-//   	TF1 *f = new TF1("f", "[0]*x+[1]",100,250);
-//     int side, plane, straw_in_plane;
-//     STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-// 		//STT = NULL
-//   	//getOutBranchObject("StrawTubeHits",(TObject **) &STT);
-//   	//if(!STT) getBranchObject("StrawTubeHits",(TObject **) &STT); 
-//   	//if(!STT) debug(0,"Could not find STT hits in file\n");
-
-//     for (auto hit:STT->hits)
-//     {
-//     		if (side==1 && plane <5&& STT->hits.size()>3 && hit.dist>0.6 && hit.dist<4.5){
-//         numhits++;
-// 				}
-//         //ret=Plugin::stop;
-//         int side, plane, straw_in_plane;
-//         STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-//         if (side==1 && plane <5 && STT->hits.size()>3 && hit.dist>0.6 && hit.dist<4.5)
-//         {
-//           auto pos=getStrawPos(hit.id)-off;//this is wire position x',y'
-//           //now need intercept of line perpendicular to fit that passes through the straw
-//           //the x coordinate of intercept is given by
-//           double slope = f->GetParameter(0);
-//           double intercept = f->GetParameter(1);
-//           double lineX = (pos.X()/slope+pos.Y()- intercept)/(slope+1/slope);//this is given by solving equation for two perpendicular intersecting lines 
-//           double lineY = f->Eval(lineX);
-//           res = sqrt(pow(pos.X()-lineX,2)+pow(pos.Y()-lineY,2))-hit.dist;
-//           chisq = chisq + pow(res,2)/pow(0.15,2)/(numhits-2);
-//         }
-//     }
-
-// }
-
-int minimizer()
-{
-	int m, n, info, lwa;
-	double  fnorm;
-	
-	m = 0; //This should be number of functions
-	n = 0; //This should be number of variables, < m
-	lwa = m*n + 5*n + m;
-	
-	int iwa[n];
-	double x[n], fvec[m], wa[lwa];	
-	//x should contain initial estimate, so need to initialize that
-
-	double tol = 0; //This should be a precision
-
-	//info = lmdif1(fcn, 0, m, n, fvec, tol, iwa, wa, lwa);
-
-}
-
-
-
-/*
-Long_t covfefe::process()
-{
-  int ret=0;
-	double tol = 0; //This should be a precision
-
-	//info = lmdif1(fcn, 0, m, n, fvec, tol, iwa, wa, lwa);
-
-	return 0;
-}
-*/
-
-//end cmin stuff
-
-/*
-Long_t covfefe::startup()
-{
-  STT = NULL;
-  getOutBranchObject("StrawTubeHits",(TObject **) &STT);
-  if(!STT) getBranchObject("StrawTubeHits",(TObject **) &STT); 
-  if(!STT) debug(0,"Could not find STT hits in file\n");
-
-  Tracks = new TrackHits;
-  makeBranch("TrackHits",(TObject **) &Tracks);
-
-  hough=dH2("hough","hough",180,-0.5,179.5,401,-200,200);
-  circ=dH2("circ","circ",401,0,400,401,-40,40);
-  line=dH2("line","line",151,100,250,401,-40,40);
-  lineprime=dH2("line prime","line prime",151,100,250,401,-40,40);
-
-  both=dH2("Tracks","Tracks;Pos X (mm);Pos Z (mm)",151,100,250,401,-40,40);
-  hitresidual=dH1("Hit Residual","Hit Residual; Residual (mm);counts",401,-10,10);
-  hitchisq=dH1("Hit Chi Squared","Hit Chi Squared",401,-40,40);
-  //strawresidual=dH1("Straw Residual","Straw Residual",401,-40,40);
-  //strawchisq=dH1("Straw Chi Squared","Straw Chi Squared",401,-40,40);
-  straws=dH2("Plane","Plane",51,150,200,41,-20,20);
-  Angle=dH1("Angle","Angle",180,-0.5,179.5);
-  chiVangle=dH2("Chi sq V Angle","Chi sq V angle;angle (degree);chisq",180,-0.5,179.5,500,0,500);
-  chiVangleprime=dH2("Chi sq V Angle prime","Chi sq V angle prime;angle (degree);chisq",180,-0.5,179.5,500,0,500);
-  
-  return 0;
-  
-};
-
-*/
-
-
-Long_t covfefe::process()
-{
-  int ret=0;
-  const TVector2 off(80,20);
-
-
-
-  hough->Reset();
-  //circ->Reset();
-  straws->Reset();
-  line->Reset();
-  both->Reset();
-  //Angle->Reset();
-  chiVangle->Reset();
-  // double plane0[33]={0};
-  // double plane1[33]={0};
-  // double plane2[33]={0};
-  // double plane3[33]={0};
-  // double plane4[33]={0};
-  if (STT->hits.size()<3) return ok;
-  //residual->Reset();
-  // for(auto hit:STT->hits)
-  // {
-  //   int side, plane, straw_in_plane;
-  //   STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-  //   if (side==1 && plane <5&& STT->hits.size()>3 && hit.dist>0.6 && plane!=0)
-  //     numhits++;
-
-  //   if(plane==0)
-  //     plane0[straw_in_plane]=1;
-  //   if(plane==1)
-  //     plane1[straw_in_plane]=1;
-  //   if(plane==2)
-  //     plane2[straw_in_plane]=1;
-  //   if(plane==3)
-  //     plane3[straw_in_plane]=1;
-  //   if(plane==4)
-  //     plane4[straw_in_plane]=1;
-
-  // }
-
-  // for(int i=0;i<33;i++)
-  // {
-  //   for(int j=0;j<33;j++)
-  //   {
-  //     if(plane0[i]&&plane1[j])
-  //       H2(i,j,"Plane0-1","Plane0-1",33,-0.5,32.5,33,-0.5,32.5);
-  //     if(plane1[i]&&plane2[j])
-  //       H2(i,j,"Plane1-2","Plane1-2",33,-0.5,32.5,33,-0.5,32.5);
-  //     if(plane2[i]&&plane3[j])
-  //       H2(i,j,"Plane2-3","Plane2-3",33,-0.5,32.5,33,-0.5,32.5);
-  //     if(plane3[i]&&plane4[j])
-  //       H2(i,j,"Plane3-4","Plane3-4",33,-0.5,32.5,33,-0.5,32.5);
-
-  //}
-  //}
-
-  double numhits =0;
-  for (auto hit:STT->hits)
-  {
-      //ret=Plugin::stop;
-      int side, plane, straw_in_plane;
-      STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-      if (side==1 && plane <5&& STT->hits.size()>3 && hit.dist>0.6 && hit.dist<4.5)
-	    {
-        numhits++;
-	      auto pos=getStrawPos(hit.id)-off;
-	      straws->Fill(pos.X()+hit.dist,pos.Y());
-        straws->Fill(pos.X()-hit.dist,pos.Y());
-        straws->Fill(pos.X(),pos.Y()-hit.dist);
-        straws->Fill(pos.X(),pos.Y()+hit.dist);
-//        straws->Fill(pos.X(),pos.Y());
-
-	      //std::cout<<"Plane: "<<plane << " Straw: " << straw_in_plane;
-        //std::cout <<" hit dist: "<<hit.dist<<std::endl;
-
-	      for (int i =0; i<180;i++)// probably should do -90 to 90 but that means things have to be rewritten more intelligently for the negative angles.
-	      {
-
-	       TVector2 d=pos+TVector2(hit.dist,0).Rotate(2*i*M_PI/180);
-	       circ->Fill(d.X(),d.Y());
-         both->Fill(d.X(),d.Y());
-	      
-	       double x=pos.Rotate(i*M_PI/180).X();
-         for(int j =0;j<10;j++)
-         {
-          double r = gRandom->Gaus(0,0.5);//random smearing. This makes regions with a high density of Hough points stand out in the search for best Hough points
-          double r1 = gRandom->Gaus(0,0.7);
-	        hough->Fill(i+r,(x+hit.dist)+r1);
-	        if (trunc(x+hit.dist+r1+0.5)!=trunc(x-hit.dist-r1+0.5)) 
-          {
-            hough->Fill(i+r,x-hit.dist-r1);
-          }
-         }
-	      } 
-	    }
-  }
-  if (numhits<3)
-    return ok;
-
-  TF1 *f1 = new TF1("f1","[0]*x+[1]",100,200);
-  f1->SetParameter(0,1);
-  f1->SetParameter(1,1);
-  straws->Fit("f1","q","",100,200);
-
-  double strawangle = 90-TMath::ATan(f1->GetParameter(0))*180/M_PI;//90 because we measure from 0 differently then ROOT does, for us 0 is +y for ROOT it is +x
-  int x,y,z;
-  double res = 100000;
-  double chisq = 100000;
-  double dx=100000;
-  double dy = 100000;
-  int counter =0;
-  hough->GetXaxis()->SetRange(0,180);
-  std::vector<double> *chi = new std::vector<double>;
-  std::vector<double> *par0 = new std::vector<double>;
-  std::vector<double> *par1 = new std::vector<double>;
-  std::vector<double> *maxX = new std::vector<double>;
-  std::vector<double> *maxY = new std::vector<double>;
-  std::vector<double> *angledx = new std::vector<double>;
-  std::vector<double> *rho = new std::vector<double>;
-  TF1 *f = new TF1("f", "[0]*x+[1]",100,250);
-  while(chisq>2 && counter < 100)
-  {
-    chisq=0;
-    //line->Reset();
-    hough->GetXaxis()->SetRange(strawangle-40,strawangle+40);
-      hough->GetMaximumBin(x,y,z);
-      dx= hough->GetXaxis()->GetBinCenter(x);
-      dy= hough->GetYaxis()->GetBinCenter(y);
-    hough->SetBinContent(x,y,0);
-    maxX->push_back(x);
-    maxY->push_back(y);
-    //std::cout << x <<" "<<y<<" "<<z<<std::endl;
-    for (int i=-200;i<200;i++)
-    {
-      auto p=TVector2(dy,i).Rotate(-x*M_PI/180);
-      line->Fill(p.X(),p.Y());
-    }
-
-    f->SetParameter(0,TMath::Cos(x*M_PI/180)/TMath::Sin(x*M_PI/180));//I don't remember Cotangent in ROOT and am too lazy to guess
-    f->SetParameter(1,dy/(TMath::Sin(-x*M_PI/180)));
-    //std::cout << " Par 0: " << f->GetParameter(0) << " Par 1: " << f->GetParameter(1) << std::endl;
-    //std::cout << " Hough theta: " << x << " Hough R: " << dy << std::endl;
-    //line->Fit("f","","MUL",100,250);
-
-
-  //derp don't be an idiot, do it this way.
-    //finding residuals and chi sq from fit
-    for (auto hit:STT->hits)
-    {
-        //ret=Plugin::stop;
-        int side, plane, straw_in_plane;
-        STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-        if (side==1 && plane <5 && STT->hits.size()>3 && hit.dist>0.6 && hit.dist<4.5)
-        {
-          auto pos=getStrawPos(hit.id)-off;//this is wire position x',y'
-          //now need intercept of line perpendicular to fit that passes through the straw
-          //the x coordinate of intercept is given by
-          double slope = f->GetParameter(0);
-          double intercept = f->GetParameter(1);
-          double lineX = (pos.X()/slope+pos.Y()- intercept)/(slope+1/slope);//this is given by solving equation for two perpendicular intersecting lines 
-          double lineY = f->Eval(lineX);
-          res = sqrt(pow(pos.X()-lineX,2)+pow(pos.Y()-lineY,2))-hit.dist;
-          chisq = chisq + pow(res,2)/pow(0.15,2)/(numhits-2);
-          // std::cout << " lineX: " << lineX << " lineY: " << lineY<< " WireX: " << pos.X() << " WireY: " << pos.Y() << " hit.dist " << hit.dist;
-          // std::cout<<" Residual: " << res << std::endl;
+covfefe::~covfefe(){
+  for(int iClock=0;iClock<12;iClock++){
+    for(int iFB=0;iFB<2;iFB++){
+      for(int iUD=0;iUD<2;iUD++){
+        for(int iModule=0;iModule<15;iModule++){
+          delete h1time[iClock][iFB][iUD][iModule];
+          delete h1cali[iClock][iFB][iUD][iModule];
         }
-    }
-    chiVangle->Fill(dx,chisq);
-    chi->push_back(chisq);
-    par0->push_back(f->GetParameter(0));
-    par1->push_back(f->GetParameter(1));
-    angledx->push_back(x);
-    rho->push_back(dy);
-    //std::cout <<" optimizing chi sq: " << chisq << std::endl;
-    counter++;
-  }
-
-
-  double min = 1000000;
-  int loc;
-  for(int k=0;k<chi->size();k++)
-  {
-    if(min > chi->at(k))
-    {
-      min=chi->at(k);
-      loc=k;
-    }
-  }
-
-
-
-
-  // for(int i=-200;i<250;i++)
-  // {
-  //   //auto p=TVector2(dy,i).Rotate(-x*M_PI/180);
-  //   //both->Fill(p.X(),p.Y());
-  //   both->Fill(i,par0->at(loc)*i+par1->at(loc));
-  // }
-
-
-//Do it again but use the starting point of fit as the optimal value found above.
-//Hough Transform isn't perfect for us (only accurate to level of bin size) so have to kind of look around optimal guessed value.
-
-  std::vector<double> *chiprime = new std::vector<double>;
-  std::vector<double> *par0prime = new std::vector<double>;
-  std::vector<double> *par1prime = new std::vector<double>;
-  int counter1=0;
-  double chisqprime=100000;
-  double resprime=100000;
-  TF1 *f2 = new TF1("f2", "[0]*x+[1]",100,250);
-  dx= hough->GetXaxis()->GetBinCenter(maxX->at(loc));
-  dy= hough->GetYaxis()->GetBinCenter(maxY->at(loc));
-  double gran = 0.1;//granularity of search around best hough params
-  chiVangleprime->Reset();
-  lineprime->Reset();
-  double param0 = TMath::Cos(  (angledx->at(loc)) *M_PI/180)/TMath::Sin(  (angledx->at(loc)) *M_PI/180);
-  double param1 = (rho->at(loc))/(TMath::Sin(- (angledx->at(loc))*M_PI/180));
-  for(int i = -100;i<100;i++)
-  {
-    for(int j=-100;j<100;j++)
-    {
-      param0 = TMath::Cos(  (angledx->at(loc) +gran*i) *M_PI/180)/TMath::Sin(  (angledx->at(loc)+gran*i) *M_PI/180);
-      param1 = (rho->at(loc)+gran*j)/(TMath::Sin(- (angledx->at(loc)+gran*i)*M_PI/180));
-      double slope = param0;
-      double intercept = param1;
-      f2->SetParameter(0,param0);
-      f2->SetParameter(1,param1);
-      for (int k=0;k<400;k++)
-      {
-        lineprime->Fill(k,f2->Eval(k));
       }
-      // lineprime->Fit("f2","q","MUL",100,250);
-      chisqprime = 0;
-      for (auto hit:STT->hits)
-      {
-          //ret=Plugin::stop;
-          int side, plane, straw_in_plane;
-          STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-          if (side==1 && plane <5 && STT->hits.size()>3 && hit.dist>0.6 && hit.dist<4.5)
-          {
-            auto pos=getStrawPos(hit.id)-off;//this is wire position x',y'
-            //now need intercept of line perpendicular to fit that passes through the straw
-            //the x coordinate of intercept is given by
-            double lineX = (pos.X()/slope+pos.Y()- intercept)/(slope+1/slope);//this is given by solving equation for two perpendicular intersecting lines 
-            double lineY = slope*lineX+intercept;
-            resprime = sqrt(pow(pos.X()-lineX,2)+pow(pos.Y()-lineY,2))-hit.dist;
-            chisqprime = chisqprime + pow(resprime,2)/pow(0.15,2)/(numhits-2);
-            // std::cout << " lineX: " << lineX << " lineY: " << lineY<< " WireX: " << pos.X() << " WireY: " << pos.Y() << " hit.dist " << hit.dist;
-            // std::cout<<" Residual: " << resprime << std::endl;
-          }
-      }
-
-      //std::cout <<" optimizing chi sq: " << chisqprime << std::endl;
-      chiprime->push_back(chisqprime);
-      par0prime->push_back(slope);
-      par1prime->push_back(intercept);
-      chiVangleprime->Fill(angledx->at(loc)+gran*i,chisqprime);
-
     }
   }
-
-  // //The minimization by TMinuit
-  // Int_t iflag =0;
-  // TMinuit *gMinuit = new TMinuit(2);//2 param fit
-  // gMinuit->SetFCN(mychi2);
-  // Double_t arglist[10];
-  // arglist[0] = 1;
-  // gMinuit->mnexcm("SET ERR",arglist,1,iflag);
-
-  // gMinuit->mnparm(0,"Slope",param0,0.1,-1000,1000,iflag);//par num, par name, star val, step size,min val, max val, errflag
-  // gMinuit->mnparm(1,"Intercept",param1,0.1,-1000,1000,iflag);
-
-  // gMinuit->mnexcm("CALL FCN", arglist,1,iflag);
-
-  // gMinuit->mnexcm("MIGRAD",arglist,2,iflag);
-
-      
-
-  double minprime = 1000000000;
-  int locprime;
-  for(int k=0;k<chiprime->size();k++)
-  {
-    if(minprime>chiprime->at(k))
-    {
-      minprime=chiprime->at(k);
-      locprime=k;
-    }
+  for(int i=0; i<3; i++){
+    delete h1t_0[i];
+    delete h1tcorr[i];
+    delete h1trefCorr[i];
+    delete h1cdf50[i];
+    delete h1refgaus[i];
   }
-  double finalangle = 90-TMath::ATan(par0prime->at(locprime))*180/M_PI;
-  Angle->Fill(finalangle);
-  // if (finalangle < 30)
-  //   ret = Plugin::stop;
+  delete calibHist;
+  delete Ecorr;
+  delete integHist;
+  delete intEn;
+  delete phdis;
+  delete hkmu2;
+  delete timing;
+};
 
-
-  //std::cout<<"new min chisq is: " << minprime << " old was: " << min<<std::endl;
-  //plot the track
-  for (int i=0;i<400;i++)
-  {
-    both->Fill(i,par0prime->at(locprime)*i+par1prime->at(locprime));
+Long_t covfefe::histos(){
+  for(int i=0; i<3; i++){
+    std::ostringstream name1, name2,name3,name4,name5;
+    name1<<"t_0_"; name2<<"tcorr_"; name3<<"trefCorr_"; name4<<"cdf50_"; name5<<"refgaus_";
+    name1<<i;name2<<i;name3<<i;name4<<i;name5<<i;
+    h1t_0[i]=new TH1D(name1.str().c_str(),"stats",50,-100,100);
+    h1tcorr[i]=new TH1D(name2.str().c_str(),"stats",50,-100,100);
+    h1trefCorr[i]=new TH1D(name3.str().c_str(),"stats",50,-100,100);
+    h1cdf50[i]=new TH1D(name4.str().c_str(),"stats",50,-100,100);
+    h1refgaus[i]=new TH1D(name5.str().c_str(),"stats",50,-100,100);
   }
-  Tracks->clear();
-  if(chiprime->at(locprime) < 10)
-  {
-    chisqprime=0;
-    //do it one last time to actually fill plots with the smallest chisq and its params
-			int kk = 0;
-      for (auto hit:STT->hits)
-      {
-				kk++;
-				std::cout << "\n\nLOOK HERE:" << kk << std::endl;
-        //ret=Plugin::stop;
-        int side, plane, straw_in_plane;
-        STT_internal_to_logic(hit.id,&side,&plane,&straw_in_plane);
-        if (side==1 && plane <5 && STT->hits.size()>3 && hit.dist>0.6 && hit.dist<4.5)
-        {
-          auto pos=getStrawPos(hit.id)-off;//this is wire position x',y'
-          //now need intercept of line perpendicular to fit that passes through the straw
-          //the x coordinate of intercept is given by
-          double slope = par0prime->at(locprime);
-          double intercept = par1prime->at(locprime);
-          double lineX = (pos.X()/slope+pos.Y()- intercept)/(slope+1/slope);//this is given by solving equation for two perpendicular intersecting lines 
-          double lineY = slope*lineX+intercept;
-          resprime = sqrt(pow(pos.X()-lineX,2)+pow(pos.Y()-lineY,2))-hit.dist;
-          chisqprime = chisqprime + pow(resprime,2)/pow(0.15,2)/(numhits-2);
-          hitresidual->Fill(resprime);  
+  std::ostringstream nameCal, ename, nameInt, inEne;
+  nameCal<<"CalibCsI";
+  ename<<"E_corr";
+  nameInt<<"integCsI";
+  inEne<<"IntEnergy";
+  calibHist=new TH1D(nameCal.str().c_str(),"stat",62.0,0,250);
+  Ecorr=new TH1D(ename.str().c_str(),"stat",63.0,0,250);
+  integHist=new TH1D(nameInt.str().c_str(),"stat",63.0,0,250);
+  intEn=new TH1D(inEne.str().c_str(),"stat",63.0,0,250);
+  phdis=new TH1D("pheight","stat",150.,0,1000);
+  timing=new TH1D("timing","stat",60.,-30,30);
+  phdistr=new TH1D("ptdist","stat",62.5,1,249);
+  hkmu2=new TH1D("kmu2Ds","stat",150.,0,1000);
+  for(int iClock=0;iClock<12;iClock++){
+    for(int iFB=0;iFB<2;iFB++){
+      for(int iUD=0;iUD<2;iUD++){
+        for(int iModule=0;iModule<15;iModule++){
+          std::ostringstream name, name2, name3, name4, name5, name6, tname;
+          name<<"IntEne_"; name2<<"Mnfit_"; name3<<"F1fit_"; name4<<"Dhfit_"; name5<<"pHeight", name6<<"Diff";
+          tname<<"time";
+          name<<iClock<<"_"<<iFB<<"_"<<iUD<<"_"<<iModule;
+          tname<<iClock<<"_"<<iFB<<"_"<<iUD<<"_"<<iModule;
+          h1time[iClock][iFB][iUD][iModule]=new TH1D(tname.str().c_str(),"stat",86.5,0,1300);
+          h1cali[iClock][iFB][iUD][iModule]=new TH1D(name.str().c_str(),"stat",87.5,0,70000);
         }
-    
       }
-    TrackHit outtrack;
-    outtrack.chisq=chisqprime;
-    outtrack.slope=par0prime->at(locprime);
-    outtrack.intercept=par1prime->at(locprime);
-    Tracks->tracks.emplace_back(std::move(outtrack));
-    hitchisq->Fill(chisqprime); 
+    }
   }
+  return 0;
 }
 
-Long_t covfefe::cmdline(char *cmd)
-{
+Long_t covfefe::startup(){
+  getBranchObject("treeSing",(TObject **) &csimar); 
+  calibcsi=new CATCaliCsI();
+  makeBranch("marinCsI",(TObject **) &calibcsi);
+  gStyle->SetOptStat(0);
+
+  return 0;
+};
+
+Long_t covfefe::process(){
+  iclock=csimar->clock-1;
+  iModule=csimar->indexCsI-1;
+  iUD=csimar->ud; iFB=csimar->fb;
+  adcVal=csimar->phei;
+  std::cout<<" ... so called adc val: "<<adcVal<<std::endl;
+  intVal=csimar->intKmu2;
+  phdis->Fill(csimar->phei);
+  hkmu2->Fill(adcVal);
+  // timing variables
+  //double t_ref=csimar->tref;
+  if(adcVal > 0){
+    std::cout<<" -----------------------------------" <<std::endl;
+    std::cout<<" value of clock:  "<<iclock<<std::endl;
+    std::cout<<" value of Module: "<<iModule<<std::endl;
+    std::cout<<" value of iUD:    "<<iUD<<std::endl;
+    std::cout<<" value of iFB:    "<<iFB<<std::endl;
+    std::cout<<" value of adcVal: "<<adcVal<<std::endl;
+    //h1time[iclock][iFB][iUD][iModule]->Fill(adcVal);
+    //h1cali[iclock][iFB][iUD][iModule]->Fill(intVal);
+    // timing histos
+    for(int n=0; n<3; n++){
+    T_0[n]=csimar->tref[n]; tcorr[n]=csimar->tcorr[n];
+    refgaus[n]=csimar->rgaus[n];
+      h1t_0[n]->Fill(T_0[n]); h1tcorr[n]->Fill(tcorr[n]); 
+      h1refgaus[n]->Fill(refgaus[n]);
+    }
+  }
+  //if(t_ref> -900){
+    //double t_rise=csimar->trise;
+    //std::cout<<"\n timing check ------> "<<t_rise<<std::endl;
+    //timing->Fill(csimar->tcsi);
+  //}
+  double pktime=csimar->phdstr;
+  if(pktime>0 && pktime<250)
+    phdistr->Fill(csimar->phdstr);
 
   return 0; // 0 = all ok
 };
 
-Long_t covfefe::finalize()
-{
-
+Long_t covfefe::finalize(){
+  TSpectrum *s;
+  gStyle->SetOptStat(0);
+  std::ofstream calib;
+  calib.open("calibPar.txt");
+  double xmax, xx, calpar;
+  for(int iClock=0;iClock<12;iClock++){
+    for(int iFB=0;iFB<2;iFB++){
+      for(int iUD=0;iUD<2;iUD++){
+        for(int iModule=0;iModule<15;iModule++){
+          xmax=h1time[iClock][iFB][iUD][iModule]->GetMaximumBin();
+	  xx=h1time[iClock][iFB][iUD][iModule]->GetXaxis()->GetBinCenter(xmax);
+	  nbins=h1time[iClock][iFB][iUD][iModule]->GetXaxis()->GetNbins();
+	  lowRange=xx-110;
+          upRange=xx+100;
+	  TF1* f1=new TF1("f1","gaus",lowRange,upRange);
+	  //f1->SetParLimits(0,lowRange,upRange);
+	  h1time[iClock][iFB][iUD][iModule]->Fit(f1,"QR");
+	  apcsi=f1->GetMaximumX();
+	  calpar=dE/apcsi;
+	  calib<<iClock<<"\t"<<iFB<<"\t"<<iUD<<"\t"<<iModule<<"\t"<<calpar<<"\n";
+	  for(int n=0; n<nbins;n++){
+	    double yy=h1time[iClock][iFB][iUD][iModule]->GetBinContent(n);
+	    double x=h1time[iClock][iFB][iUD][iModule]->GetBinCenter(n);
+	    double xnew=calpar*x;
+	    calibHist->Fill(xnew,yy);
+	    Ecorr->Fill(xnew+8.9,yy);
+	  }
+          xmax=h1cali[iClock][iFB][iUD][iModule]->GetMaximumBin();
+	  xx=h1cali[iClock][iFB][iUD][iModule]->GetXaxis()->GetBinCenter(xmax);
+	  nbins=h1cali[iClock][iFB][iUD][iModule]->GetXaxis()->GetNbins();
+	  lowRange=xx-11000;
+          upRange=xx+10000;
+	  TF1* f2=new TF1("f2","gaus",lowRange,upRange);
+	  //f1->SetParLimits(0,lowRange,upRange);
+	  h1cali[iClock][iFB][iUD][iModule]->Fit(f2,"QR");
+	  apcsi=f2->GetMaximumX();
+	  calpar=dE/apcsi;
+	  for(int n=0; n<h1cali[iClock][iFB][iUD][iModule]->GetXaxis()->GetNbins();n++){
+	    double yy=h1cali[iClock][iFB][iUD][iModule]->GetBinContent(n);
+	    double x=h1cali[iClock][iFB][iUD][iModule]->GetBinCenter(n);
+	    double xnew=calpar*x;
+	    integHist->Fill(xnew,yy);
+	    intEn->Fill(xnew+8.9,yy);
+	  }
+	  delete f1;
+	  delete f2;
+        }
+      }
+    }
+  }
+  calib.close();
+  gStyle->SetOptStat(0);
+  TCanvas* c1=new TCanvas("MarinateCsI","Pulse-height distribution",3508,2480);
+  TCanvas* c2=new TCanvas("MarinateCsI2","Integrated pulse-height distribution",3508,2480);
+  TCanvas* c3=new TCanvas("E_CsI","Energy CsI",808,700);
+  TCanvas* c4=new TCanvas("ECsI","Energy CsI comparison",808,700);
+  TCanvas* c5=new TCanvas("Phei","Pulse height Distribution",808,700);
+  TCanvas* c6=new TCanvas("c6"," CsI timing",808,700);
+  TCanvas* c7=new TCanvas("c7"," Peak time ",808,700);
+  c1->Divide(3,4);
+  c2->Divide(3,4);
+  for(int iClock=0;iClock<1;iClock++){
+    for(int iFB=0;iFB<1;iFB++){
+      for(int iUD=0;iUD<1;iUD++){
+        for(int iModule=0;iModule<12;iModule++){
+          c1->cd(iModule+1);
+          h1time[iClock][iFB][iUD][iModule]->Draw();
+          c2->cd(iModule+1);
+          h1cali[iClock][iFB][iUD][iModule]->Draw();
+	}
+      }
+    }
+  }
+  c1->Write();
+  c2->Write();
+  c3->cd();
+  Ecorr->SetTitle("CsI: reconstructed energy for K_{#mu2} ");
+  Ecorr->GetXaxis()->SetTitle("Energy (T_{#mu}) [MeV]");
+  Ecorr->GetYaxis()->SetTitle("counts/bin");
+  Ecorr->GetYaxis()->SetRangeUser(0,1050e3);
+  Ecorr->SetLineColor(kCyan);
+  Ecorr->SetLineWidth(2);
+  Ecorr->Draw("hist");
+  calibHist->Draw("hist same");
+  auto leg0=new TLegend(0.1,0.7,0.48,0.9);
+  leg0->SetHeader("Key:","C");
+  leg0->AddEntry(Ecorr, "CD E_{loss} correction (#mu=153.67, #sigma=9.78)");
+  leg0->AddEntry(intEn, "dE (#mu=145.8, #sigma=12.9)");
+  leg0->Draw();
+  c3->Write();
+  c4->cd();
+  Ecorr->SetTitle("Comparing CsI Energy for K_{#mu2} for 2 methods ");
+  Ecorr->GetXaxis()->SetTitle("Deposited energy (T_{#mu}) [MeV]");
+  Ecorr->GetYaxis()->SetTitle("counts");
+  Ecorr->SetLineWidth(2);
+  Ecorr->Draw("hist");
+  intEn->SetLineColor(kCyan+3);
+  intEn->SetLineWidth(3);
+  intEn->Draw("hist same");
+  auto leg=new TLegend(0.1,0.7,0.48,0.9);
+  leg->SetHeader("Key:","C");
+  leg->AddEntry(Ecorr, "Pulse-height: E_{loss} applied (#mu=155.3, #sigma=11.7)");
+  leg->AddEntry(intEn, "Integrated waveform: E_{loss} applied (#mu=153.3, #sigma=19.5)");
+  leg->Draw();
+  c4->Write();
+  c5->cd();
+  phdis->SetTitle("Pulse-height distribution");
+  phdis->GetXaxis()->SetTitle("pulse-height");
+  phdis->GetYaxis()->SetTitle("counts/bin");
+  phdis->SetLineWidth(2);
+  phdis->Draw("hist");
+  hkmu2->SetFillColor(kMagenta);
+  hkmu2->SetFillStyle(3244);
+  hkmu2->SetLineWidth(2);
+  hkmu2->Draw("hist same");
+  auto leg2=new TLegend(0.1,0.7,0.48,0.9);
+  leg2->SetHeader("Key:","C");
+  leg2->AddEntry(phdis, "Pulse-height distribution");
+  leg2->AddEntry(hkmu2, "K_{#mu2} pulse-height distribtion");
+  leg2->Draw();
+  c5->Write();
+  c6->cd();
+  timing->SetTitle("CsI timing");
+  timing->GetXaxis()->SetTitle("time");
+  timing->GetYaxis()->SetTitle("counts/bin");
+  timing->SetLineWidth(2);
+  timing->Draw("hist");
+  c6->Write();
+  c7->cd();
+  phdistr->SetTitle("Peak time distribution");
+  phdistr->GetXaxis()->SetTitle("time [ch]");
+  phdistr->GetYaxis()->SetTitle("counts/bin");
+  phdistr->SetLineWidth(2);
+  phdistr->Draw("hist");
+  c7->Write();
   return 0; // 0 = all ok
 };
 
+Long_t covfefe::cmdline(char* cmd){
+  return 0;
+}
 
 extern "C"{
-  Plugin *factory(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p)
-  {
+  Plugin *factory(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p){
     return (Plugin *) new covfefe(in,out,inf_,outf_,p);
   }
 }
