@@ -230,14 +230,14 @@ Long_t Det_CsI::process_fit(){
 	h2ang->Fill(myCsI.getTheta(),myCsI.getPhi());
 	// Fill temporary CsI information
 	// Needed for future re-analysis
-	treeClus->tsig[angles]=myCsI.getCDF50();
-	treeClus->csiph[angles]=myCsI.getEdep();
-        treeClus->crysChk[angles]=true;
-        treeClus->csiR[angles]=myCsI.getR();
-        treeClus->csiZ[angles]=myCsI.getZ();
-	treeClus->csiEdep.push_back(myCsI.getphDiff());
-	treeClus->csiTheta.push_back(myCsI.getTheta());
-	treeClus->csiPhi.push_back(myCsI.getPhi());
+	//treeClus->tsig[angles]=myCsI.getCDF50();
+	//treeClus->csiph[angles]=myCsI.getEdep();
+        //treeClus->crysChk[angles]=true;
+        //treeClus->csiR[angles]=myCsI.getR();
+        //treeClus->csiZ[angles]=myCsI.getZ();
+	//treeClus->csiEdep.push_back(myCsI.getphDiff());
+	//treeClus->csiTheta.push_back(myCsI.getTheta());
+	//treeClus->csiPhi.push_back(myCsI.getPhi());
       }
       // not sure this is needed... just in case
       myCsI.setClustCsI(false);
