@@ -8,6 +8,7 @@
 
 #include <TLorentzVector.h>
 #include <TVector3.h>
+#include <TH1D.h>
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -112,6 +113,7 @@ private:
   double diffMass;
   std::vector<clusterVar> cvars;
   clusterVar clustvar;
+  TH1D* h1sc;
 
   std::vector<double> mdiff;
   // merge manyCrys and singleCrys clusters into single vector

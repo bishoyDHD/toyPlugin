@@ -102,11 +102,12 @@ private:
 private:
   int clusCrys;
   bool clus_csi;
-  std::vector<double> crysE;
-  std::map<std::pair<double,double>,double> csiph;
-  std::map<std::pair<double,double>,double> csiR;
-  std::map<std::pair<double,double>,double> csiZ;
-  std::map<std::pair<double,double>,bool> csiClus;
+  Double_t phdiff,tcalc;
+  std::vector<Double_t> crysE;
+  std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
+  std::map<std::pair<Double_t,Double_t>,Double_t> csiR;
+  std::map<std::pair<Double_t,Double_t>,Double_t> csiZ;
+  std::map<std::pair<Double_t,Double_t>,bool> csiClus;
   Double_t findChi2(shared_ptr<TH1D>);
   Double_t round(double val);
   void tryFit(shared_ptr<TH1D>);
@@ -116,35 +117,36 @@ private:
   void drawWaves(shared_ptr<TH1D> h1);
   void drawWaves(TH1D* h1);
   void drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1);
-  double mapPhi,pcal,Theta,acos,energy;
-  double lmax,lmin;
+  Double_t mapPhi,pcal,Theta,acos,energy;
+  Double_t lmax,lmin;
+  Double_t ptime,rtime,cdf50;
   int moduleNo,thetaIndex,phiIndex;
-  std::pair<double,double> angles;
+  std::pair<Double_t,Double_t> angles;
   TH2D* h2ang;
   // indices start at zero now
   int thetaCsI[16][48];
   int phiCsI[16][48];
   // angles to be used by the clusterFinder table
-  double otheta, ophi, wtheta, wphi, wz, wr;
+  Double_t otheta, ophi, wtheta, wphi, wz, wr;
   // crystal center Z:
-  double crysZ[20]={-48.3449, -42.0302, -36.5676, -31.5834, -26.851,
+  Double_t crysZ[20]={-48.3449, -42.0302, -36.5676, -31.5834, -26.851,
                     -20.9203, -15.7210, -10.9616, -6.46940, -2.1341,
                     2.1341, 6.46940, 10.9616, 15.7210, 20.9203,
                     26.851, 31.5834, 36.5676, 42.0302, 48.3449};
   // crystal center r:
-  double crysr[20]={16.4109, 20.727, 24.4337, 27.6979, 30.6177,
+  Double_t crysr[20]={16.4109, 20.727, 24.4337, 27.6979, 30.6177,
                     31.3094, 31.879, 32.2917, 32.5240, 32.5595,
                     32.5595, 32.5240, 32.2917, 31.879, 31.3094,
                     30.6177, 27.6979, 24.4337, 20.727, 16.4109};
 
   // Parameters for the waveform fitting function
-  double param[31]={1000, 35.76, 26.68, 19.85, 15.83, 0.065, 2.255, 31.21,120,
+  Double_t param[31]={1000, 35.76, 26.68, 19.85, 15.83, 0.065, 2.255, 31.21,120,
                     120.5, 800, 700., 200.1, 17.1, 0.065, 2.255, 31.21,
                     200.5, 600, 28.9, 18.0, 17.1, 0.065, 2.255, 31.21,
                     25, 28.9, 18.0, 17.1, 0.065, 62.7-17.1};
-  double parUplim[31]={1e5, 70.1, 60, 45, 20, 1.07, 4, 90, 350,
+  Double_t parUplim[31]={1e5, 70.1, 60, 45, 20, 1.07, 4, 90, 350,
                     250, 1e5, 80, 70, 50, 1.07, 1000, 250};
-  double parLowlim[31]={80.0, 15.1, 1, 5, 0., 1e-4, 0., 10,
+  Double_t parLowlim[31]={80.0, 15.1, 1, 5, 0., 1e-4, 0., 10,
                     70.1, 15, 10, 10, 10, 1e-4, 10, 20};
 public:
   ClusterCsI(){}
@@ -160,6 +162,7 @@ public:
   inline void setIndexTheta(int iTheta){thetaIndex=iTheta;}
   inline void setIndexPhi(UInt_t iPhi){phiIndex=iPhi;}
   void calcThetaPhi(double);
+  void calTime(shared_ptr<TF1> f1);
   inline void dumbFn(){std::cout<<" -----> Hola 7 phezulu ===== "<<wtheta<<", "<<wphi<<std::endl;}
   void setAngles(int module,int channel,int yy,int zz);
   inline void setpCalib(double calib){pcal=calib/1000.;}
@@ -170,8 +173,12 @@ public:
   Double_t getTheta(){return wtheta;}
   Double_t getPhi(){return wphi;}
   Double_t getEdep(){return energy;}
+  Double_t getphDiff(){return phdiff;}
   Double_t getR(){return wr;}
   Double_t getZ(){return wz;}
+  Double_t getTime(){return rtime;}
+  Double_t getpTime(){return ptime;}
+  Double_t getCDF50(){return cdf50;}
   UInt_t numberWave() const{
     return mNWave;
   }

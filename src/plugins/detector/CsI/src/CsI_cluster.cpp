@@ -25,7 +25,7 @@ Long_t Det_CsI::histos_fit(){
 }
 Long_t Det_CsI::startup_fit(){
   getBranchObject("vf48",(TObject **) &treeRaw);
-  getBranchObject("tgtInfo",(TObject **) &treetgt);
+  getBranchObject("mwpcInfo",(TObject **) &mwpcTree);
   treeClus=new CRTClusterCsI();
   makeBranch("treeClus",(TObject **) &treeClus);
   gROOT->SetBatch(kTRUE);
@@ -75,6 +75,8 @@ void Det_CsI::initVar(){
   treeClus->cpid1phiE=dummy;     treeClus->kM2=dummy;
   treeClus->cpid2thetaE=dummy;   treeClus->cpid1E=dummy;
   treeClus->cpid2phiE=dummy;     treeClus->cpid2E=dummy;
+  treeClus->isBad=dummy;
+  channel.clear();               phdiff.clear();
   csiph.clear();   phval.clear();   crysChk.clear();
   csiR.clear();    csiZ.clear();
   clusEne.clear(); singleEne.clear();
@@ -119,18 +121,23 @@ Long_t Det_CsI::angleCsI(int id, int module, int channel, int yy, int zz){
   return 0;
 }
 Long_t Det_CsI::process_fit(){
+  // Save relavant run/event info
+  treeClus->eventNo=treeRaw->eventNo;
+  treeClus->runNo=treeRaw->runNo;
   if(treeRaw->isBad<0){
     cout<<"slipped event"<<endl;
     return 0;
   }
+  // need to make sure this called for every event
+  // avoid memory leaks
   initVar();
-  if(treetgt->run != treeRaw->runNo){
+  if(mwpcTree->run != treeRaw->runNo){
     std::cout<<" Oops you are comparing to different runs \n";
     std::cout<<" ***Bailing*** Bailing*** \n";
     std::abort();
   }
-  // make sure that this is a good gap event
-  if(treetgt->TOF1Gap<=0 || treetgt->TOF2Gap<=0) return 0;
+  // make sure that this is a good gap event: isBad>0 (=1)
+  if(mwpcTree->nTracks==0 || mwpcTree->fVertSP==-10000) return 0;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
@@ -164,7 +171,7 @@ Long_t Det_CsI::process_fit(){
       std::cout<<"..... Got one!!\n";
       return 0;
     }
-    #pragma omp parallel num_threads(8)
+    #pragma omp parallel num_threads(16)
     iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
     //std::cout<< " Gap config FB is  : " <<p[1]<<std::endl;
     //std::cout<< " Gap config UD is  : " <<p[0]<<std::endl;
@@ -221,7 +228,18 @@ Long_t Det_CsI::process_fit(){
 	csiPhi.push_back(myCsI.getPhi());
 	//if(myCsI.getTheta()<16.2) std::abort();
 	h2ang->Fill(myCsI.getTheta(),myCsI.getPhi());
+	// Fill temporary CsI information
+	// Needed for future re-analysis
+	treeClus->tsig[angles]=myCsI.getCDF50();
+	treeClus->csiph[angles]=myCsI.getEdep();
+        treeClus->crysChk[angles]=true;
+        treeClus->csiR[angles]=myCsI.getR();
+        treeClus->csiZ[angles]=myCsI.getZ();
+	treeClus->csiEdep.push_back(myCsI.getphDiff());
+	treeClus->csiTheta.push_back(myCsI.getTheta());
+	treeClus->csiPhi.push_back(myCsI.getPhi());
       }
+      // not sure this is needed... just in case
       myCsI.setClustCsI(false);
     }// end of signal CsI if-loop
   }
@@ -248,7 +266,7 @@ Long_t Det_CsI::process_fit(){
     TVector3 prim1vec3,prim2vec3,gv1;
     double opAngle,prim2px,prim2py,prim2pz;
     scoring->setScoreMass(0.09);
-    if((multiCrys==4 || singleCrys==4)) goto exitFill;
+    if((multiCrys>=4 || singleCrys>=4)) goto exitFill;
     //if((multiCrys+singleCrys>=4)) goto exitFill;
     if(multiCrys==2 && singleCrys==0){
       std::cout<<"  This is only 2 multiCrys ---|\n";
@@ -416,6 +434,7 @@ Long_t Det_CsI::process_fit(){
     std::cout<<"... End reached! Outta here! \n";
     std::cout<<" ***************************************************************************\n";
   }
+  treeClus->isBad=1; // event register, this is the case for good event
   return 0;
 }
 Long_t Det_CsI::finalize_fit(){

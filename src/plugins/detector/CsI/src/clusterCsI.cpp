@@ -131,6 +131,11 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin)*pcal;
 	calcThetaPhi(energy);
+	phdiff=(lmax-lmin);
+        tcalc=.5*(lmax-lmin);
+        cdf50=f1->GetParameter(1);
+        std::cout<<" -------------------- "<<cdf50<<std::endl;
+	//calTime(f1);
         if(mEventNo % 1000==0)
           drawWaves(h1);
         std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
@@ -171,6 +176,11 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin)*pcal;
 	calcThetaPhi(energy);
+	phdiff=(lmax-lmin);
+        tcalc=.5*(lmax+lmin);
+        cdf50=f1->GetParameter(1);
+        std::cout<<" -------------------- "<<cdf50<<std::endl;
+	//calTime(f1);
         if(mEventNo % 1000==0)
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
@@ -214,7 +224,12 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
           clus_csi=true;
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin)*pcal;
+	phdiff=(lmax-lmin);
 	calcThetaPhi(energy);
+        tcalc=.5*(lmax+lmin);
+        cdf50=f1->GetParameter(1);
+        std::cout<<" -------------------- "<<cdf50<<std::endl;
+	//calTime(f1);
         if(mEventNo % 1000==0)
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
@@ -249,7 +264,12 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
           clus_csi=true;
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin)*pcal;
+	phdiff=(lmax-lmin);
 	calcThetaPhi(energy);
+        tcalc=.5*(lmax+lmin);
+        cdf50=f1->GetParameter(1);
+        std::cout<<" -------------------- "<<cdf50<<std::endl;
+	//calTime(f1);
         //if(mEventNo % 1000==0)
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
@@ -275,6 +295,12 @@ void ClusterCsI::calcThetaPhi(double Edep){
   angles=std::make_pair(wtheta,wphi);
   //h2ang->Fill(wtheta,wphi);
   cout<< " *** World Angles  "<<wtheta<<", "<<wphi<<endl;
+}
+void ClusterCsI::calTime(shared_ptr<TF1> f1){
+  // calculate cdf50 time
+  lmin=f1->GetMinimum();
+  lmax=f1->GetMaximum();
+  //std::cout<<"--------> checking min, max: "<<lmin<<", "<<lmax<<std::endl;
 }
 //void ClusterCsI::drawWaves(TH1D* h1){
 void ClusterCsI::drawWaves(shared_ptr<TH1D> h1){

@@ -24,7 +24,7 @@ private:
   //CRTFitCsI *treeFit;			/// Output tree for CSI data
   CRTRawCsI *treeRaw;			/// Input tree with CSI raw data
   CRTClusterCsI *treeClus;			/// Input tree with CSI raw data
-  targetE36* treetgt;
+  mwpcE36* mwpcTree;
   //
   // Detector parameters set in init file
   //
@@ -33,36 +33,38 @@ private:
   clusterScore* scoring;
   std::map<IdCsI,UInt_t> mapCsI;
   std::ifstream parfile;
-  UInt_t iClock,iFB,iUD,iModule;
+  UInt_t iClock,iFB,iUD,iModule, event=0;
   double calibpar[12][2][2][16];
   double mapPhi,pcal;
   int moduleNo, clusCrys,clustM;;
   int multiCrys, singleCrys;
   bool clus_csi;
-  std::vector<double> crysE,phval;
-  std::map<std::pair<double,double>,double> csiph;
-  std::map<std::pair<double,double>,double> csiR;
-  std::map<std::pair<double,double>,double> csiZ;
-  std::map<std::pair<double,double>,bool> crysChk;
-  std::vector<double> clusEne,singleEne,singZ,singR,singTheta,singPhi;
-  std::vector<double> clusThetaE, clusPhiE, clusEz, clusEr;
-  std::vector<double> csiEdep, csiPhi, csiTheta;
+  std::vector<Double_t> crysE,phval;
+  std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
+  std::map<std::pair<Double_t,Double_t>,Double_t> csiR;
+  std::map<std::pair<Double_t,Double_t>,Double_t> csiZ;
+  std::map<std::pair<Double_t,Double_t>,bool> crysChk;
+  std::vector<Double_t> clusEne,singleEne,singZ,singR,singTheta,singPhi;
+  std::vector<Double_t> clusThetaE, clusPhiE, clusEz, clusEr;
+  std::vector<Double_t> csiEdep, csiPhi, csiTheta;
+  std::vector<UInt_t> channel;
+  std::vector<Double_t> phdiff; // difference of pulse-height
   // indices start at zero now
   int thetaCsI[16][48];
   int phiCsI[16][48];
   // angles to be used by the clusterFinder table
-  double otheta, ophi, wtheta, wphi, wz, wr;
-  double pr2px, pr2py, pr2pz;
-  double cl1px, cl1py, cl1pz;
-  double cl2px, cl2py, cl2pz;
-  double cl1x,  cl1y,  cl1z, cl1r;
-  double cl2x,  cl2y,  cl2z, cl2r;
-  double cl1E,cl2E,cl1theta, cl2theta;
-  double cl1phi, cl2phi;
-  double pr1px, pr1py, pr1pz;
-  double pr2x, pr2y, pr2z;
-  double pr1Etot;
-  double E2clust=0;
+  Double_t otheta, ophi, wtheta, wphi, wz, wr;
+  Double_t pr2px, pr2py, pr2pz;
+  Double_t cl1px, cl1py, cl1pz;
+  Double_t cl2px, cl2py, cl2pz;
+  Double_t cl1x,  cl1y,  cl1z, cl1r;
+  Double_t cl2x,  cl2y,  cl2z, cl2r;
+  Double_t cl1E,cl2E,cl1theta, cl2theta;
+  Double_t cl1phi, cl2phi;
+  Double_t pr1px, pr1py, pr1pz;
+  Double_t pr2x, pr2y, pr2z;
+  Double_t pr1Etot;
+  Double_t E2clust=0;
 
 public:
   Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_);
@@ -86,18 +88,13 @@ public:
   void initVar();
   Long_t angleCsI(int id, int module, int channel, int yy, int zz);
   //histograms for fit
-
   TH2D* h2TimeVSCsI,*h2ang;
   TH2D* h2ChargeVSCsI;
   TH1D* h1MaxDiff;
   TH2D* h2DiffVSCsI;
   
-
   virtual Long_t cmdline(char * cmd);
-
-  
   
   ClassDef(Det_CsI,1);
-    };
-
+};
 #endif

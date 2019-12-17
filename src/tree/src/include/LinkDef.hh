@@ -42,5 +42,6 @@
 #pragma link C++ class CRTtrackVar+;
 #pragma link C++ class trackingE36+;
 #pragma link C++ class targetE36+;
+#pragma link C++ class mwpcE36+;
 
 #endif

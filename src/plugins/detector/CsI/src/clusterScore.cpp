@@ -3,7 +3,7 @@
 //clusterVar::clusterVar(){}
 
 clusterScore::clusterScore():cpid(1),clustEvalNo(2){
- 
+  h1sc=new TH1D("h1cs"," scoring difference", 55.,0.,.3); 
 }
 clusterScore::~clusterScore(){
 
@@ -23,6 +23,7 @@ void clusterScore::init(){
   csitheta.clear();      csiphi_.clear();
   csiphi.clear();        csitime_.clear();
   csitime.clear();
+  cMultip=0;
 }
 // will be needed for sanity check plots and scoring
 // default is pi0
@@ -65,7 +66,7 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
   // manyCrysPhi and singleCrysPhi
   mergeVect(phi,phi2);
   // set Cluster multiplicity
-  setClustM(mCrys.size());
+  cMultip=mCrys.size();
   // push cluster variables to container
   for(UInt_t i=0; i<mCrys.size(); i++){
     // cluster storage:
@@ -102,6 +103,7 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
           invMass=particlelv.M();
           diffMass=std::abs(mass-invMass);
           // fill vars for scoring:
+	  h1sc->Fill(diffMass);
           mdiff.push_back(diffMass);
           InvMass[diffMass]=invMass;
           clustE[diffMass]=energy;
@@ -144,6 +146,7 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
             invMass=particlelv.M();
             diffMass=std::abs(mass-invMass);
             // fill vars for scoring:
+	    h1sc->Fill(diffMass);
             mdiff.push_back(diffMass);
             InvMass[diffMass]=invMass;
             clustE[diffMass]=energy;
@@ -201,7 +204,7 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
   //energy=(eneCrys[0]+eneCrys[1]);
   //std::cout<<" ... new energy eval.: "<<energy<<std::endl;
   // set Cluster multiplicity
-  setClustM(eneCrys.size());
+  cMultip=eneCrys.size();
   for(UInt_t i=0; i<eneCrys.size(); i++){
     // cluster storage:
     px=eneCrys[i]*std::sin(theta[i])*std::cos(phi[i]);
@@ -237,6 +240,7 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
           invMass=particlelv.M();
           diffMass=std::abs(mass-invMass);
           // fill vars for scoring:
+	  h1sc->Fill(diffMass);
           mdiff.push_back(diffMass);
           InvMass[diffMass]=invMass;
           clustE[diffMass]=energy;
@@ -273,6 +277,7 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
             invMass=particlelv.M();
             diffMass=std::abs(mass-invMass);
             // fill vars for scoring:
+	    h1sc->Fill(diffMass);
             mdiff.push_back(diffMass);
             InvMass[diffMass]=invMass;
             clustE[diffMass]=energy;
@@ -362,6 +367,7 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
           invMass=particlelv.M();
           diffMass=std::abs(mass-invMass);
           // fill vars for scoring:
+	  h1sc->Fill(diffMass);
           mdiff.push_back(diffMass);
           InvMass[diffMass]=invMass;
           clustE[diffMass]=energy;
@@ -400,6 +406,7 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
             invMass=particlelv.M();
             diffMass=std::abs(mass-invMass);
             // fill vars for scoring:
+	    h1sc->Fill(diffMass);
             mdiff.push_back(diffMass);
             InvMass[diffMass]=invMass;
             clustE[diffMass]=energy;
@@ -478,6 +485,7 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
           invMass=particlelv.M();
           diffMass=std::abs(mass-invMass);
           // fill vars for scoring:
+	  h1sc->Fill(diffMass);
           mdiff.push_back(diffMass);
           InvMass[diffMass]=invMass;
           clustE[diffMass]=energy;
@@ -510,6 +518,7 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
             invMass=particlelv.M();
             diffMass=std::abs(mass-invMass);
             // fill vars for scoring:
+	    h1sc->Fill(diffMass);
             mdiff.push_back(diffMass);
             InvMass[diffMass]=invMass;
             clustE[diffMass]=energy;

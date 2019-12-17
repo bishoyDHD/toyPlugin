@@ -81,6 +81,19 @@ public:
   virtual ~targetE36();
   ClassDef(targetE36,2);
 };
+class mwpcE36: public CRTBase{
+public:
+  UInt_t run ;
+  UInt_t event;
+  Int_t nTracks;
+  Int_t fgapNumTof2;
+  Int_t nHits;
+  Double_t fTof2SP;
+  Double_t fVertSP;
+  mwpcE36();
+  virtual ~mwpcE36();
+  ClassDef(mwpcE36,2);
+};
 class trackingE36 : public CRTBase{
 public:
   Double_t nxVert, nyVert, nzVert;
