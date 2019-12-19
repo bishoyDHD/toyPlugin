@@ -7,7 +7,7 @@ if [ $ans1 == $ans ]; then
     cmake ../
     make -j8 && make install
     if [ $? -ne 0 ]; then
-       echo "... Oops something went wrong, exiting now ...";
+       echo "***Oops something went wrong!***\n ...Exiting now";
        return 0;
     fi
 else # case no: No new file(s) added 
@@ -17,12 +17,12 @@ else # case no: No new file(s) added
       if [ $ans1 == $newAns ]; then # if existing file(s) added
          make -j8 && make install
 	 if [ $? -ne 0 ]; then
-            echo "... Oops something went wrong, exiting now ...";
+            echo "***Oops something went wrong!***\n ...Exiting now";
 	    return 0;
 	 fi
       else
          echo " Moving onto running the plugin...";
-         echo " without changes of couse";
+         echo " without changes of course";
       fi
    fi
 fi
