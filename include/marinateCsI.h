@@ -55,12 +55,26 @@ class CATSingleCsI:public CATBase{
 
 class CATClusterCsI:public CATBase{
  public:
+  UInt_t runNo;
+  UInt_t eventNo;
+  Int_t isBad;
+  UInt_t nChannel;
+  //std::vector<UInt_t> nameModule;
+  //std::vector<UInt_t> indexChannel;
+  //std::vector<UInt_t> nameCsI;
+  //std::vector<UInt_t> indexCsI;
+  Int_t evtNo, channel;
+  //std::vector<Double_t> crysE,phval,csiTheta,csiPhi,csiEdep;
+  //std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
+  //std::map<std::pair<Double_t,Double_t>,Double_t> csiR;
+  //std::map<std::pair<Double_t,Double_t>,Double_t> csiZ;
+  //std::map<std::pair<Double_t,Double_t>,Double_t> tsig;
+  //std::map<std::pair<Double_t,Double_t>,bool> crysChk;
   // timing determination for CsI(Tl):                       
   Double_t tpeak, tref[3],rgaus[3];
   Double_t refpk[3], tcorr[3], refmn[3];
   Double_t trise;
   // cluster variables
-  Int_t evtNo, channel;
   int waveID;  // distinguish between 4-different kinds of waves
   Int_t dubP_1; // pre-pile up with double peak
   Double_t E_prim1, M_prim1, prim1M2;
