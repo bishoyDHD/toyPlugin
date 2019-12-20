@@ -4,7 +4,7 @@
 
 <init>init/trekAll.xml</init>
 
-<source>vf48_hdw:tracks</source> <!-- the source tree name-->
+<source>vf48_hdw:tracks:target</source> <!-- the source tree name-->
 <destination>csi_cali</destination> <!-- the destination tree name-->
 
 <plugins>

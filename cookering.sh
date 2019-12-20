@@ -31,7 +31,8 @@ read num;
 echo " Would you like to use visco?"
 read visCo;
 if [ $ans1 == $visCo ]; then
-    nice ./bin/visco ../recipe/CsI/clustering.xml $path_decoded/run${num}.root:$path_converted/run${num}conv.root $path_cooked/cookedRun${num}.root
+    nice ./bin/visco ../recipe/CsI/clustering.xml $path_decoded/run${num}.root:$path_converted/run${num}mwpcConv.root:$path_converted/run${num}tgtConv.root $path_cooked/cookedRun${num}.root
 else
-    nice ./bin/cooker ../recipe/CsI/clustering.xml $path_decoded/run${num}.root:$path_converted/run${num}conv.root $path_cooked/cookedRun${num}.root
+    nice ./bin/cooker ../recipe/CsI/clustering.xml $path_decoded/run${num}.root:$path_converted/run${num}mwpcConv.root:$path_converted/run${num}tgtConv.root $path_cooked/cookedRun${num}.root
+    #nice ./bin/cooker ../recipe/CsI/clustering.xml $path_decoded/run${num}.root:$path_converted/run${num}conv.root $path_cooked/cookedRun${num}.root
 fi

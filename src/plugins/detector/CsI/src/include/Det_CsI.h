@@ -25,6 +25,7 @@ private:
   CRTRawCsI *treeRaw;			/// Input tree with CSI raw data
   CRTClusterCsI *treeClus;			/// Input tree with CSI raw data
   mwpcE36* mwpcTree;
+  targetE36* tgtTree;
   //
   // Detector parameters set in init file
   //

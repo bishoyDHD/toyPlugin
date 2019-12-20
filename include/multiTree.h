@@ -22,8 +22,8 @@ public:
   UInt_t eventFlag;
   Int_t TOF1Gap;
   Int_t TOF2Gap;
-  /*
   Int_t extraTOF1;
+  /*
   Float_t phiAngle;
   Float_t deltaPhiAngle;
   Float_t chiS;

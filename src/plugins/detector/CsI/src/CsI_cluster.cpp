@@ -26,6 +26,7 @@ Long_t Det_CsI::histos_fit(){
 Long_t Det_CsI::startup_fit(){
   getBranchObject("vf48",(TObject **) &treeRaw);
   getBranchObject("mwpcInfo",(TObject **) &mwpcTree);
+  getBranchObject("tgtInfo",(TObject **) &tgtTree);
   treeClus=new CRTClusterCsI();
   makeBranch("treeClus",(TObject **) &treeClus);
   gROOT->SetBatch(kTRUE);
@@ -76,6 +77,7 @@ void Det_CsI::initVar(){
   treeClus->cpid2thetaE=dummy;   treeClus->cpid1E=dummy;
   treeClus->cpid2phiE=dummy;     treeClus->cpid2E=dummy;
   treeClus->isBad=dummy;
+  treeClus->extraTOF1=dummy;
   channel.clear();               phdiff.clear();
   csiph.clear();   phval.clear();   crysChk.clear();
   csiR.clear();    csiZ.clear();
@@ -131,7 +133,7 @@ Long_t Det_CsI::process_fit(){
   // need to make sure this called for every event
   // avoid memory leaks
   initVar();
-  if(mwpcTree->run != treeRaw->runNo){
+  if(mwpcTree->run != treeRaw->runNo && tgtTree->run != treeRaw->runNo){
     std::cout<<" Oops you are comparing to different runs \n";
     std::cout<<" ***Bailing*** Bailing*** \n";
     std::abort();
@@ -394,6 +396,7 @@ Long_t Det_CsI::process_fit(){
     prim1lv.SetPxPyPzE(pr1px, pr1py, pr1pz,pr1Etot);
     kaon=prim1lv+prim2lv;
     // Fill tree var
+    treeClus->extraTOF1=tgtTree->extraTOF1;
     treeClus->E_prim2=E2clust;
     treeClus->cpid1Px=cl1px;       treeClus->cpid2Px=cl2px;      treeClus->prim2px=prim2lv.Px();
     treeClus->cpid1Py=cl1py;       treeClus->cpid2Py=cl2py;      treeClus->prim2py=prim2lv.Py();

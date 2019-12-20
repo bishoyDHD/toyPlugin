@@ -57,7 +57,7 @@ class CATClusterCsI:public CATBase{
  public:
   UInt_t runNo;
   UInt_t eventNo;
-  Int_t isBad;
+  Int_t isBad,extraTOF1;
   UInt_t nChannel;
   //std::vector<UInt_t> nameModule;
   //std::vector<UInt_t> indexChannel;
