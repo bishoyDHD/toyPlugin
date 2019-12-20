@@ -53,13 +53,12 @@ Long_t covfefe::process_clust(){
         clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,1);
         clustEval->fillHistos(prim2lv.M2(),1);
 	//std::cout<<" Checking the momentum of pi+ =>"<<P<<"\n";
-	/*
-	if(P>= .195 && P<=.215){
+	if(prim2lv.M()>= .07 && prim2lv.M()<=.16){
           clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,2);
           clustEval->fillHistos(prim2lv.M2(),2);
-	  std::cout<<" ... Mass2: "<<prim2lv.M2()<<std::endl;
+	  //std::cout<<" ... Mass2: "<<prim2lv.M2()<<std::endl;
 	  //std::cout<<" Px, Py, Pz: ["<<clsmar->prim2px<<", "<<clsmar->prim2py<<", "<<clsmar->prim2pz<<"]\n";
-	}*/
+	}
       }
     //}
   }
