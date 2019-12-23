@@ -48,14 +48,14 @@ Long_t covfefe::process_clust(){
       //clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,0);
       clustEval->fillHistos(prim2lv.M2(),0);
       //clustEval->fillHistos(clsmar->cpid1theta,clsmar->cpid1phi,clsmar->cpid2theta,clsmar->cpid2phi,0,0);
-      clustEval->fillMltp(clsmar->clusterM);
       // eval only 2 clusters
       if(clsmar->clusterM==2 && clsmar->E_prim2>0.02){
         clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,0);
+        clustEval->fillMltp(clsmar->extraTOF1);
         clustEval->fillHistos(prim2lv.M2(),0);
 	//std::cout<<" Checking the momentum of pi+ =>"<<P<<"\n";
 	// check that TOF1 multiplicity is greater than or equal to 2
-	if(clsmar->extraTOF1>=2){
+	if(clsmar->extraTOF1>=1){
           clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,1);
           clustEval->fillHistos(prim2lv.M2(),1);
 	  //std::cout<<" ... Mass2: "<<prim2lv.M2()<<std::endl;
