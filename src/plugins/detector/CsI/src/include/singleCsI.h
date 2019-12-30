@@ -38,6 +38,7 @@ private:
   UInt_t mIndexCsI;
   UInt_t mNWave;
   Double_t mPar[36];
+  Int_t x1,x2,diffMax;
   vector<Double_t> mListData;
   vector<Double_t> mListTime;
   vector<Double_t> mListEnergy;
@@ -52,6 +53,22 @@ private:
   void drawWaves(shared_ptr<TH1D> h1);
   void drawWaves(TH1D* h1);
   void drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1);
+  Double_t mapPhi,pcal,Theta,acos,energy;
+  Double_t lmax,lmin,ymax2,ymax3;
+  Double_t ptime,rtime,cdf50;
+  Double_t phdiff,tcalc;
+  Double_t otheta, ophi, wtheta, wphi, wz, wr;
+  int moduleNo,thetaIndex,phiIndex;
+  // crystal center Z:
+  Double_t crysZ[20]={-48.3449, -42.0302, -36.5676, -31.5834, -26.851,
+                    -20.9203, -15.7210, -10.9616, -6.46940, -2.1341,
+                    2.1341, 6.46940, 10.9616, 15.7210, 20.9203,
+                    26.851, 31.5834, 36.5676, 42.0302, 48.3449};
+  // crystal center r:
+  Double_t crysr[20]={16.4109, 20.727, 24.4337, 27.6979, 30.6177,
+                    31.3094, 31.879, 32.2917, 32.5240, 32.5595,
+                    32.5595, 32.5240, 32.2917, 31.879, 31.3094,
+                    30.6177, 27.6979, 24.4337, 20.727, 16.4109};
   // Parameters for the waveform fitting function
   double param[31]={1000, 35.76, 26.68, 19.85, 15.83, 0.065, 2.255, 31.21,120,
                     120.5, 800, 700., 200.1, 17.1, 0.065, 2.255, 31.21,
@@ -73,6 +90,21 @@ public:
   inline void setCsI(UInt_t index){mIndexCsI=index;}
   inline void addData(UShort_t sample){mListData.push_back(sample);}
   void setData(const vector<UShort_t>&);
+  inline void setIndexTheta(int iTheta){thetaIndex=iTheta;}
+  inline void setIndexPhi(UInt_t iPhi){phiIndex=iPhi;}
+  void calcThetaPhi(double);
+  void calTime(shared_ptr<TF1> f1);
+  inline void dumbFn(){std::cout<<" -----> Hola 7 phezulu ===== "<<wtheta<<", "<<wphi<<std::endl;}
+  void setAngles(int module,int channel,int yy,int zz);
+  Double_t getTheta(){return wtheta;}
+  Double_t getPhi(){return wphi;}
+  Double_t getEdep(){return energy;}
+  Double_t getphDiff(){return phdiff;}
+  Double_t getR(){return wr;}
+  Double_t getZ(){return wz;}
+  Double_t getTime(){return rtime;}
+  Double_t getpTime(){return ptime;}
+  Double_t getCDF50(){return cdf50;}
   UInt_t numberWave() const{
     return mNWave;
   }

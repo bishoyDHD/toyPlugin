@@ -1,7 +1,4 @@
 #include <Det_CsI.h>
-
-#include<cmath>
-
 #include <fstream>
 #include <iostream>
 using namespace std;
@@ -39,262 +36,203 @@ Long_t Det_CsI::setIdCsI(map<IdCsI,UInt_t> & map){
   }
 }
 
-Long_t Det_CsI::histos()
-{
+Long_t Det_CsI::histos(){
 
   return 0;
-
 }
 
-Long_t Det_CsI::startup()
-{
-  /*
-   debug(1,"TOF Startup called.\n ToF Config:\nTDC offsets:");
-  debug(1,"\nADC offsets:");
-  for (int i=0;i<72;i++)
-    debug(1,"%i ",adcoffset[i]);
-  debug(1,"\nADC gains:");
-  for (int i=0;i<72;i++)
-    debug(1,"%g ",adcgain[i]);
-  for (int i=0;i<36;i++)
-    debug(1,"\n Speed Of Light:  %g  mm/count\n",channeldist[i]);
-
-
-  // Generate our ToF object
-  tofo=new ToF();
-  
-  // Make new branch on output tree
-  makeBranch("ToFhits",(TObject **)&tofo);
-
-  // Look up input tof:
-  getBranchObject("ToF",(TObject **) &tofi);
-  
-  getBranchObject("EventInfo", (TObject**)&eventinfo);
-
-  // Check for pedestals from pedestal running
-  ped = (ORTPedestal*) getFileObject("TOF_PEDS");
-  double avg=0;
-  if (ped != NULL) // Pedestals exist in raw file
-  {
-    debug(1,"############# Found pedestal data in raw file\n");
-    for (int a = 0; a < 72; a++) 
-    {
-      // Indexing used by saved pedestals is different from indexing used everywhere else
-      // ped 0-71: L_top, R_top, L_bottom, R_bottom 
-      int pindex = (a%18) + ((a %36)>17?36:0)+ (a>35?18:0);
-      double peda= ped->pedestals[pindex].mean;
-
-      avg+=peda;
-      set_adcoffset(a, peda);
-      char buf[1000];
-      sprintf(buf,"ToF:ADC:ped:%i",a);
-      saveInfo(buf,peda);
-    }
-    saveInfo("ToF:ADC:ped:all",avg/72);
-  }
-  debug(1,"ADC pedestals:");
-  for (int b = 0; b < 72; b++) 
-    debug(1,"%i ",adcoffset[b]);
-  debug(1,"\n");
-
-  switch (getRunType())
-  {
-  case Plugin::PositronPositive:
-    debug(1,"ToF: Beam Species:  Positrons\nToF: Toroid Current: positive\n");
-    for(int i = 0; i< 72; i++)
-      TDCoffset[i] = pTDCoffset[i];
-    std::cout << "positive " << std::endl;
-    break;
-  case Plugin::PositronNegative:
-    debug(1,"ToF: Beam Species:  Positrons\nToF: Toroid Current: negative\n");
-    for(int i = 0; i< 72; i++)
-      TDCoffset[i] = pTDCoffset[i];
-    break;
-  case Plugin::ElectronPositive:
-    debug(1,"ToF: Beam Species:  Electrons\nToF: Toroid Current: positive\n");
-    for(int i = 0; i< 72; i++)
-      TDCoffset[i] = eTDCoffset[i];
-    break;
-  case Plugin::ElectronNegative:
-    debug(1,"ToF: Beam Species:  Electrons\nToF: Toroid Current: negative\n");
-    for(int i = 0; i< 72; i++)
-      TDCoffset[i] = eTDCoffset[i];
-    break;
-  case Plugin::unknown:
-    debug(0," *** Slow control does not know run type! Cosmic run? Using Positron/positive.\n");
-    for(int i = 0; i< 72; i++)
-      TDCoffset[i] = pTDCoffset[i];
-    break;
-  }
-
-
-  //setup hv tests
-  eventshvoff=0;
-  brokenchannels=0;
-  scmanager= (slowctrl::manager*)getMemoryObject("SlowCtrl Manager");
-  for (int i=1;i<19;i++)
-  {
-    char channame[1000];
-    sprintf(channame,"TOF:LB%02iSTI",i);
-    scmanager->addWatch(scmanager->getCurrentByName(channame),0.5,1,&brokenchannels);
-    sprintf(channame,"TOF:LT%02iSTI",i);
-    scmanager->addWatch(scmanager->getCurrentByName(channame),0.5,1,&brokenchannels);
-    sprintf(channame,"TOF:RB%02iSTI",i);
-    scmanager->addWatch(scmanager->getCurrentByName(channame),0.5,1,&brokenchannels);
-    sprintf(channame,"TOF:RT%02iSTI",i);
-    scmanager->addWatch(scmanager->getCurrentByName(channame),0.5,1,&brokenchannels);
-  }
-
-  loadGeo(); // Load geometry for phi reconstruction
-  */
+Long_t Det_CsI::startup(){
   getBranchObject("vf48",(TObject **) &treeRaw);
-  //gStyle->SetOptStat(0);
+  treeFit=new CRTSingleCsI();
+  makeBranch("singleCsI",(TObject **) &treeFit);
+  gStyle->SetOptStat(0);
 
   return 0;
 };
 
+Long_t Det_CsI::singleAng(int id, int module, int channel, int yy, int zz){
+  //std::cout<<"\n --- "<<id<<"-"<<module<<"-"<<channel<<"-"<<yy<<"-"<<zz<<" ---\n";
+  phiCsI[module][channel]=yy;
+  thetaCsI[module][channel]=zz;
+  std::cout<<"\n --- thetaCsI["<<module<<"]["<<channel<<"] = "<<yy<<" <---> "<<thetaCsI[module][channel]<<" ---\n";
 
-Long_t Det_CsI::process()
-{
-  /*
-  if (brokenchannels>0)
-  {
-    eventshvoff++;
-    debug(1,"TOF HV dropped out\n");
+  return 0;
+}
+//Initialize storage variables here
+void Det_CsI::initSingleVar(){
+  int dummy=-1000;
+  treeFit->thSing=dummy;
+  treeFit->indexCsI=dummy;      treeFit->phiSing=dummy;
+  treeFit->tpeak=dummy; 
+  treeFit->trise=dummy;         treeFit->typeAB=dummy;
+  treeFit->calInt=dummy;        treeFit->crysID=dummy;
+  treeFit->csiArrange[0]=dummy; treeFit->fb=dummy;
+  treeFit->csiArrange[1]=dummy; treeFit->ped=dummy;
+  treeFit->clock=dummy;
+  treeFit->ovrped=dummy;
+  treeFit->ovrpH=dummy;
+  treeFit->ud=dummy;           
+  treeFit->phei=dummy;         
+  treeFit->phdstr=dummy;
+  //Single pulse                 //double pulse
+  treeFit->sphei=dummy;         treeFit->kmu2=dummy;
+  treeFit->sptime=dummy;        treeFit->dubPed=dummy;
+  treeFit->sped=dummy;          treeFit->dubphei=dummy;
+  treeFit->waveID=dummy;        treeFit->intKmu2=dummy;
+  for(int i=0;i<3;i++){
+    treeFit->tref[i]=dummy;
+    treeFit->refpk[i]=dummy;
+    treeFit->tcorr[i]=dummy;
+    treeFit->refmn[i]=dummy;
+    treeFit->rgaus[i]=dummy;
   }
+}
 
-  int tofmulti=0;
-  // GetEntry already called by cooker
-  tofo->hits.clear();
-  for (int i = 0; i < 2; i++)
-    tofo->hitpattern[i] = 0;
-
-  // Scan all ToF bars
-  tofo->firstHitRight=0;
-  for (int b=0;b<36;b++)
-  {  
-    alltdc_bypmt->Fill(b,tofi->tofs[b].tdc[0]);
-    alltdc_bypmt->Fill(b+36,tofi->tofs[b].tdc[1]);
-    
-    alladc_bypmt->Fill(b,tofi->tofs[b].adc[0]);
-    alladc_bypmt->Fill(b+36,tofi->tofs[b].adc[1]);
-
-    // Top PMTs
-    alltdc_bypmt->Fill(b,tofi->tofs[b].tdc[0]);
-    if (tdc_valid(tofi->tofs[b].tdc[0]))
-    {
-      validadc_bypmt->Fill(b,tofi->tofs[b].adc[0]);
-      validtdc_bypmt->Fill(b,tofi->tofs[b].tdc[0]);
+Long_t Det_CsI::process(){
+  // Save relavant run/event info
+  treeFit->eventNo=treeRaw->eventNo;
+  treeFit->runNo=treeRaw->runNo;
+  if(treeRaw->isBad<0){
+    cout<<"slipped event"<<endl;
+    return 0;
+  }
+  // need to make sure this called for every event
+  // avoid memory leaks
+  initSingleVar();
+  for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
+    UInt_t myEvent=treeRaw->eventNo;
+    std::stringstream ss;
+    char* p=(char*)&(treeRaw->nameModule[iCh]);
+    int moduleName=(p[3]-'0')*10+(p[2]-'0')-1;
+    std::string nameModule;
+    nameModule+=(*p);
+    p++;
+    nameModule+=*p;
+    p++;
+    nameModule+=*p;
+    p++;
+    nameModule+=*p;
+    std::string nameCsI;
+    p=(char*)&(treeRaw->nameCsI[iCh]);
+    int indexClock=(p[3]-'0')*10+(p[2]-'0')-1;
+    //std::cout<< "\n Index clock 11: "<<indexClock<<endl;
+    p+=3;
+    nameCsI+=(*p);
+    p--;
+    nameCsI+=*p;
+    p--;
+    nameCsI+=*p;
+    p--;
+    nameCsI+=*p;
+    iFB=0;
+    if(p[1]=='b' || p[1]=='B') iFB=1;
+    iUD=0;
+    if(p[0]=='d' || p[0]=='D') iUD=1;
+    if(p[1]=='\0' || p[0]=='\0'){
+      std::cout<<"..... Got one!!\n";
+      return 0;
     }
-    else
-      invalidadc_bypmt->Fill(b, (double)tofi->tofs[b].adc[0]-adcoffset[b]);
-
-    // Bottom PMTs
-    alltdc_bypmt->Fill(b+36,tofi->tofs[b].tdc[1]);
-    if (tdc_valid(tofi->tofs[b].tdc[1]))
-    {
-      validadc_bypmt->Fill(b+36,tofi->tofs[b].adc[1]);
-      validtdc_bypmt->Fill(b+36,tofi->tofs[b].tdc[1]);
-    }
-    else
-      invalidadc_bypmt->Fill(b+36, (double)tofi->tofs[b].adc[1]-adcoffset[b+36]);
-
-    // We have a coincidence hit
-    if (tdc_valid(tofi->tofs[b].tdc[0]) && tdc_valid(tofi->tofs[b].tdc[1]))
-    {
-      tup_vs_tbottom[b] ->Fill(tofi->tofs[b].tdc[0]+TDCoffset[b]-tofi->reftime,tofi->tofs[b].tdc[1]+TDCoffset[b+36]-tofi->reftime);
-
-      // Fill the hit info
-      ToFhit hit;
-      hit.bar = b;
-      hit.meantime = get_tdc_meantime(b);
-      hit.hitpos = get_tdc_position(b);
-      hit.qsum = get_energy_deposition(b);
-		
-		double loc[3] = {0.0, hit.hitpos/10, 0.0};
-		double glob[3];
-		tofvolumes[hit.bar]->LocalToMaster(loc,glob);
-		TVector3 ptg(10*glob[0],10*glob[1],10*glob[2]);
-		hit.phi = ptg.Phi();
-		if (hit.phi<0) hit.phi = 2*M_PI+hit.phi;
-
-//      hit.altphi = atan((hit.hitpos+V[b].Y())/fabs(V[b].X()));
-//      if((b < 18) && (hit.altphi < 0))
-//			hit.altphi = 2*M_PI+hit.altphi;
-//      if(b > 18)
-//			hit.altphi = M_PI - hit.altphi;
-      
-		tofo->hits.push_back(hit);
-
-      if (b<18) tofo->firstHitRight++;
-      tofo->hitpattern[b < 18 ? 0 : 1] |= 0x1 << (b%18);
-
-      // Fill the histograms
-  
-      hits_bybar->Fill(hit.bar);
-      mtime_bybar->Fill(hit.bar,hit.meantime);
-      edep_bybar->Fill(hit.bar,hit.qsum);
-      e_vs_t_all->Fill(hit.meantime,hit.qsum);
-      if (hit.bar %18 >14) e_vs_t_back->Fill(hit.meantime,hit.qsum);
-      e_vs_t_bybar[b]->Fill(hit.meantime,hit.qsum);
-      RefTime->Fill(tofi->reftime);
-      ypos_bybar->Fill(b,hit.hitpos);
-     }
+    #pragma omp parallel num_threads(16)
+    iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
+    //std::cout<< " Gap config FB is  : " <<p[1]<<std::endl;
+    //std::cout<< " Gap config UD is  : " <<p[0]<<std::endl;
+    // start of signal CsI if-loop
+    if(!(treeRaw->indexCsI[iCh]==16 && iFB==0 && iUD==0) ||
+       !(indexClock==0 || indexClock==2 || indexClock==4 ||
+         indexClock==6 || indexClock==8 || indexClock==10)){
+      IdCsI myIndex(treeRaw->nameCsI[iCh],treeRaw->indexCsI[iCh]);
+      UInt_t iCsI=mapCsI[myIndex];
+      //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
+      //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
+      // convert TKO module to module number here
+      if(nameModule=="TK34") moduleNo=1;
+      if(nameModule=="TK32") moduleNo=2;
+      if(nameModule=="TK36") moduleNo=3;
+      if(nameModule=="TK37") moduleNo=4;
+      if(nameModule=="TK38") moduleNo=5;
+      if(nameModule=="TK08") moduleNo=6;
+      if(nameModule=="TK50") moduleNo=7;
+      if(nameModule=="TK09") moduleNo=8;
+      if(nameModule=="TK54") moduleNo=9;
+      if(nameModule=="TK31") moduleNo=10;
+      if(nameModule=="TK04") moduleNo=11;
+      if(nameModule=="TK45") moduleNo=12;
+      if(nameModule=="TK33") moduleNo=13;
+      if(nameModule=="TK39") moduleNo=14;
+      if(nameModule=="TK40") moduleNo=15;
+      if(nameModule=="TK41") moduleNo=16;
+      std::cout<<" naming TKO module:  "<<nameModule<<std::endl;
+      SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
+      //std::cout<<" top U/D || F/B :"<<p[0]<<", "<<p[1]<<std::endl;
+      //std::cout<<" checking the hell outta this shit:"<<thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]]<<std::endl;
+      int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
+      int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
+      myCsI.nameCsI(iClock,iFB,iUD,iModule);
+      myCsI.setData(treeRaw->data[iCh]);
+      myCsI.setIndexTheta(thetaIndex);
+      myCsI.setIndexPhi(phiIndex);
+      myCsI.fit();
+      // not sure this is needed... just in case
+    }// end of signal CsI if-loop
   }
-  H1(tofmulti, "ToF/TOFmulti", "TOFmultiplicity", 37, -0.5, 36.5);
-
-//	int nhitl = 0;
-//	int nhitr = 0;
-//   double bnr = -999;
-//	double bnl = -999;
-//	// Go through the registered hits
-//	for (int i=0;i<(int)tofo->hits.size();i++)
-//	{
-//		// Get which bar was hit
-//		int bn = tofo->hits[i].bar;
-//		if (bn<18) {nhitl++; bnl=bn;}
-//		else {nhitr++; bnr=bn;}
-//	}
-//	if ((eventinfo->trigFired & 0x2) && nhitr==1) lumitofl->Fill(bnr+0.5);
-//	if ((eventinfo->trigFired & 0x4) && nhitl==1) lumitofr->Fill(bnl+0.5);
-*/
-  return 0;
-};
-
-
-Long_t Det_CsI::done()
-{
+  /****************************************************
+   *     Fill tree Variables
+   ****************************************************/
+  // K+ Lorentz vector info. from pi+ and pi0
   /*
-  saveInfo("ToF:HVoff",eventshvoff*1.0/in->GetEntries());
+  prim1lv.SetPxPyPzE(pr1px, pr1py, pr1pz,pr1Etot);
+  kaon=prim1lv+prim2lv;
+  // Fill tree var
+  treeClus->extraTOF1=tgtTree->extraTOF1;
+  treeClus->E_prim2=E2clust;
+  treeClus->cpid1Px=cl1px;       treeClus->cpid2Px=cl2px;      treeClus->prim2px=prim2lv.Px();
+  treeClus->cpid1Py=cl1py;       treeClus->cpid2Py=cl2py;      treeClus->prim2py=prim2lv.Py();
+  treeClus->cpid1Pz=cl1pz;       treeClus->cpid2Pz=cl2pz;      treeClus->prim2pz=prim2lv.Pz();
+  // position variables:
+  treeClus->cpid1x=cl1x;       treeClus->cpid2x=cl2x;
+  treeClus->cpid1y=cl1y;       treeClus->cpid2y=cl2y;
+  treeClus->cpid1z=cl1z;       treeClus->cpid2z=cl2z;
+  treeClus->cpid1r=cl1r;       treeClus->cpid2r=cl2r;
+  // pi+ pi0
+  treeClus->prim1px=pr1px;
+  treeClus->prim1py=pr1py;
+  treeClus->prim1pz=pr1pz;
+  treeClus->clCosTheta=opAngle;
+  treeClus->prCosTheta=std::cos(prim1vec3.Angle(prim2vec3));
+  treeClus->M_prim2=prim2lv.M();
+  treeClus->prim2M2=prim2lv.M2();
+  treeClus->M_k=kaon.M();
+  treeClus->kM2=kaon.M2();
+  treeClus->cpid1E=cl1E;
+  treeClus->cpid2E=cl2E;
+  treeClus->cpid1thetaE=cl1theta;
+  treeClus->cpid2thetaE=cl2theta;
+  treeClus->cpid1phiE=cl1phi;
+  treeClus->cpid2phiE=cl2phi;
+  treeClus->clusterM=clustM;
+  std::cout<<"\n  piPecking total Cluster Energy:  "<<E2clust<<endl;
+  std::cout<<"\n  Angular1 checking (centriod)   ("<<cl1theta<<", "<<cl1phi<<")\n";
+  std::cout<<"\n  Angular2 checking (centriod)   ("<<cl2theta<<", "<<cl2phi<<")\n";
+  std::cout<<"\n  Checking pi0 InvMass:      "<<prim2lv.M()<<endl;
+  std::cout<<"\n  Checking cos(theta):       "<<opAngle<<std::endl;
+  std::cout<<"\n  Checking vertex opening    "<<std::cos(prim1vec3.Angle(prim2vec3))<<endl;
+  std::cout<<"\n  Cluster multiplicity:      "<<clustM<<endl;
+  treeClus->channel=(singleCrys+multiCrys);
+  exitFill:
+  std::cout<<" ........ singleCrys "<<singleCrys<<std::endl;
+  std::cout<<" ........ Multi-Crys "<<multiCrys<<std::endl;
+  std::cout<<"... End reached! Outta here! \n";
+  std::cout<<" ***************************************************************************\n";
+  treeClus->isBad=1; // event register, this is the case for good event*/
+  return 0;
+}
 
-  setDetectorFlag("ToF",eventshvoff>0?2:1);
-
-  // Save ADC means for each PMT
-  TProfile *adc_mean = validadc_bypmt->ProfileX();
-  for (int i=0;i<72;i++)
-  {
-    char buf[1000];
-    sprintf(buf,"ToF:ADC:mean:%i",i);
-    saveInfo(buf,adc_mean->GetBinContent(i+1));
-  }
-  saveInfo("ToF:ADC:mean:all", validadc_bypmt->GetMean());
-
-  // Save energy deposition means for each ToF
-  TProfile *edep_mean = edep_bybar->ProfileX();
-  for (int i=0;i<36;i++)
-  {
-    char buf[1000];
-    sprintf(buf,"ToF:EnergyDeposited:%i",i);
-    saveInfo(buf,edep_mean->GetBinContent(i+1));
-  }
-  // Done with ToFs
-  delete tofo;
-  */
+Long_t Det_CsI::done(){
+  cout<<"***************| Finalize fit |***************\n";
   return 0;
 };
 
-Long_t Det_CsI::cmdline(char *cmd)
-{
+Long_t Det_CsI::cmdline(char *cmd){
   //add cmdline hanling here
 
   return 0; // 0 = all ok
@@ -303,11 +241,9 @@ Long_t Det_CsI::cmdline(char *cmd)
 /////////////////////////////////////////////////////////////////////////////////////////////////// 
 
 extern "C"{
-  Plugin *factory(TTree *in_, TTree *out_, TFile *inf_, TFile * outf_,TObject *p_)
-  {
-      return (Plugin *) new Det_CsI(in_,out_,inf_,outf_,p_);
+  Plugin *factory(TTree *in_, TTree *out_, TFile *inf_, TFile * outf_,TObject *p_){
+    return (Plugin *) new Det_CsI(in_,out_,inf_,outf_,p_);
   }
 }
-
 
 ClassImp(Det_CsI);

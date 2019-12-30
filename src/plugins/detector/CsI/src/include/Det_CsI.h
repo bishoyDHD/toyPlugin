@@ -1,11 +1,12 @@
 #ifndef __DET_CSI__
 #define __DET_CSI__
-#include "TObject.h"
-#include "Plugin.h"
-#include "TTree.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TF1.h"
+#include <TObject.h>
+#include <TStyle.h>
+#include <Plugin.h>
+#include <TTree.h>
+#include <TH1D.h>
+#include <TH2D.h>
+#include <TF1.h>
 #include <singleCsI.h>
 #include "findClusters.h"
 #include "clusterScore.h"
@@ -21,7 +22,7 @@
 typedef std::pair<UInt_t,UInt_t> IdCsI;
 class Det_CsI:public Plugin{
 private:
-  //CRTFitCsI *treeFit;			/// Output tree for CSI data
+  CRTSingleCsI *treeFit;			/// Output tree for CSI data
   CRTRawCsI *treeRaw;			/// Input tree with CSI raw data
   CRTClusterCsI *treeClus;			/// Input tree with CSI raw data
   mwpcE36* mwpcTree;
@@ -87,7 +88,9 @@ public:
   std::vector<std::pair<int,int> > listGoodEvent;
   void readFiles();
   void initVar();
+  void initSingleVar();
   Long_t angleCsI(int id, int module, int channel, int yy, int zz);
+  Long_t singleAng(int id, int module, int channel, int yy, int zz);
   //histograms for fit
   TH2D* h2TimeVSCsI,*h2ang;
   TH2D* h2ChargeVSCsI;

@@ -44,6 +44,7 @@ class CRTRawCsI:public CRTBase{
 class CRTSingleCsI:public CRTBase{
  public:
   //Var for all pulse types
+  UInt_t runNo,eventNo,isBad;
   Int_t ud, fb;
   Double_t ped, phei, calInt, tpeak, tref[3];
   Double_t refpk[3], tcorr[3],rgaus[3],refmn[3];

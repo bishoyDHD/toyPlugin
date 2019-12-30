@@ -148,8 +148,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       break;
     case 2:
       NPar=11;
-      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));//"WaveformCsI","waveformCut"));
-      //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
+      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));
       for(UInt_t n=0; n<NPar+1; n+=1){
         f1->SetParameter(n,param[n]);
         f1->SetParLimits(n,parLowlim[n],parUplim[n]);
@@ -192,8 +191,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       break;
     case 3:
       NPar=13;
-      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));//"WaveformCsI","waveformCut"));
-      //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
+      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));
       for(UInt_t n=0; n<NPar+1; n+=1){
         f1->SetParameter(n,param[n]);
         f1->SetParLimits(n,parLowlim[n],parUplim[n]);
@@ -238,8 +236,7 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       break;
     case 5:
       NPar=10;
-      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformOverrange,1,250,NPar));//"WaveformCsI","waveformCut"));
-      //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
+      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformOverrange,1,250,NPar));
       for(UInt_t n=0; n<NPar+1; n+=1){
         f1->SetParameter(n,param[n]);
         f1->SetParLimits(n,parLowlim[n],parUplim[n]);
