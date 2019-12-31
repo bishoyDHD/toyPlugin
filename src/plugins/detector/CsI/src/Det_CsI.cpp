@@ -1,7 +1,6 @@
 #include <Det_CsI.h>
 #include <fstream>
 #include <iostream>
-using namespace std;
 
 Det_CsI::Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_):Plugin(in_,out_,inf_,outf_,p_){
   // Set defaults for various options
@@ -10,10 +9,9 @@ Det_CsI::Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_):
   std::cout<<" -- Checking the hell outta this thing!\n";
 };
 
-
 Det_CsI::~Det_CsI(){
 };
-
+/*
 Long_t Det_CsI::setIdCsI(map<IdCsI,UInt_t> & map){
   char fb[2]={'f','b'};
   char ud[2]={'u','d'};
@@ -35,7 +33,7 @@ Long_t Det_CsI::setIdCsI(map<IdCsI,UInt_t> & map){
     }
   }
 }
-
+*/
 Long_t Det_CsI::histos(){
 
   return 0;
@@ -99,6 +97,9 @@ Long_t Det_CsI::process(){
   // need to make sure this called for every event
   // avoid memory leaks
   initSingleVar();
+  // since this is a calibration plugin,
+  // we should only consider single crystal hits
+  if(treeRaw->nChannel>7) goto exitFill;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
@@ -134,6 +135,36 @@ Long_t Det_CsI::process(){
     }
     #pragma omp parallel num_threads(16)
     iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
+    // reference timing from 3 modules
+    // timing from all 3 modules will considered
+    if((treeRaw->indexCsI[iCh]==16 && iFB==0 && iUD==0) &&
+                    (indexClock==0 || indexClock==4 || indexClock==8)){
+      SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
+      //myCsI.initVar();
+      myCsI.setData(treeRaw->data[iCh]);
+      myCsI.fit();
+      // Three timing modules
+      switch(indexClock){
+        case 0:
+	  std::cout<<"---------| This is reference Module: 1 \n";
+          treeFit->rgaus[0]=myCsI.getTime();
+          treeFit->tref[0]=myCsI.getCDF50();
+	  treeFit->refpk[0]=myCsI.getpTime();
+	  break;
+	case 4:
+	  std::cout<<"---------| This is reference Module: 2 \n";
+          treeFit->rgaus[1]=myCsI.getTime();
+          treeFit->tref[1]=myCsI.getCDF50();
+	  treeFit->refpk[1]=myCsI.getpTime();
+	  break;
+	case 8:
+	  std::cout<<"---------| This is reference Module: 3 \n";
+          treeFit->rgaus[2]=myCsI.getTime();
+          treeFit->tref[2]=myCsI.getCDF50();
+	  treeFit->refpk[2]=myCsI.getpTime();
+	  break;
+      }// end of switch statement
+    }// end of if-timing loop
     //std::cout<< " Gap config FB is  : " <<p[1]<<std::endl;
     //std::cout<< " Gap config UD is  : " <<p[0]<<std::endl;
     // start of signal CsI if-loop
@@ -168,64 +199,36 @@ Long_t Det_CsI::process(){
       int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       myCsI.nameCsI(iClock,iFB,iUD,iModule);
-      myCsI.initVar();
       myCsI.setData(treeRaw->data[iCh]);
       myCsI.setIndexTheta(thetaIndex);
       myCsI.setIndexPhi(phiIndex);
       myCsI.fit();
-      std::cout<<"***** Chi2 "<<myCsI.getChi2()<<std::endl;
-      // not sure this is needed... just in case
+      //Filling the TTree here:
+      treeFit->indexCsI=treeRaw->indexCsI[iCh];
+      treeFit->tpeak=myCsI.getpTime();
+      treeFit->trise=myCsI.getTime();
+      if(myCsI.numberWave()==2){
+        treeFit->kmu2=myCsI.getphDiff();
+        treeFit->dubPed=myCsI.getPedestal();
+      }
+      treeFit->phei=myCsI.getphDiff();
+      treeFit->ped=myCsI.getPedestal();
+      treeFit->clock=indexClock+1;
+      treeFit->thSing=myCsI.getTheta();
+      treeFit->phiSing=myCsI.getPhi();
+      treeFit->chi2=myCsI.getChi2();
+      treeFit->ndf=myCsI.getNDF();
+      treeFit->waveID=myCsI.numberWave();
+      treeFit->ud=iUD;
+      treeFit->fb=iFB;
+      std::cout<<"---> rise time: "<<myCsI.getTime()<<"\n";
+      std::cout<<"---> WaveID: "<<myCsI.numberWave()<<"\n";
     }// end of signal CsI if-loop
-  }
-  /****************************************************
-   *     Fill tree Variables
-   ****************************************************/
-  // K+ Lorentz vector info. from pi+ and pi0
-  /*
-  prim1lv.SetPxPyPzE(pr1px, pr1py, pr1pz,pr1Etot);
-  kaon=prim1lv+prim2lv;
-  // Fill tree var
-  treeClus->extraTOF1=tgtTree->extraTOF1;
-  treeClus->E_prim2=E2clust;
-  treeClus->cpid1Px=cl1px;       treeClus->cpid2Px=cl2px;      treeClus->prim2px=prim2lv.Px();
-  treeClus->cpid1Py=cl1py;       treeClus->cpid2Py=cl2py;      treeClus->prim2py=prim2lv.Py();
-  treeClus->cpid1Pz=cl1pz;       treeClus->cpid2Pz=cl2pz;      treeClus->prim2pz=prim2lv.Pz();
-  // position variables:
-  treeClus->cpid1x=cl1x;       treeClus->cpid2x=cl2x;
-  treeClus->cpid1y=cl1y;       treeClus->cpid2y=cl2y;
-  treeClus->cpid1z=cl1z;       treeClus->cpid2z=cl2z;
-  treeClus->cpid1r=cl1r;       treeClus->cpid2r=cl2r;
-  // pi+ pi0
-  treeClus->prim1px=pr1px;
-  treeClus->prim1py=pr1py;
-  treeClus->prim1pz=pr1pz;
-  treeClus->clCosTheta=opAngle;
-  treeClus->prCosTheta=std::cos(prim1vec3.Angle(prim2vec3));
-  treeClus->M_prim2=prim2lv.M();
-  treeClus->prim2M2=prim2lv.M2();
-  treeClus->M_k=kaon.M();
-  treeClus->kM2=kaon.M2();
-  treeClus->cpid1E=cl1E;
-  treeClus->cpid2E=cl2E;
-  treeClus->cpid1thetaE=cl1theta;
-  treeClus->cpid2thetaE=cl2theta;
-  treeClus->cpid1phiE=cl1phi;
-  treeClus->cpid2phiE=cl2phi;
-  treeClus->clusterM=clustM;
-  std::cout<<"\n  piPecking total Cluster Energy:  "<<E2clust<<endl;
-  std::cout<<"\n  Angular1 checking (centriod)   ("<<cl1theta<<", "<<cl1phi<<")\n";
-  std::cout<<"\n  Angular2 checking (centriod)   ("<<cl2theta<<", "<<cl2phi<<")\n";
-  std::cout<<"\n  Checking pi0 InvMass:      "<<prim2lv.M()<<endl;
-  std::cout<<"\n  Checking cos(theta):       "<<opAngle<<std::endl;
-  std::cout<<"\n  Checking vertex opening    "<<std::cos(prim1vec3.Angle(prim2vec3))<<endl;
-  std::cout<<"\n  Cluster multiplicity:      "<<clustM<<endl;
-  treeClus->channel=(singleCrys+multiCrys);
+  }// End of Channel No. for-loop
   exitFill:
-  std::cout<<" ........ singleCrys "<<singleCrys<<std::endl;
-  std::cout<<" ........ Multi-Crys "<<multiCrys<<std::endl;
   std::cout<<"... End reached! Outta here! \n";
   std::cout<<" ***************************************************************************\n";
-  treeClus->isBad=1; // event register, this is the case for good event*/
+  treeFit->isBad=1; // event register, this is the case for good event
   return 0;
 }
 
@@ -236,7 +239,6 @@ Long_t Det_CsI::done(){
 
 Long_t Det_CsI::cmdline(char *cmd){
   //add cmdline hanling here
-
   return 0; // 0 = all ok
 };
 

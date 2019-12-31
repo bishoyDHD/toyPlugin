@@ -110,6 +110,7 @@ public:
   Double_t getCDF50(){return cdf50;}
   Double_t getChi2(){return chi2;}
   Double_t getNDF(){return ndf;}
+  Double_t getPedestal(){return lmin;}
   UInt_t numberWave() const{
     return mNWave;
   }
