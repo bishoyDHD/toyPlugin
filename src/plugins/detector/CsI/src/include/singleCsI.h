@@ -45,6 +45,7 @@ private:
   char mName[7];
   vector<Double_t> mListLocalMax;
 private:
+  Double_t const dummy=-1000;
   Double_t findChi2(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>,double* xval,double yped,double ymax);
@@ -53,6 +54,7 @@ private:
   void drawWaves(shared_ptr<TH1D> h1);
   void drawWaves(TH1D* h1);
   void drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1);
+  Double_t chi2,ndf;
   Double_t mapPhi,pcal,Theta,acos,energy;
   Double_t lmax,lmin,ymax2,ymax3;
   Double_t ptime,rtime,cdf50;
@@ -94,6 +96,7 @@ public:
   inline void setIndexPhi(UInt_t iPhi){phiIndex=iPhi;}
   void calcThetaPhi(double);
   void calTime(shared_ptr<TF1> f1);
+  void initVar(); //initialize
   inline void dumbFn(){std::cout<<" -----> Hola 7 phezulu ===== "<<wtheta<<", "<<wphi<<std::endl;}
   void setAngles(int module,int channel,int yy,int zz);
   Double_t getTheta(){return wtheta;}
@@ -105,6 +108,8 @@ public:
   Double_t getTime(){return rtime;}
   Double_t getpTime(){return ptime;}
   Double_t getCDF50(){return cdf50;}
+  Double_t getChi2(){return chi2;}
+  Double_t getNDF(){return ndf;}
   UInt_t numberWave() const{
     return mNWave;
   }

@@ -45,6 +45,7 @@ class CRTSingleCsI:public CRTBase{
  public:
   //Var for all pulse types
   UInt_t runNo,eventNo,isBad;
+  Double_t ndf;
   Int_t ud, fb;
   Double_t ped, phei, calInt, tpeak, tref[3];
   Double_t refpk[3], tcorr[3],rgaus[3],refmn[3];
@@ -61,8 +62,10 @@ class CRTSingleCsI:public CRTBase{
   //Double peak var
   Double_t kmu2, dubPed, intKmu2;
   Double_t dubphei; //location of second peak
+  Double_t chi2;
   //Overrange variables
   Double_t ovrpH, ovrpLoc, ovrped;
+  Double_t ovrX2,ovrTime;
   CRTSingleCsI();
   virtual ~CRTSingleCsI();
   ClassDef(CRTSingleCsI,1);

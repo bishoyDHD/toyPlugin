@@ -168,10 +168,12 @@ Long_t Det_CsI::process(){
       int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       myCsI.nameCsI(iClock,iFB,iUD,iModule);
+      myCsI.initVar();
       myCsI.setData(treeRaw->data[iCh]);
       myCsI.setIndexTheta(thetaIndex);
       myCsI.setIndexPhi(phiIndex);
       myCsI.fit();
+      std::cout<<"***** Chi2 "<<myCsI.getChi2()<<std::endl;
       // not sure this is needed... just in case
     }// end of signal CsI if-loop
   }

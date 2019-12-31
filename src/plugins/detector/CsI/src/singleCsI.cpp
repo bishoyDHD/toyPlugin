@@ -182,6 +182,20 @@ char* SingleCsI::nameCsI(unsigned int index){
   sprintf(mName,"%i%c%c%i",iClock,NameFB[iFB],NameUD[iUD],iPaddle+1);
   return mName;
 }
+void SingleCsI::initVar(){
+  wtheta=dummy;
+  wphi=dummy;
+  energy=dummy;
+  phdiff=dummy;
+  wr=dummy;
+  wz=dummy;
+  rtime=dummy;
+  ptime=dummy;
+  cdf50=dummy;
+  chi2=dummy;
+  ndf=dummy;
+  mNWave=dummy;
+}
 bool SingleCsI::fit(){
   //std::cout<<"|| entering into fitting function..... success! \n";
   static unsigned int count=0;
@@ -213,7 +227,6 @@ bool SingleCsI::fit(){
   double* xpeaks=new double();
   xpeaks=s->GetPositionX();
   std::sort(xpeaks,xpeaks+nfound);
-  std::cout<<" Maximum x value & peaks "<<xmax<<" & ";
   mNWave=nfound;
   if(ymax==1023){
     mNWave=5;
@@ -226,6 +239,7 @@ bool SingleCsI::fit(){
     if(nfound==2){
       mNWave=6;
       if(diffMax<=3) mNWave=2;
+      //if(diffMax>3 && diffMax<35) mNWave=5;
     }
     //return false;
   }
@@ -349,6 +363,8 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax-lmin);
         cdf50=f1->GetParameter(1);
+	chi2=f1->GetChisquare();
+	ndf=f1->GetNDF();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
         if(mEventNo % 1000==0)
@@ -391,6 +407,8 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax+lmin);
         cdf50=f1->GetParameter(1);
+	chi2=f1->GetChisquare();
+	ndf=f1->GetNDF();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
         if(mEventNo % 1000==0)
@@ -438,6 +456,8 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	//calcThetaPhi(energy);
         tcalc=.5*(lmax+lmin);
         cdf50=f1->GetParameter(1);
+	chi2=f1->GetChisquare();
+	ndf=f1->GetNDF();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
         if(mEventNo % 1000==0)
@@ -455,7 +475,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       }
       ymax2=h1->GetBinContent(h1->FindBin(xval[1]));
       f1->SetParameter(0,ymax*10.5);
-      f1->SetParLimits(0,ymax-61.7,ymax+4971.7);
+      f1->SetParLimits(0,ymax-61.7,1e5);
       f1->SetParameter(1,xval[0]+40.1);
       f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
       f1->SetParameter(8,yped);
@@ -475,6 +495,8 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	//calcThetaPhi(energy);
         tcalc=.5*(lmax+lmin);
         cdf50=f1->GetParameter(1);
+	chi2=f1->GetChisquare();
+	ndf=f1->GetNDF();
         std::cout<<" ------| 1023 |------ "<<cdf50<<std::endl;
 	//calTime(f1);
         //if(mEventNo % 1000==0)
@@ -496,7 +518,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       std::cout<<" ---- Waveform 2 max Bin:  "<<xval[0]<<" "<<xval[1]<<std::endl;
       ymax2=h1->GetBinContent(h1->FindBin(xval[1]));
       f1->SetParameter(0,ymax*10.5);
-      f1->SetParLimits(0,ymax-61.7,ymax+9971.7);
+      f1->SetParLimits(0,ymax-61.7,1e4);
       f1->SetParameter(1,xval[0]+40.1);
       f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
       f1->SetParameter(8,yped);
@@ -516,6 +538,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax+lmin);
         cdf50=f1->GetParameter(1);
+	chi2=f1->GetChisquare();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
         //if(mEventNo % 1000==0)
@@ -563,7 +586,7 @@ void SingleCsI::drawWaves(shared_ptr<TH1D> h1){
   //sprintf(name,"wave_run%d_%dCsI_%s.png",mRunNo,mEventNo,nameCsI(mIndexCsI));
   //c1->SaveAs(name);
 }
-//Double_t SingleCsI::findChi2(TH1D* h1){
+/*
 Double_t SingleCsI::findChi2(shared_ptr<TH1D> h1){
   unsigned int iLow=1;
   unsigned int iUp=h1->GetNbinsX();
@@ -579,4 +602,4 @@ Double_t SingleCsI::findChi2(shared_ptr<TH1D> h1){
   }
   chi2/=(iUp-1-h1->GetFunction("waveCut")->GetNpar());
   return chi2;
-}
+}*/
