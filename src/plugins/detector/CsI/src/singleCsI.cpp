@@ -360,7 +360,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin);
-	//calcThetaPhi(energy);
+	calcThetaPhi();
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax-lmin);
         rtime=f1->GetParameter(1);
@@ -406,7 +406,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin);
-	//calcThetaPhi(energy);
+	calcThetaPhi();
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
@@ -458,7 +458,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin);
 	phdiff=(lmax-lmin);
-	//calcThetaPhi(energy);
+	calcThetaPhi();
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
         cdf50=f1->GetX(tcalc);
@@ -499,7 +499,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
         lmax=f1->GetMaximum();lmin=f1->GetMinimum();
         energy=(lmax-lmin);
 	phdiff=(lmax-lmin);
-	//calcThetaPhi(energy);
+	calcThetaPhi();
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
         cdf50=f1->GetX(tcalc);
@@ -546,6 +546,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	//calcThetaPhi(energy);
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax+lmin);
+	calcThetaPhi();
         rtime=f1->GetParameter(1);
         cdf50=f1->GetX(tcalc);
 	ptime=f1->GetMaximumX();
@@ -563,7 +564,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       break;
   }// end of switch statement
 }
-void SingleCsI::calcThetaPhi(double Edep){
+void SingleCsI::calcThetaPhi(){
   mapPhi=2*180*(phiIndex-0.5)/48.; // from mapping init file
   wz=crysZ[thetaIndex-1];
   wr=crysr[thetaIndex-1];

@@ -69,6 +69,8 @@ void Det_CsI::initSingleVar(){
   treeFit->clock=dummy;
   treeFit->ovrped=dummy;
   treeFit->ovrpH=dummy;
+  treeFit->ovrX2=dummy;
+  treeFit->ovrTime=dummy;
   treeFit->ud=dummy;           
   treeFit->phei=dummy;         
   treeFit->phdstr=dummy;
@@ -135,13 +137,35 @@ Long_t Det_CsI::process(){
     }
     #pragma omp parallel num_threads(16)
     iClock=indexClock; iModule=treeRaw->indexCsI[iCh]-1;
+    // convert TKO module to module number here
+    if(nameModule=="TK34") moduleNo=1;
+    if(nameModule=="TK32") moduleNo=2;
+    if(nameModule=="TK36") moduleNo=3;
+    if(nameModule=="TK37") moduleNo=4;
+    if(nameModule=="TK38") moduleNo=5;
+    if(nameModule=="TK08") moduleNo=6;
+    if(nameModule=="TK50") moduleNo=7;
+    if(nameModule=="TK09") moduleNo=8;
+    if(nameModule=="TK54") moduleNo=9;
+    if(nameModule=="TK31") moduleNo=10;
+    if(nameModule=="TK04") moduleNo=11;
+    if(nameModule=="TK45") moduleNo=12;
+    if(nameModule=="TK33") moduleNo=13;
+    if(nameModule=="TK39") moduleNo=14;
+    if(nameModule=="TK40") moduleNo=15;
+    if(nameModule=="TK41") moduleNo=16;
     // reference timing from 3 modules
     // timing from all 3 modules will considered
     if((treeRaw->indexCsI[iCh]==16 && iFB==0 && iUD==0) &&
                     (indexClock==0 || indexClock==4 || indexClock==8)){
+      int thetaIndex=thetaCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
+      int phiIndex=phiCsI[moduleNo-1][treeRaw->indexChannel[iCh]];
       SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
-      //myCsI.initVar();
+      myCsI.nameCsI(iClock,iFB,iUD,iModule);
       myCsI.setData(treeRaw->data[iCh]);
+      myCsI.setIndexTheta(thetaIndex);
+      myCsI.setIndexPhi(phiIndex);
+      //myCsI.initVar();
       myCsI.fit();
       // Three timing modules
       switch(indexClock){
@@ -175,23 +199,6 @@ Long_t Det_CsI::process(){
       UInt_t iCsI=mapCsI[myIndex];
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
       //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
-      // convert TKO module to module number here
-      if(nameModule=="TK34") moduleNo=1;
-      if(nameModule=="TK32") moduleNo=2;
-      if(nameModule=="TK36") moduleNo=3;
-      if(nameModule=="TK37") moduleNo=4;
-      if(nameModule=="TK38") moduleNo=5;
-      if(nameModule=="TK08") moduleNo=6;
-      if(nameModule=="TK50") moduleNo=7;
-      if(nameModule=="TK09") moduleNo=8;
-      if(nameModule=="TK54") moduleNo=9;
-      if(nameModule=="TK31") moduleNo=10;
-      if(nameModule=="TK04") moduleNo=11;
-      if(nameModule=="TK45") moduleNo=12;
-      if(nameModule=="TK33") moduleNo=13;
-      if(nameModule=="TK39") moduleNo=14;
-      if(nameModule=="TK40") moduleNo=15;
-      if(nameModule=="TK41") moduleNo=16;
       std::cout<<" naming TKO module:  "<<nameModule<<std::endl;
       SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
       //std::cout<<" top U/D || F/B :"<<p[0]<<", "<<p[1]<<std::endl;
@@ -205,22 +212,28 @@ Long_t Det_CsI::process(){
       myCsI.fit();
       //Filling the TTree here:
       treeFit->indexCsI=treeRaw->indexCsI[iCh];
+      treeFit->clock=indexClock+1;
+      treeFit->ud=iUD;
+      treeFit->fb=iFB;
       treeFit->tpeak=myCsI.getpTime();
       treeFit->trise=myCsI.getTime();
       if(myCsI.numberWave()==2){
         treeFit->kmu2=myCsI.getphDiff();
         treeFit->dubPed=myCsI.getPedestal();
       }
+      if(myCsI.numberWave()==5 || myCsI.numberWave()==6){
+        treeFit->ovrpH=myCsI.getphDiff();
+        treeFit->ovrped=myCsI.getPedestal();
+	treeFit->ovrX2=myCsI.getChi2();
+	treeFit->ovrTime=myCsI.getTime();
+      }
       treeFit->phei=myCsI.getphDiff();
       treeFit->ped=myCsI.getPedestal();
-      treeFit->clock=indexClock+1;
       treeFit->thSing=myCsI.getTheta();
       treeFit->phiSing=myCsI.getPhi();
       treeFit->chi2=myCsI.getChi2();
       treeFit->ndf=myCsI.getNDF();
       treeFit->waveID=myCsI.numberWave();
-      treeFit->ud=iUD;
-      treeFit->fb=iFB;
       std::cout<<"---> rise time: "<<myCsI.getTime()<<"\n";
       std::cout<<"---> WaveID: "<<myCsI.numberWave()<<"\n";
     }// end of signal CsI if-loop

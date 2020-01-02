@@ -61,6 +61,7 @@ private:
   Double_t phdiff,tcalc;
   Double_t otheta, ophi, wtheta, wphi, wz, wr;
   int moduleNo,thetaIndex,phiIndex;
+  TH2D* h2ang;
   // crystal center Z:
   Double_t crysZ[20]={-48.3449, -42.0302, -36.5676, -31.5834, -26.851,
                     -20.9203, -15.7210, -10.9616, -6.46940, -2.1341,
@@ -94,7 +95,7 @@ public:
   void setData(const vector<UShort_t>&);
   inline void setIndexTheta(int iTheta){thetaIndex=iTheta;}
   inline void setIndexPhi(UInt_t iPhi){phiIndex=iPhi;}
-  void calcThetaPhi(double);
+  void calcThetaPhi();
   void calTime(shared_ptr<TF1> f1);
   void initVar(); //initialize
   inline void dumbFn(){std::cout<<" -----> Hola 7 phezulu ===== "<<wtheta<<", "<<wphi<<std::endl;}
