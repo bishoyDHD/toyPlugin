@@ -370,7 +370,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	ndf=f1->GetNDF();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
-        if(mEventNo % 1000==0)
+        if(mEventNo % 10000==0)
           drawWaves(h1);
         std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
         std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
@@ -416,7 +416,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	ndf=f1->GetNDF();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
-        if(mEventNo % 1000==0)
+        if(mEventNo % 10000==0)
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
         //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
@@ -467,7 +467,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	ndf=f1->GetNDF();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
-        if(mEventNo % 1000==0)
+        if(mEventNo % 10000==0)
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
         //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
@@ -508,7 +508,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	ndf=f1->GetNDF();
         std::cout<<" ------| 1023 |------ "<<cdf50<<std::endl;
 	//calTime(f1);
-        //if(mEventNo % 1000==0)
+        if(mEventNo % 1000==0)
           drawWaves(h1);
         std::cout<<"*|First bin: "<<h1->FindFirstBinAbove(1022)<<" || "<<h1->FindLastBinAbove(1022)<<std::endl;
         //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
@@ -553,7 +553,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	chi2=f1->GetChisquare();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
-        //if(mEventNo % 1000==0)
+        if(mEventNo % 1000==0)
           drawWaves(h1);
         //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
         //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
