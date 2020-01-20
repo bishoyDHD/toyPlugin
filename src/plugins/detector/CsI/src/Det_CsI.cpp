@@ -41,6 +41,7 @@ Long_t Det_CsI::histos(){
 
 Long_t Det_CsI::startup(){
   getBranchObject("vf48",(TObject **) &treeRaw);
+  getBranchObject("tgtInfo",(TObject **) &tgtTree);
   treeFit=new CRTSingleCsI();
   makeBranch("singleCsI",(TObject **) &treeFit);
   gStyle->SetOptStat(0);
@@ -99,6 +100,11 @@ Long_t Det_CsI::process(){
   // need to make sure this called for every event
   // avoid memory leaks
   initSingleVar();
+  if(treeRaw->runNo && tgtTree->run != treeRaw->runNo){
+    std::cout<<" Oops you are comparing to different runs \n";
+    std::cout<<" ***Bailing*** Bailing*** \n";
+    std::abort();
+  }
   // since this is a calibration plugin,
   // we should only consider single crystal hits
   if(treeRaw->nChannel>7) goto exitFill;
@@ -234,8 +240,15 @@ Long_t Det_CsI::process(){
       treeFit->chi2=myCsI.getChi2();
       treeFit->ndf=myCsI.getNDF();
       treeFit->waveID=myCsI.numberWave();
+      // fill target variables:
+      treeFit->extraTOF1_size=tgtTree->extraTOF1_size;
+      treeFit->extraTOF1=tgtTree->extraTOF1;
+      treeFit->vec_extraTOF1=tgtTree->vec_extraTOF1;
+      treeFit->tof1Gap=tgtTree->TOF1Gap;
+      treeFit->tof2Gap=tgtTree->TOF2Gap;
       std::cout<<"---> rise time: "<<myCsI.getTime()<<"\n";
       std::cout<<"---> WaveID: "<<myCsI.numberWave()<<"\n";
+      std::cout<<"---> extraTOF1: "<<tgtTree->vec_extraTOF1->size()<<"\n";
     }// end of signal CsI if-loop
   }// End of Channel No. for-loop
   exitFill:

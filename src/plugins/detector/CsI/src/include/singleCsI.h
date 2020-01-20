@@ -113,6 +113,7 @@ public:
   Double_t getNDF(){return ndf;}
   Double_t getPedestal(){return lmin;}
   UInt_t numberWave() const{
+    std::cout<<" .... waveNo. "<<mNWave<<std::endl;
     return mNWave;
   }
   UInt_t runNo() const{

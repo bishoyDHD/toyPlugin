@@ -2,15 +2,15 @@
 <cooker xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:noNamespaceSchemaLocation='recipe.xsd'>
 
-<init>init/trekAll.xml</init>
+<init>/${HOME}/.cooker/shared/init/covfefe.xml</init>
 
-<source>vf48_hdw:tracks:target</source> <!-- the source tree name-->
-<destination>csiCali</destination> <!-- the destination tree name-->
+<source>calibCsI</source> <!-- the source tree name-->
+<destination>csiCalib</destination> <!-- the destination tree name-->
 
 <plugins>
   <plugin>
-     <name>CsI</name>
-     <file>libCsI</file>
+     <name>covfefe</name>
+     <file>libcovfefe</file>
   </plugin>
 
 
@@ -18,22 +18,22 @@
 
 
 <defineHistograms>
- <CsI>histos_fit</CsI>
+ <covfefe>histos</covfefe>
 </defineHistograms>
 
 <!-- These functions will be called at the beginning -->
 <startup>
- <CsI>startup_fit</CsI>
+ <covfefe>startup</covfefe>
 </startup>
 
 <!-- These functions will be executed for every event, in order of appearance -->
 <execute>
- <CsI>process_fit</CsI>
+ <covfefe>process</covfefe>
 </execute>
 
 <!-- These functions will be called at the end of the file -->
 <finalize>
- <CsI>finalize_fit</CsI>
+ <covfefe>finalize</covfefe>
 </finalize>
 
 </cooker>

@@ -5,6 +5,7 @@
 
 #pragma link C++ class std::vector<unsigned short>+;
 #pragma link C++ class std::vector<UInt_t>+;
+#pragma link C++ class std::vector<std::vector<Int_t>+;
 #pragma link C++ class std::pair<unsigned short, std::string>+;
 #pragma link C++ class std::map<unsigned short, std::string>+;
 

@@ -20,7 +20,7 @@
 
 class covfefe:public Plugin{
  private:
-  CATSingleCsI* csimar;
+  CATSingleCsI* treeCalib;
   CATClusterCsI* clsmar;
   CATCaliCsI* calibcsi;
   const double dE=143.5;
@@ -28,26 +28,13 @@ class covfefe:public Plugin{
   const double mpip=0.13957018;
   double sigdE=3.25;
   double T_0[3], tcorr[3], trefCorr[3], cdf50[3], refgaus[3];
-  double theta[20]={18.75, 26.25, 33.75, 41.25, 48.75, 56.25, 63.75, 71.25, 78.75, 86.25,
-                    93.75, 101.25, 108.75, 116.25, 123.75, 131.25, 138.75, 146.25, 153.75, 161.25};
-  double phi[12][2][2]={{{3.75, 11.25},{18.75, 26.25}},
-                        {{33.75,41.25},{48.75, 56.25}},
-                      {{63.75,71.25},{78.75, 86.25}},
-                      {{93.75,101.25},{108.75,116.25}},
-                      {{123.75,131.25},{138.75,146.25}},
-                      {{153.75,161.25},{168.75,176.25}},
-                      {{183.75,191.25},{198.75,206.25}},
-                      {{213.75,221.25},{228.75,236.25}},
-                      {{243.75,251.25},{258.75,266.25}},
-                      {{273.75,281.25},{288.75,296.25}},
-                      {{303.75,311.25},{318.75,326.25}},
-                      {{333.75,341.25},{348.75,356.25}}};
+  double phi[12]={30.,60.,0.,90.,120.,150.,180.,210.,240.,270.,300.,330.};
+  double csiphi;
   double lowRange, upRange, apcsi;
   evalClusters* clustEval;
  public:
   covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p);
   virtual ~covfefe();
-
   int iclock, iModule;
   Int_t iUD, iFB, nbins;
   Double_t adcVal, intVal;
@@ -59,6 +46,9 @@ class covfefe:public Plugin{
   TH1D* phdis;
   TH1D* hkmu2;
   TH1D* timing, *phdistr;
+  TH1D* tof1ang;
+  TH2D* csiAng;
+  Int_t index;
   TH1D* h1time[12][2][2][16];
   TH1D* h1cali[12][2][2][16];
   // add funtions with return value Long_t here:

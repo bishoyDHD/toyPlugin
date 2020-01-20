@@ -2,16 +2,17 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
-#include "TVector2.h"
-#include "TH2.h"
-#include "TF1.h"
-#include "TRandom3.h"
-#include "TMath.h"
+#include <TVector2.h>
+#include <TH2.h>
+#include <TF1.h>
+#include <TRandom3.h>
+#include <TMath.h>
 #include <TCanvas.h>
 #include <stdio.h>
 #include <math.h>
 
 covfefe::covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p):Plugin(in,out,inf_,outf_,p){
+  treeCalib=NULL;
   calibcsi=0;
   h1time[12][2][2][16]=NULL;
   h1cali[12][2][2][16]=NULL;
@@ -52,6 +53,8 @@ covfefe::~covfefe(){
 };
 
 Long_t covfefe::histos(){
+  tof1ang=new TH1D("tof1Angles","stat",24,0,360.);
+  csiAng=new TH2D("csiAngles","stat",24,0.,360.,24,0.,360.);
   for(int i=0; i<3; i++){
     std::ostringstream name1, name2,name3,name4,name5;
     name1<<"t_0_"; name2<<"tcorr_"; name3<<"trefCorr_"; name4<<"cdf50_"; name5<<"refgaus_";
@@ -94,7 +97,7 @@ Long_t covfefe::histos(){
 }
 
 Long_t covfefe::startup(){
-  getBranchObject("treeSing",(TObject **) &csimar); 
+  getBranchObject("singleCsI",(TObject **) &treeCalib); 
   calibcsi=new CATCaliCsI();
   makeBranch("marinCsI",(TObject **) &calibcsi);
   gStyle->SetOptStat(0);
@@ -103,16 +106,17 @@ Long_t covfefe::startup(){
 };
 
 Long_t covfefe::process(){
-  iclock=csimar->clock-1;
-  iModule=csimar->indexCsI-1;
-  iUD=csimar->ud; iFB=csimar->fb;
-  adcVal=csimar->phei;
+  iclock=treeCalib->clock-1;
+  //std::cout<<"-----> "<<treeCalib->extraTOF1->size()<<std::endl;
+  iModule=treeCalib->indexCsI-1;
+  iUD=treeCalib->ud; iFB=treeCalib->fb;
+  adcVal=treeCalib->phei;
   std::cout<<" ... so called adc val: "<<adcVal<<std::endl;
-  intVal=csimar->intKmu2;
-  phdis->Fill(csimar->phei);
+  intVal=treeCalib->intKmu2;
+  phdis->Fill(treeCalib->phei);
   hkmu2->Fill(adcVal);
   // timing variables
-  //double t_ref=csimar->tref;
+  //double t_ref=treeCalib->tref;
   if(adcVal > 0){
     std::cout<<" -----------------------------------" <<std::endl;
     std::cout<<" value of clock:  "<<iclock<<std::endl;
@@ -120,33 +124,42 @@ Long_t covfefe::process(){
     std::cout<<" value of iUD:    "<<iUD<<std::endl;
     std::cout<<" value of iFB:    "<<iFB<<std::endl;
     std::cout<<" value of adcVal: "<<adcVal<<std::endl;
+    csiphi=treeCalib->phiSing;
     //h1time[iclock][iFB][iUD][iModule]->Fill(adcVal);
     //h1cali[iclock][iFB][iUD][iModule]->Fill(intVal);
     // timing histos
     for(int n=0; n<3; n++){
-    T_0[n]=csimar->tref[n]; tcorr[n]=csimar->tcorr[n];
-    refgaus[n]=csimar->rgaus[n];
+    T_0[n]=treeCalib->tref[n]; tcorr[n]=treeCalib->tcorr[n];
+    refgaus[n]=treeCalib->rgaus[n];
       h1t_0[n]->Fill(T_0[n]); h1tcorr[n]->Fill(tcorr[n]); 
       h1refgaus[n]->Fill(refgaus[n]);
     }
+    if(treeCalib->extraTOF1->size()>0){
+      for(UInt_t i=0; i <treeCalib->extraTOF1->size(); i++){
+	index=treeCalib->extraTOF1->at(i);
+        tof1ang->Fill(phi[index-1]);
+	csiAng->Fill(csiphi,phi[index-1]);
+      }
+    }
   }
   //if(t_ref> -900){
-    //double t_rise=csimar->trise;
+    //double t_rise=treeCalib->trise;
     //std::cout<<"\n timing check ------> "<<t_rise<<std::endl;
-    //timing->Fill(csimar->tcsi);
+    //timing->Fill(treeCalib->tcsi);
   //}
-  double pktime=csimar->phdstr;
+  double pktime=treeCalib->phdstr;
   if(pktime>0 && pktime<250)
-    phdistr->Fill(csimar->phdstr);
+    phdistr->Fill(treeCalib->phdstr);
 
   return 0; // 0 = all ok
 };
 
 Long_t covfefe::finalize(){
+/*
   TSpectrum *s;
   gStyle->SetOptStat(0);
   std::ofstream calib;
-  calib.open("calibPar.txt");
+  //calib.open("calibPar.txt");
   double xmax, xx, calpar;
   for(int iClock=0;iClock<12;iClock++){
     for(int iFB=0;iFB<2;iFB++){
@@ -162,7 +175,7 @@ Long_t covfefe::finalize(){
 	  h1time[iClock][iFB][iUD][iModule]->Fit(f1,"QR");
 	  apcsi=f1->GetMaximumX();
 	  calpar=dE/apcsi;
-	  calib<<iClock<<"\t"<<iFB<<"\t"<<iUD<<"\t"<<iModule<<"\t"<<calpar<<"\n";
+	  //calib<<iClock<<"\t"<<iFB<<"\t"<<iUD<<"\t"<<iModule<<"\t"<<calpar<<"\n";
 	  for(int n=0; n<nbins;n++){
 	    double yy=h1time[iClock][iFB][iUD][iModule]->GetBinContent(n);
 	    double x=h1time[iClock][iFB][iUD][iModule]->GetBinCenter(n);
@@ -193,7 +206,7 @@ Long_t covfefe::finalize(){
       }
     }
   }
-  calib.close();
+  //calib.close();
   gStyle->SetOptStat(0);
   TCanvas* c1=new TCanvas("MarinateCsI","Pulse-height distribution",3508,2480);
   TCanvas* c2=new TCanvas("MarinateCsI2","Integrated pulse-height distribution",3508,2480);
@@ -278,6 +291,7 @@ Long_t covfefe::finalize(){
   phdistr->SetLineWidth(2);
   phdistr->Draw("hist");
   c7->Write();
+*/
   return 0; // 0 = all ok
 };
 

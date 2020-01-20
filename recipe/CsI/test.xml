@@ -8,7 +8,7 @@
 <init>/${HOME}/.cooker/shared/init/CsI.xml</init>
 -->
 
-<source>vf48_hdw</source> <!-- the source tree name-->
+<source>vf48_hdw:target</source> <!-- the source tree name-->
 <destination>calibCsI</destination> <!-- the destination tree name-->
 
 <plugins>

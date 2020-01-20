@@ -29,8 +29,19 @@ class CATBase: public TObject
 
 class CATSingleCsI:public CATBase{
  public:
+  // Target Info.
+  UInt_t runNo;
+  UInt_t eventNo;
+  Int_t tof1Gap, tof2Gap;
+  Int_t isBad,extraTOF1_size;
+  UInt_t nChannel;
+  std::vector<Int_t> *extraTOF1=0;
+  std::vector<std::vector<Int_t>> *vec_extraTOF1=0;
+  Float_t phiAngle;
+  Float_t deltaPhiAngle;
+  Int_t badEventFlag;
   //Var for all pulse types
-  //Var for all pulse types
+  Double_t ndf;
   Int_t ud, fb;
   Double_t ped, phei, calInt, tpeak, tref[3];
   Double_t refpk[3], tcorr[3],rgaus[3], refmn[3];
@@ -55,10 +66,17 @@ class CATSingleCsI:public CATBase{
 
 class CATClusterCsI:public CATBase{
  public:
+  // Target Info.
   UInt_t runNo;
   UInt_t eventNo;
-  Int_t isBad,extraTOF1;
+  Int_t tof1Gap, tof2Gap;
+  Int_t isBad,extraTOF1_size;
   UInt_t nChannel;
+  std::vector<Int_t> *extraTOF1=0;
+  std::vector<std::vector<Int_t>> *vec_extraTOF1=0;
+  Float_t phiAngle;
+  Float_t deltaPhiAngle;
+  Int_t badEventFlag;
   //std::vector<UInt_t> nameModule;
   //std::vector<UInt_t> indexChannel;
   //std::vector<UInt_t> nameCsI;

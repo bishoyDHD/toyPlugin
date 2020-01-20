@@ -36,15 +36,25 @@ class CRTRawCsI:public CRTBase{
   std::vector<UInt_t> timeCFD;
   std::vector<ULong64_t> charge;
   std::vector<UInt_t> nSample;
-  std::vector<std::vector<UShort_t> > data;  
+  std::vector<std::vector<UShort_t>> data;  
   CRTRawCsI();
   virtual ~CRTRawCsI();
   ClassDef(CRTRawCsI,1);
 };
 class CRTSingleCsI:public CRTBase{
  public:
+  // Target Info.
+  UInt_t runNo;
+  UInt_t eventNo;
+  Int_t tof1Gap, tof2Gap;
+  Int_t isBad,extraTOF1_size;
+  UInt_t nChannel;
+  std::vector<Int_t> *extraTOF1=0;
+  std::vector<std::vector<Int_t>> *vec_extraTOF1=0;
+  Float_t phiAngle;
+  Float_t deltaPhiAngle;
+  Int_t badEventFlag;
   //Var for all pulse types
-  UInt_t runNo,eventNo,isBad;
   Double_t ndf;
   Int_t ud, fb;
   Double_t ped, phei, calInt, tpeak, tref[3];
@@ -72,10 +82,17 @@ class CRTSingleCsI:public CRTBase{
 };
 class CRTClusterCsI:public CRTBase{
  public:
+  // Target Info.
   UInt_t runNo;
   UInt_t eventNo;
-  Int_t isBad,extraTOF1;
+  Int_t tof1Gap, tof2Gap;
+  Int_t isBad,extraTOF1_size;
   UInt_t nChannel;
+  std::vector<Int_t> *extraTOF1=0;
+  std::vector<std::vector<Int_t>> *vec_extraTOF1=0;
+  Float_t phiAngle;
+  Float_t deltaPhiAngle;
+  Int_t badEventFlag;
   //std::vector<UInt_t> nameModule;
   //std::vector<UInt_t> indexChannel;
   //std::vector<UInt_t> nameCsI;

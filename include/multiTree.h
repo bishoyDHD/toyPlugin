@@ -22,10 +22,12 @@ public:
   UInt_t eventFlag;
   Int_t TOF1Gap;
   Int_t TOF2Gap;
-  Int_t extraTOF1;
-  /*
+  Int_t extraTOF1_size;
+  std::vector<Int_t> *extraTOF1=0;
+  std::vector<std::vector<Int_t>> *vec_extraTOF1=0;
   Float_t phiAngle;
   Float_t deltaPhiAngle;
+  /*
   Float_t chiS;
   Int_t ndf;
   Float_t reducedChiS;
@@ -75,8 +77,8 @@ public:
   Int_t pruningMethod;
   Int_t kStopType;
   Int_t caseNum;
-  Int_t kstopErrFlag;
-  Int_t badEventFlag;*/
+  Int_t kstopErrFlag;*/
+  Int_t badEventFlag;
   targetE36();
   virtual ~targetE36();
   ClassDef(targetE36,2);
