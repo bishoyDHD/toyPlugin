@@ -46,16 +46,22 @@ class covfefe:public Plugin{
   TH1D* phdis;
   TH1D* hkmu2;
   TH1D* timing, *phdistr;
-  TH1D* tof1ang;
+  TH1D* tof1ang,*h1angDiff,*h1score;
+  TH1D* angScore,*h1tof1,*tof1ID;
   TH2D* csiAng;
   Int_t index;
   TH1D* h1time[12][2][2][16];
   TH1D* h1cali[12][2][2][16];
-  // add funtions with return value Long_t here:
+  // add funtions for calibration analysis
   Long_t histos();
   Long_t startup();
   Long_t process();
   Long_t finalize();
+  // functions for sanity analysis:
+  Long_t histosCsI();
+  Long_t startupCsI();
+  Long_t processCsI();
+  Long_t finalizeCsI();
   // functions for cluster analysis:
   Long_t hist_clust();
   Long_t startup_clust();
