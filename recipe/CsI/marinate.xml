@@ -4,7 +4,7 @@
 
 <init>/${HOME}/.cooker/shared/init/covfefe.xml</init>
 
-<source>csi_cali</source> <!-- the source tree name-->
+<source>csiCali</source> <!-- the source tree name-->
 <destination>marinated</destination> <!-- the destination tree name-->
 
 <plugins>
