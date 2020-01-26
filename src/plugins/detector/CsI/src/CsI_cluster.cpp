@@ -417,7 +417,7 @@ Long_t Det_CsI::process_fit(){
     treeClus->fVertSP=mwpcTree->fVertSP;
     treeClus->fSftSNx=mwpcTree->fSftSNx;
     treeClus->fSftSNy=mwpcTree->fSftSNy;
-    treeClus->fSftSNy=mwpcTree->fSftSNz;
+    treeClus->fSftSNz=mwpcTree->fSftSNz;
     treeClus->fVertMPhi=mwpcTree->fVertMPhi;
     treeClus->E_prim2=E2clust;
     treeClus->cpid1Px=cl1px;       treeClus->cpid2Px=cl2px;      treeClus->prim2px=prim2lv.Px();
