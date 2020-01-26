@@ -38,6 +38,7 @@ Long_t covfefe::processCsI(){
   iModule=treeCalib->indexCsI-1;
   iUD=treeCalib->ud; iFB=treeCalib->fb;
   adcVal=treeCalib->phei;
+/*
   std::cout<<" ... so called adc val: "<<adcVal<<std::endl;
   intVal=treeCalib->intKmu2;
   // timing variables
@@ -68,7 +69,7 @@ Long_t covfefe::processCsI(){
       }
     }
   }
-
+*/
   return 0; // 0 = all ok
 };
 

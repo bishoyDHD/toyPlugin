@@ -12,6 +12,10 @@ CATSingleCsI::CATSingleCsI(){};
 CATSingleCsI::~CATSingleCsI(){};
 ClassImp(CATSingleCsI);
 
+CATTimingCsI::CATTimingCsI(){};
+CATTimingCsI::~CATTimingCsI(){};
+ClassImp(CATTimingCsI);
+
 CATClusterCsI::CATClusterCsI(){};
 CATClusterCsI::~CATClusterCsI(){};
 ClassImp(CATClusterCsI);

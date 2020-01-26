@@ -64,6 +64,38 @@ class CATSingleCsI:public CATBase{
   ClassDef(CATSingleCsI,1);
 };
 
+class CATTimingCsI:public CATBase{
+ public:
+  //Var for all pulse types
+  UInt_t runNo;
+  UInt_t eventNo;
+  UInt_t isBad;
+  Double_t ndf;
+  Int_t ud, fb;
+  Double_t ped, phei, calInt, tpeak, tref[3];
+  Double_t refpk[3], tcorr[3],rgaus[3], refmn[3];
+  Double_t thSing, phiSing, trise;
+  int crysID, typeAB;
+  int indexCsI, clock;
+  int csiArrange[2];
+  int waveID;  // distinguish between 3-different kinds of waves
+  double phdstr;
+  //single peak
+  Double_t sphei; // single peak pulse-height distribution
+  Double_t sptime; //timing of single peak
+  Double_t sped; // pedestal for single pulse
+  //Double peak var
+  Double_t kmu2, dubPed, intKmu2;
+  Double_t dubphei; //location of second peak
+  Double_t chi2;
+  //Overrange variables
+  Double_t ovrpH, ovrpLoc, ovrped;
+  Double_t ovrX2,ovrTime;
+  CATTimingCsI();
+  virtual ~CATTimingCsI();
+  ClassDef(CATTimingCsI,1);
+};
+
 class CATClusterCsI:public CATBase{
  public:
   // Target Info.
@@ -77,18 +109,26 @@ class CATClusterCsI:public CATBase{
   Float_t phiAngle;
   Float_t deltaPhiAngle;
   Int_t badEventFlag;
-  //std::vector<UInt_t> nameModule;
-  //std::vector<UInt_t> indexChannel;
-  //std::vector<UInt_t> nameCsI;
-  //std::vector<UInt_t> indexCsI;
-  Int_t evtNo, channel;
+  // mwpc info.
+  Int_t nTracks;
+  Int_t fgapNumTof2;
+  Int_t nHits;
+  Double_t fTof2SP;
+  Double_t fTof1SP;
+  Double_t fVertSP;
+  Double_t fSftSNx;
+  Double_t fSftSNy;
+  Double_t fSftSNz;
+  Double_t fVertMPhi; // compare with target phi
   //std::vector<Double_t> crysE,phval,csiTheta,csiPhi,csiEdep;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiR;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiZ;
   //std::map<std::pair<Double_t,Double_t>,Double_t> tsig;
   //std::map<std::pair<Double_t,Double_t>,bool> crysChk;
+
   // timing determination for CsI(Tl):                       
+  Int_t evtNo, channel;
   Double_t tpeak, tref[3],rgaus[3];
   Double_t refpk[3], tcorr[3], refmn[3];
   Double_t trise;

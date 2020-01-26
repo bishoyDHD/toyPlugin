@@ -21,6 +21,7 @@
 class covfefe:public Plugin{
  private:
   CATSingleCsI* treeCalib;
+  CATTimingCsI* treeTime;
   CATClusterCsI* clsmar;
   CATCaliCsI* calibcsi;
   const double dE=143.5;
@@ -32,6 +33,8 @@ class covfefe:public Plugin{
   double csiphi;
   double lowRange, upRange, apcsi;
   evalClusters* clustEval;
+  double t_ref1,t_ref2,t_ref3;
+  double t_corr, tCalc;
  public:
   covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p);
   virtual ~covfefe();
@@ -51,6 +54,7 @@ class covfefe:public Plugin{
   TH2D* csiAng;
   Int_t index;
   TH1D* h1time[12][2][2][16];
+  TH1D* h1kmu2[12][2][2][16];
   TH1D* h1cali[12][2][2][16];
   // add funtions for calibration analysis
   Long_t histos();
@@ -75,12 +79,14 @@ class covfefe:public Plugin{
   TH1D* pi0px[2], *pi0py[2], *pi0pz[2];
   TH1D* vertpx[2], *vertpy[2], *vertpz[2];
   TH2D* kmass[2], *h2Angle[2];
+  double Tconst[3]={6.60068,6.58848,6.54471};
   // angles
   TH1D *h1theta[2], *h1phi[2];
   TH1D *angPP[3], *piPang[3], *pi0ang[3];
   TH2D *h2corrAng;
   // timining histograms
   TH1D* h1t_0[3], *h1tcorr[3],*h1trefCorr[3],*h1cdf50[3],*h1refgaus[3];
+  TH1D* h1Tcorr;
   TLorentzVector prim1lv,prim2lv;
 
   virtual Long_t cmdline(char * cmd);

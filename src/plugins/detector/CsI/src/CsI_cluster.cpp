@@ -76,7 +76,14 @@ void Det_CsI::initVar(){
   treeClus->cpid1phiE=dummy;     treeClus->kM2=dummy;
   treeClus->cpid2thetaE=dummy;   treeClus->cpid1E=dummy;
   treeClus->cpid2phiE=dummy;     treeClus->cpid2E=dummy;
+  // target and mwpc var
   treeClus->isBad=dummy;
+  treeClus->fTof2SP=dummy;
+  treeClus->fTof1SP=dummy;
+  treeClus->fVertSP=dummy;
+  treeClus->fSftSNx=dummy;
+  treeClus->fSftSNy=dummy;
+  treeClus->fSftSNz=dummy;
   //treeClus->extraTOF1=dummy;
   channel.clear();               phdiff.clear();
   csiph.clear();   phval.clear();   crysChk.clear();
@@ -139,7 +146,7 @@ Long_t Det_CsI::process_fit(){
     std::abort();
   }
   // make sure that this is a good gap event: isBad>0 (=1)
-  if(mwpcTree->nTracks==0 || mwpcTree->fVertSP==-10000) return 0;
+  if(mwpcTree->nTracks==0 || mwpcTree->fTof1SP==-10000) return 0;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
@@ -396,7 +403,22 @@ Long_t Det_CsI::process_fit(){
     prim1lv.SetPxPyPzE(pr1px, pr1py, pr1pz,pr1Etot);
     kaon=prim1lv+prim2lv;
     // Fill tree var
-    //treeClus->extraTOF1=tgtTree->extraTOF1;
+    // target and mwpc variables
+    treeClus->tof1Gap=tgtTree->TOF1Gap;
+    treeClus->tof2Gap=tgtTree->TOF2Gap;
+    treeClus->extraTOF1_size=tgtTree->extraTOF1_size;
+    treeClus->extraTOF1=tgtTree->extraTOF1;
+    treeClus->vec_extraTOF1=tgtTree->vec_extraTOF1;
+    treeClus->phiAngle=tgtTree->phiAngle;
+    // mwpc:
+    treeClus->fgapNumTof2=mwpcTree->fgapNumTof2;
+    treeClus->fTof2SP=mwpcTree->fTof2SP;
+    treeClus->fTof1SP=mwpcTree->fTof1SP;
+    treeClus->fVertSP=mwpcTree->fVertSP;
+    treeClus->fSftSNx=mwpcTree->fSftSNx;
+    treeClus->fSftSNy=mwpcTree->fSftSNy;
+    treeClus->fSftSNy=mwpcTree->fSftSNz;
+    treeClus->fVertMPhi=mwpcTree->fVertMPhi;
     treeClus->E_prim2=E2clust;
     treeClus->cpid1Px=cl1px;       treeClus->cpid2Px=cl2px;      treeClus->prim2px=prim2lv.Px();
     treeClus->cpid1Py=cl1py;       treeClus->cpid2Py=cl2py;      treeClus->prim2py=prim2lv.Py();

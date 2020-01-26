@@ -43,9 +43,11 @@ class CRTRawCsI:public CRTBase{
 };
 class CRTSingleCsI:public CRTBase{
  public:
-  // Target Info.
   UInt_t runNo;
   UInt_t eventNo;
+  UInt_t isBad;
+/*
+  // Target Info.
   Int_t tof1Gap, tof2Gap;
   Int_t isBad,extraTOF1_size;
   UInt_t nChannel;
@@ -54,6 +56,7 @@ class CRTSingleCsI:public CRTBase{
   Float_t phiAngle;
   Float_t deltaPhiAngle;
   Int_t badEventFlag;
+*/
   //Var for all pulse types
   Double_t ndf;
   Int_t ud, fb;
@@ -93,18 +96,26 @@ class CRTClusterCsI:public CRTBase{
   Float_t phiAngle;
   Float_t deltaPhiAngle;
   Int_t badEventFlag;
-  //std::vector<UInt_t> nameModule;
-  //std::vector<UInt_t> indexChannel;
-  //std::vector<UInt_t> nameCsI;
-  //std::vector<UInt_t> indexCsI;
-  Int_t evtNo, channel;
+  // mwpc info.
+  Int_t nTracks;
+  Int_t fgapNumTof2;
+  Int_t nHits;
+  Double_t fTof2SP;
+  Double_t fTof1SP;
+  Double_t fVertSP;
+  Double_t fSftSNx;
+  Double_t fSftSNy;
+  Double_t fSftSNz;
+  Double_t fVertMPhi; // compare with target phi
   //std::vector<Double_t> crysE,phval,csiTheta,csiPhi,csiEdep;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiR;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiZ;
   //std::map<std::pair<Double_t,Double_t>,Double_t> tsig;
   //std::map<std::pair<Double_t,Double_t>,bool> crysChk;
+
   // timing determination for CsI(Tl):
+  Int_t evtNo, channel;
   Double_t tpeak, tref[3],rgaus[3];
   Double_t refpk[3], tcorr[3], refmn[3];
   Double_t trise;
