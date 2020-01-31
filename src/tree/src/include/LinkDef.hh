@@ -45,5 +45,7 @@
 #pragma link C++ class trackingE36+;
 #pragma link C++ class targetE36+;
 #pragma link C++ class mwpcE36+;
+#pragma link C++ class track+;
+#pragma link C++ class trackArray+;
 
 #endif

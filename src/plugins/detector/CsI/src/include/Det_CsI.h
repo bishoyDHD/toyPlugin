@@ -12,6 +12,7 @@
 #include "clusterScore.h"
 #include "csitree.h"
 #include "multiTree.h"
+#include "track.h"
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -26,6 +27,7 @@ private:
   CRTRawCsI *treeRaw;			/// Input tree with CSI raw data
   CRTClusterCsI *treeClus;			/// Input tree with CSI raw data
   mwpcE36* mwpcTree;
+  trackArray* trackTree;   // Input tree from tracks (MWPCs)
   targetE36* tgtTree;
   //
   // Detector parameters set in init file
@@ -63,10 +65,14 @@ private:
   Double_t cl2x,  cl2y,  cl2z, cl2r;
   Double_t cl1E,cl2E,cl1theta, cl2theta;
   Double_t cl1phi, cl2phi;
-  Double_t pr1px, pr1py, pr1pz;
+  Double_t pr1p,pr1px, pr1py, pr1pz;
   Double_t pr2x, pr2y, pr2z;
   Double_t pr1Etot;
   Double_t E2clust=0;
+  TLorentzVector prim1lv,prim2lv;
+  TLorentzVector kaon;
+  TVector3 prim1vec3,prim2vec3,gv1;
+  double opAngle,prim2px,prim2py,prim2pz;
 
 public:
   Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_);

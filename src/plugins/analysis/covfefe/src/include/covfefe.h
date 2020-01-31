@@ -3,6 +3,7 @@
 
 #include <marinateCsI.h>
 #include "evalClusters.h"
+#include "track.h"
 #include "TObject.h"
 #include "Plugin.h"
 #include "TTree.h"
@@ -24,6 +25,7 @@ class covfefe:public Plugin{
   CATTimingCsI* treeTime;
   CATClusterCsI* clsmar;
   CATCaliCsI* calibcsi;
+  trackArray *trackArr;
   const double dE=143.5;
   const double mpi0=0.1349766;
   const double mpip=0.13957018;
@@ -35,6 +37,7 @@ class covfefe:public Plugin{
   evalClusters* clustEval;
   double t_ref1,t_ref2,t_ref3;
   double t_corr, tCalc;
+  double pVert, piPpx, piPpy, piPpz, P, primCosTheta;
  public:
   covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p);
   virtual ~covfefe();
@@ -47,7 +50,7 @@ class covfefe:public Plugin{
   TH1D* Ecorr;
   TH1D* intEn;
   TH1D* phdis;
-  TH1D* hkmu2;
+  TH1D* hkmu2,*h1Pkpi2;
   TH1D* timing, *phdistr;
   TH1D* tof1ang,*h1angDiff,*h1score;
   TH1D* angScore,*h1tof1,*tof1ID;
@@ -84,10 +87,12 @@ class covfefe:public Plugin{
   TH1D *h1theta[2], *h1phi[2];
   TH1D *angPP[3], *piPang[3], *pi0ang[3];
   TH2D *h2corrAng;
+  TH1D*h1prmAng;
   // timining histograms
   TH1D* h1t_0[3], *h1tcorr[3],*h1trefCorr[3],*h1cdf50[3],*h1refgaus[3];
   TH1D* h1Tcorr;
   TLorentzVector prim1lv,prim2lv;
+  TVector3 prim1vec3,prim2vec3;
 
   virtual Long_t cmdline(char * cmd);
 

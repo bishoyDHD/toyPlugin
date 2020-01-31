@@ -27,6 +27,7 @@ Long_t Det_CsI::startup_fit(){
   getBranchObject("vf48",(TObject **) &treeRaw);
   getBranchObject("mwpcInfo",(TObject **) &mwpcTree);
   getBranchObject("tgtInfo",(TObject **) &tgtTree);
+  getBranchObject("tracks",(TObject **) &trackTree);
   treeClus=new CRTClusterCsI();
   makeBranch("treeClus",(TObject **) &treeClus);
   gROOT->SetBatch(kTRUE);
@@ -146,7 +147,7 @@ Long_t Det_CsI::process_fit(){
     std::abort();
   }
   // make sure that this is a good gap event: isBad>0 (=1)
-  if(mwpcTree->nTracks==0 || mwpcTree->fTof1SP==-10000) return 0;
+  if(mwpcTree->nTracks==0) return 0; // || mwpcTree->fTof1SP==-10000) return 0;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
@@ -270,11 +271,13 @@ Long_t Det_CsI::process_fit(){
     singPhi=fclusters->getSinglePhi();
     singZ=fclusters->getSingleZ();
     singR=fclusters->getSingleR();
-    TLorentzVector prim1lv,prim2lv;
-    TLorentzVector kaon;
-    TVector3 prim1vec3,prim2vec3,gv1;
-    double opAngle,prim2px,prim2py,prim2pz;
     scoring->setScoreMass(0.09);
+    // momentum/Energy in GeV/c (c=1)
+    pr1p=trackTree->vectTrack[0].getVertSPPionPlus()/1000.;
+    // vertex momentum direction for pi+
+    pr1px=pr1p*(trackTree->vectTrack[0].getVertSNx());
+    pr1py=pr1p*(trackTree->vectTrack[0].getVertSNy());
+    pr1pz=pr1p*(trackTree->vectTrack[0].getVertSNz());
     if((multiCrys>=4 || singleCrys>=4)) goto exitFill;
     //if((multiCrys+singleCrys>=4)) goto exitFill;
     if(multiCrys==2 && singleCrys==0){
