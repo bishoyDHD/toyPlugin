@@ -13,6 +13,7 @@
 
 Long_t covfefe::hist_clust(){
   tof1ID=new TH1D("tofID","stat",13,-0.5,12.5);
+  h1diffTof2=new TH1D("tof2diff","stat",25,-12.5,12.5);
   h1score=new TH1D("h1score","stat",16.,-0.5,15.5);
   h1Pkpi2=new TH1D("kpi2Mom","stat",55.,0.15,.245);
   h1prmAng=new TH1D("prmAng","stat",75.0,-1.1,1.1);
@@ -39,6 +40,7 @@ Long_t covfefe::process_clust(){
       // Construct CM Lorentz vectors for 2gammas
       //std::cout<<" making sure this thing works "<<clsmar->clusterM<<" "<<clsmar->E_prim2<<" "<<clsmar->Ncrys<<"\n";
       prim2lv.SetPxPyPzE(clsmar->prim2px,clsmar->prim2py,clsmar->prim2pz,clsmar->E_prim2);
+      h1diffTof2->Fill(clsmar->fgapNumTof2-clsmar->tof2Gap);
       //double E=std::sqrt(P*P+mpip*mpip); //total energy of pi0 CM
       /*
       double E=0.493677-std::sqrt(P*P+mpip*mpip); //total energy of pi0 CM
@@ -59,7 +61,7 @@ Long_t covfefe::process_clust(){
         clustEval->fillMltp(clsmar->extraTOF1_size);
         clustEval->fillHistos(prim2lv.M2(),0);
 	//std::cout<<" Checking the momentum of pi+ =>"<<P<<"\n";
-	if(clsmar->fVertSP>=19. && clsmar->fVertSP<=215.){
+	if(clsmar->fVertSP>=19. && clsmar->fVertSP<=215. && clsmar->M_prim2>0.08 && clsmar->M_prim2<.145){
           clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,1);
           clustEval->fillHistos(prim2lv.M2(),1);
 	  // check that TOF1 multiplicity is greater than or equal to 2

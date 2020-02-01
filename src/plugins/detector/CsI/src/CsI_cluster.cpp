@@ -272,12 +272,24 @@ Long_t Det_CsI::process_fit(){
     singZ=fclusters->getSingleZ();
     singR=fclusters->getSingleR();
     scoring->setScoreMass(0.09);
+    //**********************************
     // momentum/Energy in GeV/c (c=1)
+    //**********************************
     pr1p=trackTree->vectTrack[0].getVertSPPionPlus()/1000.;
+    trackPhi=(phiMWPC[trackTree->vectTrack[0].getTof2GapNum()]*M_PI/180);
     // vertex momentum direction for pi+
-    pr1px=pr1p*(trackTree->vectTrack[0].getVertSNx());
-    pr1py=pr1p*(trackTree->vectTrack[0].getVertSNy());
-    pr1pz=pr1p*(trackTree->vectTrack[0].getVertSNz());
+    nXVert=trackTree->vectTrack[0].getVertSNx();
+    nYVert=trackTree->vectTrack[0].getVertSNy();
+    nZVert=trackTree->vectTrack[0].getVertSNz();
+    nxVert=nXVert*std::cos(trackPhi)-nYVert*std::sin(trackPhi);
+    nyVert=nXVert*std::sin(trackPhi)+nYVert*std::cos(trackPhi);
+    nzVert=nZVert;
+    pr1px=pr1p*(nxVert);
+    pr1py=pr1p*(nyVert);
+    pr1pz=pr1p*(nzVert);
+    //**********************************
+    //      CLUSTER EVALUATION
+    //**********************************
     if((multiCrys>=4 || singleCrys>=4)) goto exitFill;
     //if((multiCrys+singleCrys>=4)) goto exitFill;
     if(multiCrys==2 && singleCrys==0){

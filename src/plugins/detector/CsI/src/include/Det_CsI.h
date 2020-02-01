@@ -73,6 +73,11 @@ private:
   TLorentzVector kaon;
   TVector3 prim1vec3,prim2vec3,gv1;
   double opAngle,prim2px,prim2py,prim2pz;
+  double phiMWPC[12]={60,30,0,330,300,270,240,210,180,150,120,90};
+  double trackPhi;//=((phiMap[gapNumTof2[j]])*M_PI/180);
+  //std::cout<<"  --- Gap number check "<<gapNumTof1[j]<<" --- \n";
+  double nxVert,nyVert,nzVert;
+  double nXVert,nYVert,nZVert;
 
 public:
   Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_);

@@ -90,7 +90,7 @@ class covfefe:public Plugin{
   TH1D*h1prmAng;
   // timining histograms
   TH1D* h1t_0[3], *h1tcorr[3],*h1trefCorr[3],*h1cdf50[3],*h1refgaus[3];
-  TH1D* h1Tcorr;
+  TH1D* h1Tcorr,*h1diffTof2;
   TLorentzVector prim1lv,prim2lv;
   TVector3 prim1vec3,prim2vec3;
 
