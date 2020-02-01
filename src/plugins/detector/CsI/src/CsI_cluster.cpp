@@ -147,7 +147,7 @@ Long_t Det_CsI::process_fit(){
     std::abort();
   }
   // make sure that this is a good gap event: isBad>0 (=1)
-  if(mwpcTree->nTracks==0 || mwpcTree->fTof1SP<0) return 0;
+  if(mwpcTree->nTracks==0 || mwpcTree->fVertSP<0) return 0;
   for(UInt_t iCh=0;iCh<treeRaw->nChannel;iCh++){
     UInt_t myEvent=treeRaw->eventNo;
     std::stringstream ss;
