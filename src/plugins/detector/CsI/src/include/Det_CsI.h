@@ -66,6 +66,7 @@ private:
   Double_t cl1E,cl2E,cl1theta, cl2theta;
   Double_t cl1phi, cl2phi;
   Double_t pr1p,pr1px, pr1py, pr1pz;
+  Double_t piPp,piPpx, piPpy, piPpz;
   Double_t pr2x, pr2y, pr2z;
   Double_t pr1Etot;
   Double_t E2clust=0;

@@ -275,9 +275,10 @@ Long_t Det_CsI::process_fit(){
     //**********************************
     // momentum/Energy in GeV/c (c=1)
     //**********************************
-    pr1p=trackTree->vectTrack[0].getVertSPPionPlus()/1000.;
+    pr1p=trackTree->vectTrack[0].getVertSP()/1000.;
+    piPp=trackTree->vectTrack[0].getVertSPPionPlus()/1000.;
     trackPhi=(phiMWPC[trackTree->vectTrack[0].getTof2GapNum()]*M_PI/180);
-    // vertex momentum direction for pi+
+    // vertex momentum direction for tracked particle
     nXVert=trackTree->vectTrack[0].getVertSNx();
     nYVert=trackTree->vectTrack[0].getVertSNy();
     nZVert=trackTree->vectTrack[0].getVertSNz();
@@ -287,6 +288,10 @@ Long_t Det_CsI::process_fit(){
     pr1px=pr1p*(nxVert);
     pr1py=pr1p*(nyVert);
     pr1pz=pr1p*(nzVert);
+    // ------Pi+ vertex evluation
+    piPpx=piPp*(nxVert);
+    piPpy=piPp*(nyVert);
+    piPpz=piPp*(nzVert);
     //**********************************
     //      CLUSTER EVALUATION
     //**********************************
@@ -443,10 +448,14 @@ Long_t Det_CsI::process_fit(){
     treeClus->cpid1y=cl1y;       treeClus->cpid2y=cl2y;
     treeClus->cpid1z=cl1z;       treeClus->cpid2z=cl2z;
     treeClus->cpid1r=cl1r;       treeClus->cpid2r=cl2r;
-    // pi+ pi0
     treeClus->prim1px=pr1px;
     treeClus->prim1py=pr1py;
     treeClus->prim1pz=pr1pz;
+    // pi+ pi0
+    treeClus->fVertSPiplus=pr1p;
+    treeClus->piPpx=piPpx;
+    treeClus->piPpy=piPpy;
+    treeClus->piPpz=piPpz;
     treeClus->clCosTheta=opAngle;
     treeClus->prCosTheta=std::cos(prim1vec3.Angle(prim2vec3));
     treeClus->M_prim2=prim2lv.M();

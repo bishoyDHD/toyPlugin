@@ -116,6 +116,7 @@ class CATClusterCsI:public CATBase{
   Double_t fTof2SP;
   Double_t fTof1SP;
   Double_t fVertSP;
+  Double_t fVertSPiplus;
   Double_t fSftSNx;
   Double_t fSftSNy;
   Double_t fSftSNz;
@@ -158,6 +159,7 @@ class CATClusterCsI:public CATBase{
   // state vector information for primary particles
   // ---> i.e the tracked charged particle & reconstructed particle
   Double_t prim1px, prim1py, prim1pz;
+  Double_t piPpx, piPpy, piPpz;
   Double_t prim2px, prim2py, prim2pz;
   CATClusterCsI();
   virtual ~CATClusterCsI();
