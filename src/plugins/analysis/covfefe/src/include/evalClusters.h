@@ -35,6 +35,10 @@ public:
   void fillMltp(int val);
   void singleCanvas();
   void singleCanvas(TH1D*);
+  // functions to define and fill 1D histograms
+  void defHistos(std::string name,int bin,double xlow,double xhigh);
+  Long_t fillHistos(double data);
+  void writeHistos();
 private:
   int channelNo; //used for iterating TCanvas and selecting No. of cluster to analyze.
   int Ncrys, Nclust;
@@ -49,6 +53,7 @@ private:
   TH1D* h1clstAng, *h1prmAng, *h1Eclust, *h1invM;
   TH1D* cl1E, *cl2E, *cl3E;
   TH1D* clMltp;
+  TH1D* h1Hist;
   TH2D* thetaPhi;
   // just in case I need this later down the line
   double cpid1x, cpid1y, cpid1z;

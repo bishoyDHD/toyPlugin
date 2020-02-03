@@ -47,7 +47,7 @@ class covfefe:public Plugin{
   TH1D* calibHist;
   TH1D* integHist;
   TH1D* tpeak;
-  TH1D* Ecorr;
+  TH1D* Ecorr,*Eclust,*InvM;
   TH1D* intEn;
   TH1D* phdis;
   TH1D* hkmu2,*h1Pkpi2;
@@ -85,7 +85,7 @@ class covfefe:public Plugin{
   double Tconst[3]={6.60068,6.58848,6.54471};
   // angles
   TH1D *h1theta[2], *h1phi[2];
-  TH1D *angPP[3], *piPang[3], *pi0ang[3];
+  TH1D *angClust[3],*prAng[3],*h1Mass[3],*h1Eclust[3],*h1P[3];
   TH2D *h2corrAng;
   TH1D*h1prmAng;
   // timining histograms

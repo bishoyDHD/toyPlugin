@@ -113,6 +113,13 @@ void evalClusters::fillHistos(double theta1,double phi1,double theta2,double phi
       break;
   }
 }
+// define generic 1D histogram
+void evalClusters::defHistos(std::string name,int bin,double xlow,double xhigh){
+  h1Hist=new TH1D(name.c_str(),"stat",bin,xlow,xhigh);
+}
+Long_t evalClusters::fillHistos(double data){
+  h1Hist->Fill(data);
+}
 // plot cluster multiplicity regardless of channel
 void evalClusters::fillMltp(int val){
   clMltp->Fill(val);
