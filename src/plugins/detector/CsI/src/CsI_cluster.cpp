@@ -142,7 +142,7 @@ Long_t Det_CsI::process_fit(){
   // avoid memory leaks
   initVar();
   if(mwpcTree->run != treeRaw->runNo && tgtTree->run != treeRaw->runNo){
-    std::cout<<" Oops you are comparing to different runs \n";
+    std::cout<<" Oops you are comparing different runs \n";
     std::cout<<" ***Bailing*** Bailing*** \n";
     std::abort();
   }
