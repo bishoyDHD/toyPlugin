@@ -81,7 +81,7 @@ Long_t covfefe::process_clust(){
 	h1Eclust[0]->Fill(clsmar->E_prim2);
 	h1P[0]->Fill(clsmar->fVertSP/1000.);
 	//std::cout<<" Checking the momentum of pi+ =>"<<P<<"\n";
-	if(clsmar->fVertSP>=19. && clsmar->fVertSP<=215. && clsmar->M_prim2>0.06 && clsmar->M_prim2<.18){
+	if(clsmar->fVertSP>=19. && clsmar->fVertSP<=215. && clsmar->M_prim2>0.04 && clsmar->M_prim2<.18){
           clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,1);
           clustEval->fillHistos(prim2lv.M2(),1);
 	  // check that TOF1 multiplicity is greater than or equal to 2
