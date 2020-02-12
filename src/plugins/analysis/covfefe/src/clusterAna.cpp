@@ -12,17 +12,17 @@
 #include <math.h>
 
 Long_t covfefe::hist_clust(){
-  std::string pname[]={"pNoCut","pKpi2Cut","ptof1Cut"};
-  std::string Ename[]={"ENoCut","EKpi2Cut","Etof1Cut"};
-  std::string Mname[]={"MNoCut","MKpi2Cut","Mtof1Cut"};
-  std::string tf1IDname[]={"tof1IDNoCut","tof1IDKpi2Cut","tof1IDtof1Cut"};
-  std::string tf1Mname[]={"tof1MNoCut","tof1MKpi2Cut","tof1Mtof1Cut"};
-  std::string tf1Sname[]={"tof1SNoCut","tof1SKpi2Cut","tof1Stof1Cut"};
-  std::string tf1vMname[]={"tof1vMNoCut","tof1vMKpi2Cut","tof1vMtof1Cut"};
-  std::string prAngname[]={"prAngNoCut","prAngKpi2Cut","prAngtof1Cut"};
-  std::string clustAngname[]={"clustAngNoCut","clustAngKpi2Cut","clustAngtof1Cut"};
-  std::string crysNname[]={"crysNumNoCut","crysNumKpi2Cut","crysNumtof1Cut"};
-  for(int i=0; i<3; i++){
+  std::string pname[]={"pNoCut","pKpi2Cut","ptof1Cut","pAngCut"};
+  std::string Ename[]={"ENoCut","EKpi2Cut","Etof1Cut","EAngCut"};
+  std::string Mname[]={"MNoCut","MKpi2Cut","Mtof1Cut","MAngCut"};
+  std::string tf1IDname[]={"tof1IDNoCut","tof1IDKpi2Cut","tof1IDtof1Cut","tof1IDAngCut"};
+  std::string tf1Mname[]={"tof1MNoCut","tof1MKpi2Cut","tof1Mtof1Cut","tof1AngCut"};
+  std::string tf1Sname[]={"tof1SNoCut","tof1SKpi2Cut","tof1Stof1Cut","tof1AngCut"};
+  std::string tf1vMname[]={"tof1vMNoCut","tof1vMKpi2Cut","tof1vMtof1Cut","tof1vMAngCut"};
+  std::string prAngname[]={"prAngNoCut","prAngKpi2Cut","prAngtof1Cut","prAngAngCut"};
+  std::string clustAngname[]={"clustAngNoCut","clustAngKpi2Cut","clustAngtof1Cut","clustAngAngCut"};
+  std::string crysNname[]={"crysNumNoCut","crysNumKpi2Cut","crysNumtof1Cut","crysNumAngCut"};
+  for(int i=0; i<4; i++){
     angClust[i]=new TH1D(clustAngname[i].c_str(),"stats",75,-1.1,1.1);
     prAng[i]=new TH1D(prAngname[i].c_str(),"stats",75,-1.1,1.1);
     h1Mass[i]=new TH1D(Mname[i].c_str(),"stats",84.5,0.0,.210);
@@ -100,7 +100,7 @@ Long_t covfefe::process_clust(){
           tof1IDvM[0]->Fill((*(clsmar->vec_extraTOF1))[id][0],(*(clsmar->vec_extraTOF1))[id][1]);
         }
 	//std::cout<<" Checking the momentum of pi+ =>"<<P<<"\n";
-	if(clsmar->fVertSP>=190. && clsmar->fVertSP<=215. && clsmar->M_prim2>0.04 && clsmar->M_prim2<.18){
+	if(clsmar->fVertSP>=190. && clsmar->fVertSP<=215.){
           clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,1);
           clustEval->fillHistos(prim2lv.M2(),1);
 	  // check that TOF1 multiplicity is greater than or equal to 2
@@ -122,6 +122,24 @@ Long_t covfefe::process_clust(){
           h1Eclust[1]->Fill(clsmar->E_prim2);
           h1P[1]->Fill(clsmar->fVertSP/1000.);
 	  h1prmAng->Fill(primCosTheta);
+	  // apply opening angle cut pi+pi0
+	  if(clsmar->prCosTheta<=-.8){
+            // Fill various tof1 histograms
+            tof1M[3]->Fill(clsmar->vec_extraTOF1->size());
+            for(UInt_t id=0; id<clsmar->vec_extraTOF1->size(); id++){
+              // tof1ID
+              tof1ID[3]->Fill((*(clsmar->vec_extraTOF1))[id][0]);
+              // tof1 score
+              tof1S[3]->Fill((*(clsmar->vec_extraTOF1))[id][1]);
+              tof1IDvM[3]->Fill((*(clsmar->vec_extraTOF1))[id][0],(*(clsmar->vec_extraTOF1))[id][1]);
+            }
+            // fill histos to study various cut conditions
+            angClust[3]->Fill(clsmar->clCosTheta);
+            prAng[3]->Fill(clsmar->prCosTheta);
+            h1Mass[3]->Fill(clsmar->M_prim2);
+            h1Eclust[3]->Fill(clsmar->E_prim2);
+            h1P[3]->Fill(clsmar->fVertSP/1000.);
+	  }
 	  std::cout<<" ... Mass2: "<<prim2lv.M2()<<std::endl;
 	  std::cout<<" Px, Py, Pz: ["<<clsmar->prim2px<<", "<<clsmar->prim2py<<", "<<clsmar->prim2pz<<"]\n";
 	}
