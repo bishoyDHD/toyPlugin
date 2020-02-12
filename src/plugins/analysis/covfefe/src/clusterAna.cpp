@@ -27,7 +27,7 @@ Long_t covfefe::hist_clust(){
     prAng[i]=new TH1D(prAngname[i].c_str(),"stats",75,-1.1,1.1);
     h1Mass[i]=new TH1D(Mname[i].c_str(),"stats",84.5,0.0,.210);
     h1Eclust[i]=new TH1D(Ename[i].c_str(),"stats",100.,0.0,.30);
-    h1P[i]=new TH1D(pname[i].c_str(),"stats",84.5,0.0,.260);
+    h1P[i]=new TH1D(pname[i].c_str(),"stats",84.5,0.1,.300);
     tof1ID[i]=new TH1D(tf1IDname[i].c_str(),"stat",13,-0.5,12.5);
     tof1M[i]=new TH1D(tf1Mname[i].c_str(),"stat",13,-0.5,12.5);
     tof1S[i]=new TH1D(tf1Sname[i].c_str(),"stat",20,-0.5,19.5);
@@ -100,7 +100,7 @@ Long_t covfefe::process_clust(){
           tof1IDvM[0]->Fill((*(clsmar->vec_extraTOF1))[id][0],(*(clsmar->vec_extraTOF1))[id][1]);
         }
 	//std::cout<<" Checking the momentum of pi+ =>"<<P<<"\n";
-	if(clsmar->fVertSP>=19. && clsmar->fVertSP<=215. && clsmar->M_prim2>0.04 && clsmar->M_prim2<.18){
+	if(clsmar->fVertSP>=190. && clsmar->fVertSP<=215. && clsmar->M_prim2>0.04 && clsmar->M_prim2<.18){
           clustEval->fillHistos(clsmar->M_prim2,clsmar->clCosTheta,clsmar->E_prim2,clsmar->prCosTheta,1);
           clustEval->fillHistos(prim2lv.M2(),1);
 	  // check that TOF1 multiplicity is greater than or equal to 2
@@ -125,7 +125,7 @@ Long_t covfefe::process_clust(){
 	  std::cout<<" ... Mass2: "<<prim2lv.M2()<<std::endl;
 	  std::cout<<" Px, Py, Pz: ["<<clsmar->prim2px<<", "<<clsmar->prim2py<<", "<<clsmar->prim2pz<<"]\n";
 	}
-	if(clsmar->extraTOF1->size()>=3){
+	if(clsmar->extraTOF1->size()>=2){
 	  Eclust->Fill(clsmar->E_prim2);
 	  InvM->Fill(clsmar->M_prim2);
 	  h1Pkpi2->Fill(clsmar->fVertSPiplus);
