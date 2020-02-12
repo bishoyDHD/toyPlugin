@@ -17,7 +17,7 @@ Long_t covfefe::histosCsI(){
   angScore=new TH1D("angScore","stat",48.,-400.5,360.);
   h1score=new TH1D("h1score","stat",16.,-0.5,15.5);
   h1tof1=new TH1D("tofhits","stat",13,-0.5,12.5);
-  tof1ID=new TH1D("tofID","stat",13,-0.5,12.5);
+  tof1ID[0]=new TH1D("tofID","stat",13,-0.5,12.5);
   csiAng=new TH2D("csiAngles","stat",24,0.,360.,24,0.,360.);
 
   return 0;

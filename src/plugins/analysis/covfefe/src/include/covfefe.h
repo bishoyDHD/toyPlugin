@@ -53,7 +53,7 @@ class covfefe:public Plugin{
   TH1D* hkmu2,*h1Pkpi2;
   TH1D* timing, *phdistr;
   TH1D* tof1ang,*h1angDiff,*h1score;
-  TH1D* angScore,*h1tof1,*tof1ID;
+  TH1D* angScore,*h1tof1;
   TH2D* csiAng;
   Int_t index;
   TH1D* h1time[12][2][2][16];
@@ -86,7 +86,8 @@ class covfefe:public Plugin{
   // angles
   TH1D *h1theta[2], *h1phi[2];
   TH1D *angClust[3],*prAng[3],*h1Mass[3],*h1Eclust[3],*h1P[3];
-  TH2D *h2corrAng;
+  TH1D* tof1ID[3], *tof1M[3], *tof1S[3];
+  TH2D *h2corrAng, *tof1IDvM[3];
   TH1D*h1prmAng;
   // timining histograms
   TH1D* h1t_0[3], *h1tcorr[3],*h1trefCorr[3],*h1cdf50[3],*h1refgaus[3];
