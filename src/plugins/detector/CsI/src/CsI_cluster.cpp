@@ -77,6 +77,7 @@ void Det_CsI::initVar(){
   treeClus->cpid1phiE=dummy;     treeClus->kM2=dummy;
   treeClus->cpid2thetaE=dummy;   treeClus->cpid1E=dummy;
   treeClus->cpid2phiE=dummy;     treeClus->cpid2E=dummy;
+  treeClus->csiCluster.clear();
   // target and mwpc var
   treeClus->isBad=dummy;
   treeClus->fTof2SP=dummy;
@@ -473,10 +474,10 @@ Long_t Det_CsI::process_fit(){
     for(UInt_t iclus=0; iclus<scoring->clusE.size(); iclus++){
       clusVar.clusPx=scoring->clusPx[iclus];
       clusVar.clusPy=scoring->clusPy[iclus];
-      clusVar.clusPx=scoring->clusPz[iclus];
+      clusVar.clusPz=scoring->clusPz[iclus];
       clusVar.clusX=scoring->clusX[iclus];
       clusVar.clusY=scoring->clusY[iclus];
-      clusVar.clusX=scoring->clusZ[iclus];
+      clusVar.clusZ=scoring->clusZ[iclus];
       clusVar.clusR=scoring->clusR[iclus];
       clusVar.clusE=scoring->clusE[iclus];
       clusVar.clusTheta=scoring->clusTheta[iclus];
