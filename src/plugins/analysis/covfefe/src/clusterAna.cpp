@@ -34,6 +34,7 @@ Long_t covfefe::hist_clust(){
     //clustM[i]=new TH1D(crysNname[i].c_str(),"stat",13,-0.5,12.5);
     tof1IDvM[i]=new TH2D(tf1vMname[i].c_str(),"stat",13,-.5,12.5,20,-.5,19.5);
   }
+  h1TofCorr=new TH1D("angCorr","stat",90.,-3.75,362.25);
   h1diffTof2=new TH1D("tof2diff","stat",25,-12.5,12.5);
   h1score=new TH1D("h1score","stat",16.,-0.5,15.5);
   h1Pkpi2=new TH1D("GapP","stat",55.,0.15,.245);

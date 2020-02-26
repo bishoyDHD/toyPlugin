@@ -88,7 +88,7 @@ class covfefe:public Plugin{
   TH1D *angClust[4],*prAng[4],*h1Mass[4],*h1Eclust[4],*h1P[4];
   TH1D* tof1ID[4], *tof1M[4], *tof1S[4];
   TH2D *h2corrAng, *tof1IDvM[4];
-  TH1D*h1prmAng;
+  TH1D*h1prmAng, *h1TofCorr;
   // timining histograms
   TH1D* h1t_0[3], *h1tcorr[3],*h1trefCorr[3],*h1cdf50[3],*h1refgaus[3];
   TH1D* h1Tcorr,*h1diffTof2;

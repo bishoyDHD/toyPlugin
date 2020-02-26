@@ -83,6 +83,17 @@ class CRTSingleCsI:public CRTBase{
   virtual ~CRTSingleCsI();
   ClassDef(CRTSingleCsI,1);
 };
+// container for CsI clusters
+struct clusters{
+  // cluster variables
+  // state vector information for cluster particles
+  Double_t clusPx, clusPy, clusPz;
+  Double_t clusTheta, clusPhi; // cluster particle theta & phi
+  Double_t clusE;
+  // position of cluster particles
+  Double_t clusX, clusY, clusZ;
+  Double_t clusR;
+};
 class CRTClusterCsI:public CRTBase{
  public:
   // Target Info.
@@ -108,6 +119,8 @@ class CRTClusterCsI:public CRTBase{
   Double_t fSftSNy;
   Double_t fSftSNz;
   Double_t fVertMPhi; // compare with target phi
+  std::vector<clusters> csiCluster;
+  //clusters clusVar;
   //std::vector<Double_t> crysE,phval,csiTheta,csiPhi,csiEdep;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiR;

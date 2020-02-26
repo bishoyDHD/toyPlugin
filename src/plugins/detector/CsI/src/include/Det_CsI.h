@@ -84,6 +84,7 @@ public:
   Det_CsI(TTree *in_,TTree *out_,TFile *inf_, TFile * outf_,TObject *p_);
   virtual ~Det_CsI();
 
+  clusters clusVar;
   // Main CsI analysis methods
   Long_t histos();
   Long_t startup();

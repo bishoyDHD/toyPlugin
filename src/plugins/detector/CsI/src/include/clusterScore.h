@@ -96,6 +96,11 @@ public:
   double getclPhi();
   void init(); // initialize
   void reset(); // reset container
+  // cluster variables to allow future manipulations
+  std::vector<int> crysNum,clustCrys;
+  std::vector<double> clusPx,clusPy,clusPz;
+  std::vector<double> clusR,clusX,clusY,clusZ,clusE;
+  std::vector<double> clusTheta,clusPhi;
 protected:
   // variables to push items to container
   double px,py,pz,E;

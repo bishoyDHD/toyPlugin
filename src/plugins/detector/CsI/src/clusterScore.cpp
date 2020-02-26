@@ -24,6 +24,10 @@ void clusterScore::init(){
   csiphi.clear();        csitime_.clear();
   csitime.clear();
   cMultip=0;
+  crysNum.clear();      clustCrys.clear();
+  clusPx.clear();       clusPy.clear();       clusPz.clear();
+  clusR.clear();        clusX.clear();        clusY.clear();      clusZ.clear();
+  clusE.clear();        clusTheta.clear();    clusPhi.clear();
 }
 // will be needed for sanity check plots and scoring
 // default is pi0
@@ -81,6 +85,12 @@ void clusterScore::clusterEval(std::vector<double> &mCrys,std::vector<double> &s
     clustvar.clpy=py;      clustvar.cly=y;
     clustvar.clpz=pz;      clustvar.clz=z;
     clustvar.clr=r;
+    //------> cluster store:
+    clusPx.push_back(px); clusPy.push_back(py); clusPz.push_back(pz);
+    clusR.push_back(r);   clusX.push_back(x);   clusY.push_back(y);
+    clusZ.push_back(z);   clusE.push_back(mCrys[i]);
+    clusTheta.push_back(theta[i]);
+    clusPhi.push_back(phi[i]);
     // evaluate 4-momenta and corresponding vectors
     clustvar.cpidlv.SetPxPyPzE(px,py,pz,mCrys[i]);
     clustvar.cpidv3.SetXYZ(px,py,pz);
@@ -218,6 +228,12 @@ void clusterScore::clusterEval(const std::vector<double> &eneCrys,const std::vec
     clustvar.clpy=py;      clustvar.cly=y;
     clustvar.clpz=pz;      clustvar.clz=z;
     clustvar.clr=r;
+    //------> cluster store:
+    clusPx.push_back(px); clusPy.push_back(py); clusPz.push_back(pz);
+    clusR.push_back(r);   clusX.push_back(x);   clusY.push_back(y);
+    clusZ.push_back(z);   clusE.push_back(eneCrys[i]);
+    clusTheta.push_back(theta[i]);
+    clusPhi.push_back(phi[i]);
     // evaluate 4-momenta and corresponding vectors
     clustvar.cpidlv.SetPxPyPzE(px,py,pz,eneCrys[i]);
     clustvar.cpidv3.SetXYZ(px,py,pz);

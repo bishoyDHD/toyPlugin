@@ -296,7 +296,7 @@ Long_t Det_CsI::process_fit(){
     //      CLUSTER EVALUATION
     //**********************************
     if((multiCrys>=4 || singleCrys>=4)) goto exitFill;
-    //if((multiCrys+singleCrys>=4)) goto exitFill;
+    if((multiCrys+singleCrys>=4)) goto exitFill;
     if(multiCrys==2 && singleCrys==0){
       std::cout<<"  This is only 2 multiCrys ---|\n";
       scoring->init();
@@ -469,6 +469,20 @@ Long_t Det_CsI::process_fit(){
     treeClus->cpid1phiE=cl1phi;
     treeClus->cpid2phiE=cl2phi;
     treeClus->clusterM=clustM;
+    // Fill cluster variables;
+    for(UInt_t iclus=0; iclus<scoring->clusE.size(); iclus++){
+      clusVar.clusPx=scoring->clusPx[iclus];
+      clusVar.clusPy=scoring->clusPy[iclus];
+      clusVar.clusPx=scoring->clusPz[iclus];
+      clusVar.clusX=scoring->clusX[iclus];
+      clusVar.clusY=scoring->clusY[iclus];
+      clusVar.clusX=scoring->clusZ[iclus];
+      clusVar.clusR=scoring->clusR[iclus];
+      clusVar.clusE=scoring->clusE[iclus];
+      clusVar.clusTheta=scoring->clusTheta[iclus];
+      clusVar.clusPhi=scoring->clusPhi[iclus];
+      treeClus->csiCluster.push_back(clusVar);
+    }
     std::cout<<"\n  piPecking total Cluster Energy:  "<<E2clust<<endl;
     std::cout<<"\n  Angular1 checking (centriod)   ("<<cl1theta<<", "<<cl1phi<<")\n";
     std::cout<<"\n  Angular2 checking (centriod)   ("<<cl2theta<<", "<<cl2phi<<")\n";
