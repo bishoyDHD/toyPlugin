@@ -214,7 +214,10 @@ Long_t Det_CsI::process(){
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-	h1Ch->Fill(iFB);
+	if(iFB==1)
+	  h1Ch->Fill(iFB);
+	if(iUD==0)
+	  h1Ch->Fill(iUD);
       }
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
       //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
