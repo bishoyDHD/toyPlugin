@@ -9,6 +9,7 @@
 #include "TTree.h"
 #include "TSpectrum.h"
 #include "TLegend.h"
+#include <TRandom.h>
 #include <TLorentzVector.h>
 #include <TVector3.h>
 #include <TLine.h>
@@ -38,6 +39,7 @@ class covfefe:public Plugin{
   double t_ref1,t_ref2,t_ref3;
   double t_corr, tCalc;
   double pVert, piPpx, piPpy, piPpz, P, primCosTheta;
+  TRandom* rand;
  public:
   covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p);
   virtual ~covfefe();

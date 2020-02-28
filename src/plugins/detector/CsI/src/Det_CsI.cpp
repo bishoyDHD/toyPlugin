@@ -35,7 +35,7 @@ Long_t Det_CsI::setIdCsI(map<IdCsI,UInt_t> & map){
 }
 */
 Long_t Det_CsI::histos(){
-
+  h1Ch=new TH1D("h1Ch","channel7",10,-1,9);
   return 0;
 }
 
@@ -208,6 +208,7 @@ Long_t Det_CsI::process(){
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
+	h1Ch->Fill(iClock);
       }
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
       //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);

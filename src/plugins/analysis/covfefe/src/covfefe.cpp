@@ -22,6 +22,7 @@ covfefe::covfefe(TTree *in, TTree *out,TFile *inf_, TFile * outf_, TObject *p):P
   intEn=NULL;
   phdis=NULL;
   hkmu2=NULL;
+  rand=new TRandom();
   std::cout<<" checking this shit \n";
 };
 
@@ -60,7 +61,7 @@ Long_t covfefe::histos(){
     h1t_0[i]=new TH1D(name1.str().c_str(),"stats",50,-100,100);
     h1tcorr[i]=new TH1D(name2.str().c_str(),"stats",50,-10.,20.);
     h1trefCorr[i]=new TH1D(name3.str().c_str(),"stats",750,-1000,1000);
-    h1cdf50[i]=new TH1D(name4.str().c_str(),"stats",150,-250.,250.);
+    h1cdf50[i]=new TH1D(name4.str().c_str(),"stats",550,-1000.,1000.);
     h1refgaus[i]=new TH1D(name5.str().c_str(),"stats",50,-100,100);
   }
   std::ostringstream nameCal, ename, nameInt, inEne;
@@ -73,7 +74,7 @@ Long_t covfefe::histos(){
   integHist=new TH1D(nameInt.str().c_str(),"stat",63.0,0,250);
   intEn=new TH1D(inEne.str().c_str(),"stat",63.0,0,250);
   phdis=new TH1D("pheight","stat",150.,0,1000);
-  timing=new TH1D("timing","stat",60,-10.,20.);
+  timing=new TH1D("timing","stat",125,-250.,250.);
   h1Tcorr=new TH1D("tCorr","stat",40.,-100.,100.);
   phdistr=new TH1D("ptdist","stat",62.5,1,249);
   hkmu2=new TH1D("kmu2Ds","stat",150.,0,1000);
@@ -141,6 +142,9 @@ Long_t covfefe::process(){
       h1time[iclock][iFB][iUD][iModule]->Fill(treeTime->rgaus[0]-treeTime->trise);
       for(int n=0; n<3; n++)
         h1cdf50[n]->Fill((treeTime->rgaus[n]-treeTime->trise)*40);
+      double tcalc=(treeTime->rgaus[0]-treeTime->trise)*40;
+      //if(tcalc>0)
+        timing->Fill(tcalc-(rand->Gaus(22.9148,40.2762)));
     }
     // additional timing histos
     if(t_ref1>0 && t_ref2>0 && t_ref3){
@@ -177,6 +181,17 @@ Long_t covfefe::finalize(){
   std::ofstream calib;
   calib.open("newcalibPar.txt");
   double xmax, xx, calpar;
+  TCanvas* c0=new TCanvas("c0"," Peak time ",808,700);
+  c0->cd();
+  timing->SetTitle("CsI Timing Study");
+  timing->GetXaxis()->SetTitle("time [ns]");
+  timing->GetXaxis()->SetTitleSize(0.045);
+  timing->GetYaxis()->SetTitle("counts/bin");
+  timing->SetLineWidth(2);
+  timing->Draw("hist");
+  c0->Update();
+  c0->Write();
+  /*
   for(int iClock=0;iClock<12;iClock++){
     for(int iFB=0;iFB<2;iFB++){
       for(int iUD=0;iUD<2;iUD++){
@@ -248,8 +263,6 @@ Long_t covfefe::finalize(){
       }
     }
   }
-  c1->Write();
-  c2->Write();
   c3->cd();
   Ecorr->SetTitle("CsI: reconstructed energy for K_{#mu2} ");
   Ecorr->GetXaxis()->SetTitle("Energy (T_{#mu}) [MeV]");
@@ -264,7 +277,6 @@ Long_t covfefe::finalize(){
   leg0->AddEntry(Ecorr, "CD E_{loss} correction (#mu=153.67, #sigma=9.78)");
   leg0->AddEntry(intEn, "dE (#mu=145.8, #sigma=12.9)");
   leg0->Draw();
-  c3->Write();
   c4->cd();
   Ecorr->SetTitle("Comparing CsI Energy for K_{#mu2} for 2 methods ");
   Ecorr->GetXaxis()->SetTitle("Deposited energy (T_{#mu}) [MeV]");
@@ -279,7 +291,6 @@ Long_t covfefe::finalize(){
   leg->AddEntry(Ecorr, "Pulse-height: E_{loss} applied (#mu=155.3, #sigma=11.7)");
   leg->AddEntry(intEn, "Integrated waveform: E_{loss} applied (#mu=153.3, #sigma=19.5)");
   leg->Draw();
-  c4->Write();
   c5->cd();
   phdis->SetTitle("Pulse-height distribution");
   phdis->GetXaxis()->SetTitle("pulse-height");
@@ -295,22 +306,20 @@ Long_t covfefe::finalize(){
   leg2->AddEntry(phdis, "Pulse-height distribution");
   leg2->AddEntry(hkmu2, "K_{#mu2} pulse-height distribtion");
   leg2->Draw();
-  c5->Write();
   c6->cd();
   h1Tcorr->SetTitle("CsI timing");
   h1Tcorr->GetXaxis()->SetTitle("time");
   h1Tcorr->GetYaxis()->SetTitle("counts/bin");
   h1Tcorr->SetLineWidth(2);
   h1Tcorr->Draw("hist");
-  c6->Write();
   c7->cd();
   phdistr->SetTitle("Peak time distribution");
   phdistr->GetXaxis()->SetTitle("time [ch]");
   phdistr->GetYaxis()->SetTitle("counts/bin");
   phdistr->SetLineWidth(2);
   phdistr->Draw("hist");
-  c7->Write();
 
+  */
   return 0; // 0 = all ok
 };
 

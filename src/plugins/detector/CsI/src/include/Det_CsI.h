@@ -108,6 +108,7 @@ public:
   TH2D* h2TimeVSCsI,*h2ang;
   TH2D* h2ChargeVSCsI;
   TH1D* h1MaxDiff;
+  TH1D* h1Ch;
   TH2D* h2DiffVSCsI;
   
   virtual Long_t cmdline(char * cmd);
