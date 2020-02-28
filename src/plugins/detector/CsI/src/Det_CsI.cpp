@@ -210,6 +210,12 @@ Long_t Det_CsI::process(){
         std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
 	h1Ch->Fill(iClock);
       }
+      if(iClock==7 && (iFB==1 || iUD==0)){
+        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
+        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
+        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
+	h1Ch->Fill(iFB);
+      }
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
       //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
       std::cout<<" naming TKO module:  "<<nameModule<<std::endl;
