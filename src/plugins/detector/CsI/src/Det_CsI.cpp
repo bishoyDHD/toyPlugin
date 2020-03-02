@@ -217,7 +217,7 @@ Long_t Det_CsI::process(){
 	if(iFB==1)
 	  h1Ch->Fill(iModule);
 	if(iUD==0)
-	  h1Ch->Fill(-1*iModule);
+	  h1Ch->Fill(-1*(1+iModule));
       }
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
       //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
