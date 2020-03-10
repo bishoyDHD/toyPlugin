@@ -17,53 +17,61 @@ Double_t WaveformCsI::waveformSingle(Double_t *x,Double_t *par){
              par[5]*(x[0]-par[1])/(par[7])*exp(1-(x[0]-par[1])/(par[7])));
   return num+par[8];
 }
+Double_t WaveformCsI::waveformDecomp(Double_t *x,Double_t *par){
+  //std::cout<<"  ----> entering single waveform fit function \n";
+  double den=1-exp(-(x[0]-par[1])/par[6]);
+  double num=(par[0]/den)*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
+             ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
+             par[5]*(x[0]-par[1])/(par[7])*exp(1-(x[0]-par[1])/(par[7])));
+  return num;
+}
 Double_t WaveformCsI::waveformDouble(Double_t *x,Double_t* par){
   //if(x[0]<par[1]) return 0;
   double den1=1-exp(-1*(x[0]-par[1])/par[6]);
-  double den2=1-exp(-1*(x[0]-par[9])/par[6]);
+  double den2=1-exp(-1*(x[0]-par[9])/par[14]);
   double frac=par[0]*2*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
               ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
               par[5]*(x[0]-par[1])/(par[7])*exp(1-(x[0]-par[1])/(par[7])))/(den1)+
-	      par[10]*2*TMath::Freq((x[0]-par[9]-par[2])/par[3])*((x[0]-par[9])/par[4]*
-              exp(1-(x[0]-par[9])/par[7])+par[5]*(x[0]-par[9])/(par[7])*
-              exp(1-(x[0]-par[9])/par[7]))/(den2);
-  return frac+par[8];
+	      par[8]*2*TMath::Freq((x[0]-par[9]-par[10])/par[11])*((x[0]-par[9])/par[12]*
+              exp(1-(x[0]-par[9])/par[15])+par[13]*(x[0]-par[9])/(par[15])*
+              exp(1-(x[0]-par[9])/par[15]))/(den2);
+  return frac+par[16];
 }
 Double_t WaveformCsI::waveformTriple(Double_t *x,Double_t* par){
   //if(x[0]<par[1]) return 0;
   double den1=1-exp(-1*(x[0]-par[1])/par[6]);
-  double den2=1-exp(-1*(x[0]-par[9])/par[6]);
-  double den3=1-exp(-1*(x[0]-par[12])/par[6]);
+  double den2=1-exp(-1*(x[0]-par[9])/par[14]);
+  double den3=1-exp(-1*(x[0]-par[17])/par[22]);
   double frac=par[0]*2*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
               ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
               par[5]*(x[0]-par[1])/(par[7])*exp(1-(x[0]-par[1])/(par[7])))/(den1)+
-              par[10]*2*TMath::Freq((x[0]-par[9]-par[2])/par[3])*
-              ((x[0]-par[9])/par[4]*exp(1-(x[0]-par[9])/par[7]) +
-              par[5]*(x[0]-par[9])/(par[7])*exp(1-(x[0]-par[9])/(par[7])))/(den2) +
-              par[11]*2*TMath::Freq((x[0]-par[12]-par[2])/par[3])*
-              ((x[0]-par[12])/par[4]*exp(1-(x[0]-par[12])/par[7]) +
-              par[5]*(x[0]-par[12])/(par[7])*exp(1-(x[0]-par[12])/(par[7])))/(den3);
-  return frac+par[8];
+              par[8]*2*TMath::Freq((x[0]-par[9]-par[10])/par[11])*
+              ((x[0]-par[9])/par[12]*exp(1-(x[0]-par[9])/par[15]) +
+              par[13]*(x[0]-par[9])/(par[15])*exp(1-(x[0]-par[9])/(par[15])))/(den2) +
+              par[16]*2*TMath::Freq((x[0]-par[17]-par[18])/par[19])*
+              ((x[0]-par[17])/par[20]*exp(1-(x[0]-par[17])/par[20]) +
+              par[21]*(x[0]-par[17])/(par[23])*exp(1-(x[0]-par[17])/(par[23])))/(den3);
+  return frac+par[24];
 }
 Double_t WaveformCsI::waveformQuad(Double_t *x,Double_t* par){
   //if(x[0]<par[1]) return 0;
   double den1=1-exp(-1*(x[0]-par[1])/par[6]);
-  double den2=1-exp(-1*(x[0]-par[9])/par[6]);
-  double den3=1-exp(-1*(x[0]-par[12])/par[6]);
-  double den4=1-exp(-1*(x[0]-par[14])/par[6]);
+  double den2=1-exp(-1*(x[0]-par[9])/par[14]);
+  double den3=1-exp(-1*(x[0]-par[17])/par[22]);
+  double den4=1-exp(-1*(x[0]-par[25])/par[30]);
   double frac=par[0]*2*TMath::Freq((x[0]-par[1]-par[2])/par[3])*
               ((x[0]-par[1])/par[4]*exp(1-(x[0]-par[1])/par[4])+
               par[5]*(x[0]-par[1])/(par[7])*exp(1-(x[0]-par[1])/(par[7])))/(den1)+
-              par[10]*2*TMath::Freq((x[0]-par[9]-par[2])/par[3])*
-              ((x[0]-par[9])/par[4]*exp(1-(x[0]-par[9])/par[7])+
-              par[5]*(x[0]-par[9])/(par[7])*exp(1-(x[0]-par[9])/(par[7])))/(den2)+
-              par[11]*2*TMath::Freq((x[0]-par[12]-par[2])/par[3])*
-              ((x[0]-par[12])/par[4]*exp(1-(x[0]-par[12])/par[7])+
-              par[5]*(x[0]-par[12])/(par[7])*exp(1-(x[0]-par[12])/(par[7])))/(den3)+
-              par[13]*2*TMath::Freq((x[0]-par[14]-par[2])/par[3])*
-              ((x[0]-par[14])/par[4]*exp(1-(x[0]-par[14])/par[7])+
-              par[5]*(x[0]-par[14])/(par[7])*exp(1-(x[0]-par[14])/(par[7])))/(den4);    
-  return frac+par[8];
+              par[8]*2*TMath::Freq((x[0]-par[9]-par[10])/par[11])*
+              ((x[0]-par[9])/par[12]*exp(1-(x[0]-par[9])/par[15]) +
+              par[13]*(x[0]-par[9])/(par[15])*exp(1-(x[0]-par[9])/(par[15])))/(den2) +
+              par[16]*2*TMath::Freq((x[0]-par[17]-par[18])/par[19])*
+              ((x[0]-par[17])/par[20]*exp(1-(x[0]-par[17])/par[20]) +
+              par[21]*(x[0]-par[17])/(par[23])*exp(1-(x[0]-par[17])/(par[23])))/(den3);
+              par[24]*2*TMath::Freq((x[0]-par[25]-par[26])/par[27])*
+              ((x[0]-par[25])/par[28]*exp(1-(x[0]-par[25])/par[28])+
+              par[29]*(x[0]-par[25])/(par[31])*exp(1-(x[0]-par[25])/(par[31])))/(den4);
+  return frac+par[32];
 }
 Double_t WaveformCsI::waveformOverrange(Double_t *x,Double_t* par){
   //if(x[0]<par[1]) return 0;
@@ -201,6 +209,7 @@ bool SingleCsI::fit(){
   initVar(); // will be called at begining of every event
   static unsigned int count=0;
   char name[256];
+  exists=false;
   //cout<<"processing "<<mIndexCsI<<" "<<nameCsI(mIndexCsI)<<endl;
   cout<<"processing "<<mIndexCsI<<" "<<mName<<endl;
   std::cout<<" This is the add data method, size: "<<mListData.size()<<std::endl;
@@ -217,10 +226,10 @@ bool SingleCsI::fit(){
     //h1->SetBinContent(iData,mListData[iData]);
   }
   Double_t xmax=h1->GetBinLowEdge(h1->GetMaximumBin());
-  if(xmax<=57 || xmax>=68) return false;
   Double_t xmin=h1->GetBinLowEdge(h1->GetMinimumBin());
   Double_t ymax=h1->GetBinContent(h1->FindBin(xmax));
   Double_t yped=h1->GetBinContent(h1->FindBin(xmin));
+  if(xmax<56 || xmax>68) return false;
   // check for type of waveform (single, double, triple etc)
   unique_ptr<TSpectrum> s(new TSpectrum(4));
   Int_t nfound=s->Search(h1.get(),2,"",0.10);
@@ -229,6 +238,22 @@ bool SingleCsI::fit(){
   xpeaks=s->GetPositionX();
   std::sort(xpeaks,xpeaks+nfound);
   mNWave=nfound;
+/*
+  if(mNWave==1){
+    if(xmax<56 || xmax>68) return false;
+  }else if(nfound>=2 && nfound<=4){
+    size = sizeof(xpeaks) / sizeof(xpeaks[0]);
+    for(int n=0; n<size; n++){
+      if(xpeaks[n]<56 && xpeaks[n]>68){
+        exists=true;
+	goto jailbreak;
+      }else{
+      exists=false;
+      }
+    }
+  }
+  jailbreak:
+  if(!(exists)) return false;*/
   if(ymax==1023){
     mNWave=5;
     // We need to make sure that the max extends for at least 3 bins
@@ -339,10 +364,12 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
   shared_ptr<WaveformCsI> myWave(new WaveformCsI(mNWave));
   unsigned int NPar=9;
   shared_ptr<TF1> f1(new TF1("waveCut",myWave,&WaveformCsI::waveformSingle,1,250,NPar));//"WaveformCsI","waveformCut"));
+  // decompose various waveforms: pre(post)-pileup
+  //shared_ptr<TF1> f2(new TF1("Decomp",myWave,&WaveformCsI::waveformDecomp,1,250,NPar));
   switch(mNWave){
     case 1:
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
-      for(int n=0; n<9; n+=1){
+      for(int n=0; n<8; n+=1){
         f1->SetParameter(n,param[n]);
         f1->SetParLimits(n,parLowlim[n],parUplim[n]);
       }
@@ -364,7 +391,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax-lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc);
+        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(0));
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();
@@ -381,9 +408,9 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       }
       break;
     case 2:
-      NPar=11;
+      NPar=17;
       f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));
-      for(UInt_t n=0; n<NPar+1; n+=1){
+      for(UInt_t n=0; n<NPar; n+=1){
         f1->SetParameter(n,param[n]);
         f1->SetParLimits(n,parLowlim[n],parUplim[n]);
       }
@@ -393,12 +420,12 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       f1->SetParLimits(0,ymax-61.7,ymax+971.7);
       f1->SetParameter(1,xval[0]+.1);
       f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
-      f1->SetParameter(8,yped);
-      f1->SetParLimits(8,yped-161.7,yped+11.7);
+      f1->SetParameter(16,yped);
+      //f1->SetParLimits(16,yped-161.7,yped+11.7);
       f1->SetParameter(9,xval[1]-15.1);
       f1->SetParLimits(9,xval[1]-61.7,xval[1]+17.7);
-      f1->SetParameter(10,ymax2);
-      f1->SetParLimits(10,ymax2-7.7,ymax2+7.7);
+      f1->SetParameter(8,ymax2);
+      f1->SetParLimits(8,ymax2-7.7,ymax2+7.7);
       f1->SetLineStyle(6);
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
@@ -410,10 +437,20 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc);
+        cdf50=f1->GetX(tcalc,0.,xval[0]);
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();
+        peak2=f1->GetParameter(9);
+/*
+	if((ymax2>ymax) && (xval[1]>59 && xval[1]<66)){
+          f2.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDecomp,1,250,NPar));
+	  Double_t par[NPar];
+          f2->GetParameters(par);
+          f2->SetLineColor(kBlue);
+          f2->SetParameters(&par[8]);
+          drawWaves(h1,f2);
+        }*/
         std::cout<<" -------------------- "<<cdf50<<std::endl;
 	//calTime(f1);
         if(mEventNo % 10000==0)
@@ -426,30 +463,30 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       }
       break;
     case 3:
-      NPar=13;
-      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));//"WaveformCsI","waveformCut"));
+      NPar=25;
+      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformTriple,1,250,NPar));//"WaveformCsI","waveformCut"));
       //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
       for(UInt_t n=0; n<NPar+1; n+=1){
         f1->SetParameter(n,param[n]);
         f1->SetParLimits(n,parLowlim[n],parUplim[n]);
       }
-      std::cout<<" ---- Waveform 2 max Bin:  "<<xval[0]<<" "<<xval[1]<<std::endl;
+      std::cout<<" ---- Waveform 3 max Bin:  "<<xval[0]<<" "<<xval[1]<<std::endl;
       ymax2=h1->GetBinContent(h1->FindBin(xval[1]));
       ymax3=h1->GetBinContent(h1->FindBin(xval[2]));
       f1->SetParameter(0,ymax);
       f1->SetParLimits(0,ymax-61.7,ymax+971.7);
       f1->SetParameter(1,xval[0]+.1);
       f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
-      f1->SetParameter(8,yped);
-      f1->SetParLimits(8,yped-161.7,yped+11.7);
+      f1->SetParameter(24,yped);
+      f1->SetParLimits(24,yped-161.7,yped+11.7);
       f1->SetParameter(9,xval[1]-15.1);
       f1->SetParLimits(9,xval[1]-61.7,xval[1]+17.7);
-      f1->SetParameter(10,ymax2);
-      f1->SetParLimits(10,ymax2-7.7,ymax2+7.7);
-      f1->FixParameter(12,xval[2]-15.1);
-      //f1->SetParLimits(12,xpeaks[2]-61.7,xpeaks[2]+71.7);
-      f1->SetParameter(11,ymax3);
-      f1->SetParLimits(11,ymax3-41.7,ymax3+25.77);
+      f1->SetParameter(8,ymax2);
+      f1->SetParLimits(8,ymax2-7.7,ymax2+7.7);
+      f1->FixParameter(17,xval[2]-15.1);
+      //f1->SetParLimits(17,xpeaks[2]-61.7,xpeaks[2]+71.7);
+      f1->SetParameter(16,ymax3);
+      f1->SetParLimits(16,ymax3-41.7,ymax3+25.77);
       f1->SetLineStyle(6);
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
@@ -461,7 +498,57 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	calcThetaPhi();
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc);
+        cdf50=f1->GetX(tcalc,0.,xval[0]);
+	ptime=f1->GetMaximumX();
+	chi2=f1->GetChisquare();
+	ndf=f1->GetNDF();
+        std::cout<<" -------------------- "<<cdf50<<std::endl;
+	//calTime(f1);
+        if(mEventNo % 10000==0)
+          drawWaves(h1);
+        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      }
+      break;
+    case 4:
+      NPar=33;
+      f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformQuad,1,250,NPar));//"WaveformCsI","waveformCut"));
+      //TF1* f1=new TF1("waveCut",singlemodel().c_str(),1,250);//"WaveformCsI","waveformCut"));
+      for(UInt_t n=0; n<NPar+1; n+=1){
+        f1->SetParameter(n,param[n]);
+        f1->SetParLimits(n,parLowlim[n],parUplim[n]);
+      }
+      std::cout<<" ---- Waveform 4 max Bin:  "<<xval[0]<<" "<<xval[1]<<std::endl;
+      ymax2=h1->GetBinContent(h1->FindBin(xval[1]));
+      ymax3=h1->GetBinContent(h1->FindBin(xval[2]));
+      f1->SetParameter(0,ymax);
+      f1->SetParLimits(0,ymax-61.7,ymax+971.7);
+      f1->SetParameter(1,xval[0]+.1);
+      f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
+      f1->SetParameter(24,yped);
+      f1->SetParLimits(24,yped-161.7,yped+11.7);
+      f1->SetParameter(9,xval[1]-15.1);
+      f1->SetParLimits(9,xval[1]-61.7,xval[1]+17.7);
+      f1->SetParameter(8,ymax2);
+      f1->SetParLimits(8,ymax2-7.7,ymax2+7.7);
+      f1->FixParameter(17,xval[2]-15.1);
+      f1->SetParameter(16,ymax3);
+      f1->SetParLimits(16,ymax3-41.7,ymax3+25.77);
+      f1->FixParameter(25,xval[3]-15.1);
+      f1->SetParameter(24,ymax3);
+      f1->SetParLimits(24,ymax3-41.7,ymax3+25.77);
+      f1->SetLineStyle(6);
+      f1->SetLineColor(1);
+      f1->SetLineWidth(3);
+      h1->Fit("waveCut","Q");
+      if(f1->GetMaximumX()>=60 && f1->GetMaximumX()<=65){
+        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+        energy=(lmax-lmin);
+	phdiff=(lmax-lmin);
+	calcThetaPhi();
+        tcalc=.5*(lmax+lmin);
+        rtime=f1->GetParameter(1);
+        cdf50=f1->GetX(tcalc,0.,xval[0]);
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();
@@ -502,7 +589,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	calcThetaPhi();
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc);
+        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(0));
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();
@@ -518,7 +605,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       }
       break;
     case 6:
-      NPar=11;
+      NPar=16;
       f1.reset(new TF1("waveCut",myWave,&WaveformCsI::waveformDouble,1,250,NPar));
       for(UInt_t n=0; n<NPar+1; n+=1){
         f1->SetParameter(n,param[n]);
@@ -530,12 +617,12 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
       f1->SetParLimits(0,ymax-61.7,ymax*5.4);
       f1->SetParameter(1,xval[0]+40.1);
       f1->SetParLimits(1,xval[0]-261.7,xval[0]+571.7);
-      f1->SetParameter(8,yped);
-      f1->SetParLimits(8,yped-161.7,yped+11.7);
+      f1->SetParameter(16,yped);
+      f1->SetParLimits(16,yped-161.7,yped+11.7);
       f1->SetParameter(9,xval[1]-15.1);
       f1->SetParLimits(9,xval[1]-61.7,xval[1]+17.7);
-      f1->SetParameter(10,ymax2);
-      f1->SetParLimits(10,ymax2-7.7,ymax2+7.7);
+      f1->SetParameter(8,ymax2);
+      f1->SetParLimits(8,ymax2-7.7,ymax2+7.7);
       f1->SetLineStyle(6);
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
@@ -548,7 +635,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
         tcalc=.5*(lmax+lmin);
 	calcThetaPhi();
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc);
+        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(0));
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
         std::cout<<" -------------------- "<<cdf50<<std::endl;
@@ -593,6 +680,26 @@ void SingleCsI::drawWaves(shared_ptr<TH1D> h1){
     h1->SetMarkerSize(1.2);
     h1->Write();
     //h1->Draw();
+  }
+  //c1->Write();
+  //sprintf(name,"wave_run%d_%dCsI_%s.png",mRunNo,mEventNo,nameCsI(mIndexCsI));
+  //c1->SaveAs(name);
+}
+void SingleCsI::drawWaves(shared_ptr<TH1D> h1,shared_ptr<TF1> f1){
+  char name[256];
+  //sprintf(name,"canvas_run%d_%dCsI_%s",mRunNo,mEventNo,nameCsI(mIndexCsI));
+  sprintf(name,"canvas_run%d_%dCsI_%s",mRunNo,mEventNo,mName);
+  //TCanvas* c1=new TCanvas(name,name,1200,900);
+
+  if(h1!=0){
+    //TPad *pad1 = new TPad("pad1","",0,0,1,1);
+    //pad1->Draw();
+    //pad1->cd();
+    h1->SetMarkerStyle(2);
+    h1->SetMarkerSize(1.2);
+    h1->Write();
+    h1->Draw();
+    f1->Draw("same");
   }
   //c1->Write();
   //sprintf(name,"wave_run%d_%dCsI_%s.png",mRunNo,mEventNo,nameCsI(mIndexCsI));

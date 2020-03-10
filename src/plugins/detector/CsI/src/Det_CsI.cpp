@@ -35,7 +35,7 @@ Long_t Det_CsI::setIdCsI(map<IdCsI,UInt_t> & map){
 }
 */
 Long_t Det_CsI::histos(){
-  h1Ch=new TH1D("h1Ch","channel7",17,-.5,16.5);
+  //h1Ch=new TH1D("h1Ch","channel7",17,-.5,16.5);
   return 0;
 }
 
@@ -187,6 +187,7 @@ Long_t Det_CsI::process(){
           treeFit->rgaus[1]=myCsI.getTime();
           treeFit->tref[1]=myCsI.getCDF50();
 	  treeFit->refpk[1]=myCsI.getpTime();
+	  std::cout<<"---------| 2 |---------"<<myCsI.getCDF50()<<"\n";
 	  break;
 	case 8:
 	  std::cout<<"---------| This is reference Module: 3 \n";
@@ -204,19 +205,6 @@ Long_t Det_CsI::process(){
          indexClock==6 || indexClock==8 || indexClock==10)){
       IdCsI myIndex(treeRaw->nameCsI[iCh],treeRaw->indexCsI[iCh]);
       UInt_t iCsI=mapCsI[myIndex];
-      if(iClock==7 && iFB==1 && iUD==0){
-        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-	//h1Ch->Fill(iClock);
-      }
-      if(iClock==7 && (iFB==1 || iUD==0)){
-        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-        std::cout<<"============> Hell Ya this is an empty module (?) <==============\n";
-	if(iUD==0)
-	  h1Ch->Fill((1+iModule));
-      }
       //    if(iCsI==144 || iCsI==400||iCsI==656||iCsI==166||iCsI==128) continue;
       //SingleCsI myCsI(treeRaw->runNo,myEvent,iModule);
       std::cout<<" naming TKO module:  "<<nameModule<<std::endl;
@@ -240,6 +228,7 @@ Long_t Det_CsI::process(){
       if(myCsI.numberWave()==2){
         treeFit->kmu2=myCsI.getphDiff();
         treeFit->dubPed=myCsI.getPedestal();
+        treeFit->dubphei=myCsI.get2ndPeak();
       }
       if(myCsI.numberWave()==5 || myCsI.numberWave()==6){
         treeFit->ovrpH=myCsI.getphDiff();

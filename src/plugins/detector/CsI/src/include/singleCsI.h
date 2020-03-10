@@ -22,6 +22,7 @@ public:
 public:
   WaveformCsI(UInt_t nWave){mNWave=nWave;}
   Double_t waveformSingle(Double_t *x,Double_t *par);//waveform of single wave no background
+  Double_t waveformDecomp(Double_t *x,Double_t *par);//decompose waveform with prepile-up
   Double_t waveformDouble(Double_t *x,Double_t *par);//waveform with pile-up signals
   Double_t waveformTriple(Double_t *x,Double_t *par);//waveform with pile-up signals
   Double_t waveformQuad(Double_t *x,Double_t *par);//waveform with pile-up signals
@@ -44,6 +45,8 @@ private:
   vector<Double_t> mListEnergy;
   char mName[7];
   vector<Double_t> mListLocalMax;
+  int size;
+  bool exists;
 private:
   Double_t const dummy=-1000;
   Double_t findChi2(shared_ptr<TH1D>);
@@ -58,7 +61,7 @@ private:
   Double_t mapPhi,pcal,Theta,acos,energy;
   Double_t lmax,lmin,ymax2,ymax3;
   Double_t ptime,rtime,cdf50;
-  Double_t phdiff,tcalc;
+  Double_t phdiff,tcalc,peak2;
   Double_t otheta, ophi, wtheta, wphi, wz, wr;
   int moduleNo,thetaIndex,phiIndex;
   TH2D* h2ang;
@@ -72,6 +75,7 @@ private:
                     31.3094, 31.879, 32.2917, 32.5240, 32.5595,
                     32.5595, 32.5240, 32.2917, 31.879, 31.3094,
                     30.6177, 27.6979, 24.4337, 20.727, 16.4109};
+/*
   // Parameters for the waveform fitting function
   double param[31]={1000, 35.76, 26.68, 19.85, 15.83, 0.065, 2.255, 31.21,120,
                     120.5, 800, 700., 200.1, 17.1, 0.065, 2.255, 31.21,
@@ -81,12 +85,26 @@ private:
                     250, 1e5, 80, 70, 50, 1.07, 1000, 250};
   double parLowlim[31]={80.0, 15.1, 1, 5, 0., 1e-4, 0., 10,
                     70.1, 15, 10, 10, 10, 1e-4, 10, 20};
+*/
+  // Parameters for the waveform fitting function
+  Double_t param[33]={1000,35.76,26.68,19.85,15.83,0.065,2.255,31.21,
+                      800.,35.76,26.68,19.85,15.83,0.065,2.255,31.21,
+                      800.,35.76,26.68,19.85,15.83,0.065,2.255,31.21,
+                      800.,35.76,26.68,19.85,15.83,0.065,2.255,31.21,120.};
+  Double_t parUplim[33]={1e5,70.1,60,45,20,1.07,4,90,
+                         1e5,70.1,60,45,20,1.07,4,90,
+                         1e5,70.1,60,45,20,1.07,4,90,
+                         1e5,70.1,60,45,20,1.07,4,90,250};
+  Double_t parLowlim[33]={80.0,15.1,1,5,0.,1e-4,0.,10,
+                          80.0,15.1,1,5,0.,1e-4,0.,10,
+                          80.0,15.1,1,5,0.,1e-4,0.,10,
+                          80.0,15.1,1,5,0.,1e-4,0.,10,20};
 public:
   SingleCsI(){}
   ~SingleCsI(){}
   SingleCsI(UInt_t runNo){mRunNo=runNo;}
   SingleCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;}
-  SingleCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
+  SingleCsI(UInt_t runNo,UInt_t eventNo,UInt_t index):mNWave(-1000){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
   inline void setRunNo(UInt_t runNo){mRunNo=runNo;}
   inline void setEventNo(UInt_t eventNo){mEventNo=eventNo;}
   inline void setIndex(UInt_t index){mIndexCsI=index;}
@@ -112,6 +130,7 @@ public:
   Double_t getChi2(){return chi2;}
   Double_t getNDF(){return ndf;}
   Double_t getPedestal(){return lmin;}
+  Double_t get2ndPeak(){return peak2;}
   UInt_t numberWave() const{
     std::cout<<" .... waveNo. "<<mNWave<<std::endl;
     return mNWave;
@@ -180,14 +199,18 @@ private:
                     30.6177, 27.6979, 24.4337, 20.727, 16.4109};
 
   // Parameters for the waveform fitting function
-  Double_t param[31]={1000, 35.76, 26.68, 19.85, 15.83, 0.065, 2.255, 31.21,120,
-                    120.5, 800, 700., 200.1, 17.1, 0.065, 2.255, 31.21,
-                    200.5, 600, 28.9, 18.0, 17.1, 0.065, 2.255, 31.21,
-                    25, 28.9, 18.0, 17.1, 0.065, 62.7-17.1};
-  Double_t parUplim[31]={1e5, 70.1, 60, 45, 20, 1.07, 4, 90, 350,
-                    250, 1e5, 80, 70, 50, 1.07, 1000, 250};
-  Double_t parLowlim[31]={80.0, 15.1, 1, 5, 0., 1e-4, 0., 10,
-                    70.1, 15, 10, 10, 10, 1e-4, 10, 20};
+  Double_t param[33]={1000,35.76,26.68,19.85,15.83,0.065,2.255,31.21,
+                      800.,35.76,26.68,19.85,15.83,0.065,2.255,31.21,
+                      800.,35.76,26.68,19.85,15.83,0.065,2.255,31.21,
+                      800.,35.76,26.68,19.85,15.83,0.065,2.255,31.21,120.};
+  Double_t parUplim[33]={1e5,70.1,60,45,20,1.07,4,90,
+                         1e5,70.1,60,45,20,1.07,4,90,
+                         1e5,70.1,60,45,20,1.07,4,90,
+                         1e5,70.1,60,45,20,1.07,4,90,250};
+  Double_t parLowlim[33]={80.0,15.1,1,5,0.,1e-4,0.,10,
+                          80.0,15.1,1,5,0.,1e-4,0.,10,
+                          80.0,15.1,1,5,0.,1e-4,0.,10,
+                          80.0,15.1,1,5,0.,1e-4,0.,10,20};
 public:
   ClusterCsI(){}
   ~ClusterCsI(){}
