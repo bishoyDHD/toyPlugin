@@ -75,6 +75,7 @@ void Det_CsI::initSingleVar(){
   treeFit->ud=dummy;           
   treeFit->phei=dummy;         
   treeFit->phdstr=dummy;
+  treeFit->cdf50=dummy;
   //Single pulse                 //double pulse
   treeFit->sphei=dummy;         treeFit->kmu2=dummy;
   treeFit->sptime=dummy;        treeFit->dubPed=dummy;
@@ -225,6 +226,7 @@ Long_t Det_CsI::process(){
       treeFit->fb=iFB;
       treeFit->tpeak=myCsI.getpTime();
       treeFit->trise=myCsI.getTime();
+      treeFit->cdf50=myCsI.getCDF50();
       if(myCsI.numberWave()==2){
         treeFit->kmu2=myCsI.getphDiff();
         treeFit->dubPed=myCsI.getPedestal();
