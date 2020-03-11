@@ -202,11 +202,12 @@ void SingleCsI::initVar(){
   cdf50=dummy;
   chi2=dummy;
   ndf=dummy;
-  mNWave=dummy;
+  mNWave=0;
 }
 bool SingleCsI::fit(){
   //std::cout<<"|| entering into fitting function..... success! \n";
   initVar(); // will be called at begining of every event
+  std::cout<<" Top 1 .... waveNo. "<<mNWave<<": "<<rtime<<std::endl;
   static unsigned int count=0;
   char name[256];
   exists=false;
@@ -238,6 +239,7 @@ bool SingleCsI::fit(){
   xpeaks=s->GetPositionX();
   std::sort(xpeaks,xpeaks+nfound);
   mNWave=nfound;
+  std::cout<<" top 2.... waveNo. "<<mNWave<<std::endl;
 /*
   if(mNWave==1){
     if(xmax<56 || xmax>68) return false;
@@ -391,7 +393,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax-lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(0));
+        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(1));
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();
@@ -589,7 +591,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	calcThetaPhi();
         tcalc=.5*(lmax+lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(0));
+        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(1));
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();

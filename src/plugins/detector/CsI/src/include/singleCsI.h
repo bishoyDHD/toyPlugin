@@ -104,7 +104,7 @@ public:
   ~SingleCsI(){}
   SingleCsI(UInt_t runNo){mRunNo=runNo;}
   SingleCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;}
-  SingleCsI(UInt_t runNo,UInt_t eventNo,UInt_t index):mNWave(-1000){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
+  SingleCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
   inline void setRunNo(UInt_t runNo){mRunNo=runNo;}
   inline void setEventNo(UInt_t eventNo){mEventNo=eventNo;}
   inline void setIndex(UInt_t index){mIndexCsI=index;}
@@ -132,7 +132,6 @@ public:
   Double_t getPedestal(){return lmin;}
   Double_t get2ndPeak(){return peak2;}
   UInt_t numberWave() const{
-    std::cout<<" .... waveNo. "<<mNWave<<std::endl;
     return mNWave;
   }
   UInt_t runNo() const{
