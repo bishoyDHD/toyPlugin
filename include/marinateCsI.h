@@ -87,7 +87,7 @@ class CATTimingCsI:public CATBase{
   //Double peak var
   Double_t kmu2, dubPed, intKmu2;
   Double_t dubphei; //location of second peak
-  Double_t chi2;
+  Double_t chi2,cdf50;
   //Overrange variables
   Double_t ovrpH, ovrpLoc, ovrped;
   Double_t ovrX2,ovrTime;
