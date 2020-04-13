@@ -290,8 +290,8 @@ void ClusterCsI::calcThetaPhi(double Edep){
   wphi=90.-mapPhi; // world phi
   if(wphi<0) wphi=360.+wphi;
   angles=std::make_pair(wtheta,wphi);
-  h2Clus->Fill(wtheta,wphi,Edep);
-  visualCsI(); // CsI event viewer
+  //h2Clus->Fill(wtheta,wphi,Edep);
+  //visualCsI(); // CsI event viewer
   //h2ang->Fill(wtheta,wphi);
   cout<< " *** World Angles  "<<wtheta<<", "<<wphi<<endl;
 }
