@@ -290,6 +290,8 @@ void ClusterCsI::calcThetaPhi(double Edep){
   wphi=90.-mapPhi; // world phi
   if(wphi<0) wphi=360.+wphi;
   angles=std::make_pair(wtheta,wphi);
+  h2Clus->Fill(wtheta,wphi,Edep);
+  visualCsI(); // CsI event viewer
   //h2ang->Fill(wtheta,wphi);
   cout<< " *** World Angles  "<<wtheta<<", "<<wphi<<endl;
 }
@@ -392,4 +394,60 @@ Double_t ClusterCsI::findChi2(shared_ptr<TH1D> h1){
   }
   chi2/=(iUp-1-h1->GetFunction("waveCut")->GetNpar());
   return chi2;
+}
+void ClusterCsI::defVisual(){
+  h2Clus=new TH2D("h2Clus","CsI clusters", 24,0.0,180,48,0,360.); //<-- Mapped angles
+  h2Clus->GetXaxis()->SetTitle("#theta [deg]");
+  h2Clus->GetYaxis()->SetTitle("#phi [deg]");
+  cl= new TCanvas("cl","",900,800);
+  cl->cd();
+  cl->Update();
+  for(int i=0;i<11;i++){
+    hbox1[i]=new TLine(67.5,30*i+7.5,112.5,30*i+7.5); //lower gap edge in phi
+    vbox1[i]=new TLine(67.5,30*i+22.5,67.5,30*i+37.5); // create left gap edge in theta
+    hbox1[i+11]=new TLine(67.5,30*i+22.5,112.5,30*i+22.5); // upper gap edge in phi
+    vbox1[i+11]=new TLine(112.5,30*i+22.5,112.5,30*i+37.5);
+    hline1[i]=new TLine(15.0,30*i+15.0,165.5,30*i+15.0);
+    hline1[i+11]=new TLine(15.0,30*i+15.0,165.5,30*i+15.0);
+    hline2[i]=new TLine(15.0,30*i,67.5,30*i);
+    hline2[i+11]=new TLine(15.0,30*i,67.5,30*i);
+    hline3[i]=new TLine(112.5,30*i,165.5,30*i);
+    hline3[i+11]=new TLine(112.5,30*i,165.5,30*i);
+  }
+  hline2[22]=new TLine(15.0,330.0,67.5,330.0);
+  hline2[23]=new TLine(112.5,330.0,165.5,330.0);
+  hline2[24]=new TLine(15.0,352.5,67.5,352.5);
+  hline2[25]=new TLine(112.5,352.5,165.5,352.5);
+  hbox2[0]=new TLine(67.5,337.5,112.5,337.5);
+  hbox2[1]=new TLine(67.5,352.5,112.5,352.5);
+  vbox2[0]=new TLine(67.5,0.0,67.5,7.5);
+  vbox2[1]=new TLine(112.5,0.0,112.5,7.5);
+  vbox2[2]=new TLine(67.5,352.5,67.5,360.0);
+  vbox2[3]=new TLine(112.5,352.5,112.5,360.0);
+  hline1[22]=new TLine(15.0,345.0,165.5,345.0);
+}
+void ClusterCsI::visualCsI(){
+  //empty();
+  cl->cd();
+  h2Clus->GetZaxis()->SetRangeUser(0., .5);
+  h2Clus->Draw("colz");
+  for(int n=0;n<22;n++){
+    hbox1[n]->Draw("l");
+    vbox1[n]->Draw("l");
+    hline1[n]->Draw("l");
+    hline2[n]->Draw("l");
+    hline3[n]->Draw("l");
+  }
+  for(int n=0;n<2;n++){
+    hbox2[n]->Draw("l");
+  }
+  for(int n=0;n<4;n++){
+    vbox2[n]->Draw("l");
+  }
+  hline1[22]->Draw("l");
+  hline2[22]->Draw("l");
+  hline2[23]->Draw("l");
+  vbox2[0]->Draw("l");
+  cl->Modified();
+  cl->Update();
 }

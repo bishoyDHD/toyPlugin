@@ -5,6 +5,7 @@
 #include <vector>
 #include <TH1D.h>
 #include <TH2D.h>
+#include <TLine.h>
 #include <TF1.h>
 #include <algorithm>
 #include <utility>
@@ -210,12 +211,24 @@ private:
                           80.0,15.1,1,5,0.,1e-4,0.,10,
                           80.0,15.1,1,5,0.,1e-4,0.,10,
                           80.0,15.1,1,5,0.,1e-4,0.,10,20};
+  // Visualization of the CsI clusters
+  TH2D* h2Clus;
+  TLine *hbox1[25], *hline1[25];
+  TLine *hbox2[2], *hline2[26];
+  TLine *vbox1[25], *hline3[25];
+  TLine *vbox2[4];
 public:
   ClusterCsI(){}
   ~ClusterCsI(){}
-  ClusterCsI(UInt_t runNo){mRunNo=runNo;}
-  ClusterCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;}
-  ClusterCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
+  ClusterCsI(UInt_t runNo){mRunNo=runNo;defVisual();}
+  ClusterCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;defVisual();}
+  ClusterCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;defVisual();}
+  // ---> Visualization --------
+  void defVisual();
+  void visualCsI();
+  //need to reset stats in cluster event viewer
+  inline void empty(){h2Clus->Reset();}
+  TCanvas* cl;
   inline void setRunNo(UInt_t runNo){mRunNo=runNo;}
   inline void setEventNo(UInt_t eventNo){mEventNo=eventNo;}
   inline void setIndex(UInt_t index){mIndexCsI=index;}
