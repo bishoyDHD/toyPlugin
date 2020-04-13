@@ -36,6 +36,7 @@ Long_t Det_CsI::startup_fit(){
   scoring=new clusterScore();
   readFiles();
   scoring->init();
+  defCsI.defVisual();
   return 0;
 }
 Double_t firstDerive(Double_t *x,Double_t *par){
@@ -142,6 +143,7 @@ Long_t Det_CsI::process_fit(){
   // need to make sure this called for every event
   // avoid memory leaks
   initVar();
+  defCsI.empty(); // reset visualizer
   if(mwpcTree->run != treeRaw->runNo && tgtTree->run != treeRaw->runNo){
     std::cout<<" Oops you are comparing different runs \n";
     std::cout<<" ***Bailing*** Bailing*** \n";

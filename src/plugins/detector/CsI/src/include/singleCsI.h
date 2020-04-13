@@ -220,9 +220,9 @@ private:
 public:
   ClusterCsI(){}
   ~ClusterCsI(){}
-  ClusterCsI(UInt_t runNo){mRunNo=runNo;defVisual();}
-  ClusterCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;defVisual();}
-  ClusterCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;defVisual();}
+  ClusterCsI(UInt_t runNo){mRunNo=runNo;}
+  ClusterCsI(UInt_t runNo,UInt_t eventNo){mRunNo=runNo;eventNo=mEventNo;}
+  ClusterCsI(UInt_t runNo,UInt_t eventNo,UInt_t index){mRunNo=runNo;mEventNo=eventNo;mIndexCsI=index;}
   // ---> Visualization --------
   void defVisual();
   void visualCsI();

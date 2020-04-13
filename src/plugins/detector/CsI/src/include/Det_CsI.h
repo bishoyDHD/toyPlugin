@@ -33,6 +33,7 @@ private:
   // Detector parameters set in init file
   //
   // constants 
+  ClusterCsI defCsI;
   findClusters* fclusters;
   clusterScore* scoring;
   std::map<IdCsI,UInt_t> mapCsI;
