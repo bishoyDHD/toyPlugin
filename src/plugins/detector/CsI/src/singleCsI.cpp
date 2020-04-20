@@ -393,7 +393,7 @@ void SingleCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax)
 	phdiff=(lmax-lmin);
         tcalc=.5*(lmax-lmin);
         rtime=f1->GetParameter(1);
-        cdf50=f1->GetX(tcalc,0.,f1->GetParameter(1));
+        cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
 	ptime=f1->GetMaximumX();
 	chi2=f1->GetChisquare();
 	ndf=f1->GetNDF();
