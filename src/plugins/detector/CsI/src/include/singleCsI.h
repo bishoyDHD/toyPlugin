@@ -53,6 +53,7 @@ private:
   Double_t findChi2(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>);
   void tryFit(shared_ptr<TH1D>,double* xval,double yped,double ymax);
+  void tryFit(shared_ptr<TH1D>,double* xval,double xmax,double yped,double ymax);
   void tryFit(TH1D*,double* xval,double yped,double ymax);
   void findLocalMax(shared_ptr<TH1D>);
   void drawWaves(shared_ptr<TH1D> h1);
