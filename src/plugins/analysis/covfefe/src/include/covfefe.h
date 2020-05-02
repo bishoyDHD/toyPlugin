@@ -52,7 +52,7 @@ class covfefe:public Plugin{
   TH1D* Ecorr,*Eclust,*InvM;
   TH1D* intEn;
   TH1D* phdis;
-  TH1D* hkmu2,*h1Pkpi2;
+  TH1D* hkmu2,*h1Pkpi2,*refcd;
   TH1D* timing, *phdistr;
   TH1D* tof1ang,*h1angDiff,*h1score;
   TH1D* angScore,*h1tof1;

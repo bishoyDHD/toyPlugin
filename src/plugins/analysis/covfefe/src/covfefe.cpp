@@ -74,9 +74,10 @@ Long_t covfefe::histos(){
   integHist=new TH1D(nameInt.str().c_str(),"stat",63.0,0,250);
   intEn=new TH1D(inEne.str().c_str(),"stat",63.0,0,250);
   phdis=new TH1D("pheight","stat",150.,0,1000);
-  timing=new TH1D("timing","stat",125,-250.,250.);
+  timing=new TH1D("timing","stat",225,-950.,950.);
   h1Tcorr=new TH1D("tCorr","stat",40.,-100.,100.);
-  phdistr=new TH1D("ptdist","stat",62.5,1,249);
+  phdistr=new TH1D("ptdist","stat",40,1,80);
+  refcd=new TH1D("refCDF50","stat",40,1,80);
   hkmu2=new TH1D("kmu2Ds","stat",150.,0,1000);
   for(int iClock=0;iClock<12;iClock++){
     for(int iFB=0;iFB<2;iFB++){
@@ -118,9 +119,9 @@ Long_t covfefe::process(){
   phdis->Fill(treeTime->phei);
   hkmu2->Fill(treeTime->kmu2);
   // timing variables
-  t_ref1=treeTime->rgaus[0];
-  t_ref2=treeTime->rgaus[1];
-  t_ref3=treeTime->rgaus[2];
+  t_ref1=treeTime->tref[0];
+  t_ref2=treeTime->tref[1];
+  t_ref3=treeTime->tref[2];
   if(adcVal>0){
     std::cout<<" -----------------------------------" <<std::endl;
     std::cout<<" value of clock:  "<<iclock<<std::endl;
@@ -137,25 +138,30 @@ Long_t covfefe::process(){
     csiphi=treeTime->phiSing;
     h1cali[iclock][iFB][iUD][iModule]->Fill(adcVal);
     // Fill Kmu2  and timing histos
+    phdistr->Fill(treeTime->cdf50);
+    refcd->Fill(treeTime->tref[0]);
     if(treeTime->kmu2>0){
       h1kmu2[iclock][iFB][iUD][iModule]->Fill(treeTime->kmu2);
       h1time[iclock][iFB][iUD][iModule]->Fill(treeTime->rgaus[0]-treeTime->trise);
       for(int n=0; n<3; n++)
-        h1cdf50[n]->Fill((treeTime->rgaus[n]-treeTime->trise)*40);
-      double tcalc=(treeTime->rgaus[0]-treeTime->trise)*40;
+        h1cdf50[n]->Fill((treeTime->tref[n]-treeTime->cdf50)*40);
+      //double tcalc=(treeTime->tref[0]-treeTime->cdf50)*40;
       //if(tcalc>0)
-        timing->Fill(tcalc-(rand->Gaus(22.9148,40.2762)));
+      //if(treeTime->cdf50<34){
+        double tcalc=(treeTime->tref[0]-treeTime->cdf50)*40;
+        timing->Fill(tcalc);//+207.645); //-(rand->Gaus(22.9148,40.2762)));
+      //}
     }
     // additional timing histos
-    if(t_ref1>0 && t_ref2>0 && t_ref3){
+    if(t_ref1>0 && t_ref2>0 && t_ref3>0){
       for(int n=0; n<3; n++){
         T_0[n]=treeTime->tref[n]; tcorr[n]=treeTime->tcorr[n];
-        refgaus[n]=treeTime->rgaus[n];
+        refgaus[n]=treeTime->tref[n];
         h1t_0[n]->Fill(T_0[n]); 
         h1refgaus[n]->Fill(refgaus[n]);
 	tCalc=refgaus[n]-treeTime->trise;
         h1trefCorr[n]->Fill((refgaus[n]-treeTime->trise)*40.);
-	h1tcorr[n]->Fill(refgaus[n]-treeTime->trise); 
+	h1tcorr[n]->Fill(refgaus[n]-treeTime->cdf50); 
       }
     }
   }
