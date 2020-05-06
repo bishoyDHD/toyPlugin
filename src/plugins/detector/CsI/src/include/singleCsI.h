@@ -159,6 +159,9 @@ private:
   vector<Double_t> mListEnergy;
   char mName[7];
   vector<Double_t> mListLocalMax;
+  const Double_t tareTime=1.56785e+02;
+  const Double_t cdf50_ref=46.;
+  Double_t csiTime;
 private:
   int clusCrys;
   bool clus_csi;

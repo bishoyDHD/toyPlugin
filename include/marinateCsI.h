@@ -95,7 +95,17 @@ class CATTimingCsI:public CATBase{
   virtual ~CATTimingCsI();
   ClassDef(CATTimingCsI,1);
 };
-
+// container for CsI clusters
+struct Clusters{
+  // cluster variables
+  // state vector information for cluster particles
+  Double_t clusPx, clusPy, clusPz;
+  Double_t clusTheta, clusPhi; // cluster particle theta & phi
+  Double_t clusE;
+  // position of cluster particles
+  Double_t clusX, clusY, clusZ;
+  Double_t clusR;
+};
 class CATClusterCsI:public CATBase{
  public:
   // Target Info.
@@ -121,6 +131,7 @@ class CATClusterCsI:public CATBase{
   Double_t fSftSNy;
   Double_t fSftSNz;
   Double_t fVertMPhi; // compare with target phi
+  std::vector<Clusters> csiCluster;
   //std::vector<Double_t> crysE,phval,csiTheta,csiPhi,csiEdep;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiph;
   //std::map<std::pair<Double_t,Double_t>,Double_t> csiR;
