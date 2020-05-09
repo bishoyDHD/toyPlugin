@@ -126,22 +126,24 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
       //impose timing cut
-      if(f1->GetMaximumX()>=62.0 && f1->GetMaximumX()<=64.8){
-	if(!clus_csi)
-          clus_csi=true;
-        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
-        energy=(lmax-lmin)*pcal;
-	calcThetaPhi(energy);
-	phdiff=(lmax-lmin);
-        tcalc=.5*(lmax-lmin);
-        cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
-        std::cout<<" -------------------- "<<cdf50<<std::endl;
-	//calTime(f1);
-        if(mEventNo % 10000==0)
-          drawWaves(h1);
-        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
-        std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
-        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      if(f1->GetMaximumX()>=60.0 && f1->GetMaximumX()<=65.0){
+        if(f1->GetParameter(1)>=28.0 && f1->GetParameter(1)<=40.){
+          if(!clus_csi)
+            clus_csi=true;
+          lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+          energy=(lmax-lmin)*pcal;
+          calcThetaPhi(energy);
+          phdiff=(lmax-lmin);
+          tcalc=.5*(lmax-lmin);
+          cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
+          std::cout<<" -------------------- "<<cdf50<<std::endl;
+          //calTime(f1);
+          if(mEventNo % 10000==0)
+            drawWaves(h1);
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+          //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+        }
       }
       for(unsigned int i=0;i<NPar;i++){
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
@@ -171,21 +173,24 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
       // impose timing cut
-      if(f1->GetMaximumX()>=62.0 && f1->GetMaximumX()<=64.8){
-	if(!clus_csi)
-          clus_csi=true;
-        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
-        energy=(lmax-lmin)*pcal;
-	calcThetaPhi(energy);
-	phdiff=(lmax-lmin);
-        tcalc=.5*(lmax-lmin);
-        cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
-        std::cout<<" -------------------- "<<cdf50<<std::endl;
-	//calTime(f1);
-        if(mEventNo % 10000==0)
-          drawWaves(h1);
-        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
-        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      if(f1->GetMaximumX()>=60.0 && f1->GetMaximumX()<=65.0){
+        if(f1->GetParameter(1)>=28.0 && f1->GetParameter(1)<=40.){
+          if(!clus_csi)
+            clus_csi=true;
+          lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+          energy=(lmax-lmin)*pcal;
+          calcThetaPhi(energy);
+          phdiff=(lmax-lmin);
+          tcalc=.5*(lmax-lmin);
+          cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
+          std::cout<<" -------------------- "<<cdf50<<std::endl;
+          //calTime(f1);
+          if(mEventNo % 10000==0)
+            drawWaves(h1);
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+          //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+        }
       }
       for(unsigned int i=0;i<NPar;i++){
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
@@ -219,21 +224,24 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
-      if(f1->GetMaximumX()>=62.0 && f1->GetMaximumX()<=64.8){
-	if(!clus_csi)
-          clus_csi=true;
-        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
-        energy=(lmax-lmin)*pcal;
-	phdiff=(lmax-lmin);
-	calcThetaPhi(energy);
-        tcalc=.5*(lmax-lmin);
-        cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
-        std::cout<<" -------------------- "<<cdf50<<std::endl;
-	//calTime(f1);
-        if(mEventNo % 10000==0)
-          drawWaves(h1);
-        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
-        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      if(f1->GetMaximumX()>=60.0 && f1->GetMaximumX()<=65.0){
+        if(f1->GetParameter(1)>=28.0 && f1->GetParameter(1)<=40.){
+          if(!clus_csi)
+            clus_csi=true;
+          lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+          energy=(lmax-lmin)*pcal;
+          calcThetaPhi(energy);
+          phdiff=(lmax-lmin);
+          tcalc=.5*(lmax-lmin);
+          cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
+          std::cout<<" -------------------- "<<cdf50<<std::endl;
+          //calTime(f1);
+          if(mEventNo % 10000==0)
+            drawWaves(h1);
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+          //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+        }
       }
       break;
     case 5:
@@ -258,21 +266,24 @@ void ClusterCsI::tryFit(shared_ptr<TH1D> h1,double* xval,double yped,double ymax
       f1->SetLineColor(1);
       f1->SetLineWidth(3);
       h1->Fit("waveCut","Q");
-      if(f1->GetMaximumX()>=62.0 && f1->GetMaximumX()<=64.8){
-	if(!clus_csi)
-          clus_csi=true;
-        lmax=f1->GetMaximum();lmin=f1->GetMinimum();
-        energy=(lmax-lmin)*pcal;
-	phdiff=(lmax-lmin);
-	calcThetaPhi(energy);
-        tcalc=.5*(lmax-lmin);
-        cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
-        std::cout<<" -------------------- "<<cdf50<<std::endl;
-	//calTime(f1);
-        if(mEventNo % 10000==0)
-          drawWaves(h1);
-        //std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
-        //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+      if(f1->GetMaximumX()>=60.0 && f1->GetMaximumX()<=65.0){
+        if(f1->GetParameter(1)>=28.0 && f1->GetParameter(1)<=40.){
+          if(!clus_csi)
+            clus_csi=true;
+          lmax=f1->GetMaximum();lmin=f1->GetMinimum();
+          energy=(lmax-lmin)*pcal;
+          calcThetaPhi(energy);
+          phdiff=(lmax-lmin);
+          tcalc=.5*(lmax-lmin);
+          cdf50=f1->GetX(tcalc,0.,f1->GetMaximumX());
+          std::cout<<" -------------------- "<<cdf50<<std::endl;
+          //calTime(f1);
+          if(mEventNo % 10000==0)
+            drawWaves(h1);
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX(xval[0]-10,xval[0]+13)<<std::endl;
+          std::cout<<" cluster From CsI |--> "<<f1->GetMaximumX()<<" | baseline "<<f1->GetParameter(8)<<std::endl;
+          //std::cout<<" ******  Checking the energy   -->"<<energy<<" || "<<(f1->GetParameter(0)-f1->GetParameter(8))*pcal<<"\n";
+        }
       }
       for(unsigned int i=0;i<NPar;i++){
         mPar[i]=h1->GetFunction("waveCut")->GetParameter(i);
