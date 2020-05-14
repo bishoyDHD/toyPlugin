@@ -102,7 +102,8 @@ void Det_CsI::initVar(){
 }
 // Method to read in external files such as calibration par's
 void Det_CsI::readFiles(){
-  string fileName="calibPar.txt";
+  string fileName="paramCalib.txt";
+  //string fileName="calibPar.txt";
   double calib;
   int iclock, ifb, iud, imodule;
   parfile.open(fileName);
@@ -223,7 +224,7 @@ Long_t Det_CsI::process_fit(){
       myCsI.setIndexTheta(thetaIndex);
       myCsI.setIndexPhi(phiIndex);
       pcal=calibpar[indexClock][iFB][iUD][iModule];
-      if(treeRaw->indexCsI[iCh]==16) pcal=.22;
+      //if(treeRaw->indexCsI[iCh]==16) pcal=.22;
       myCsI.setpCalib(pcal);
       myCsI.fit();
       if(myCsI.getClustCsI()){
