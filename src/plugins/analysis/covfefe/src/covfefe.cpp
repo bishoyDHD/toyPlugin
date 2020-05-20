@@ -71,6 +71,8 @@ Long_t covfefe::histos(){
   h2cfd50Vph=new TH2D(cfdvE.str().c_str(),"stats",100,-.5,999.5,180,5.0,50.0);
   h2rTvph=new TH2D(rtvE.str().c_str(),"stats",100,-.5,999.5,244,-.5,60.5);
   h2cfd50Vpt=new TH2D(cfdvpt.str().c_str(),"stats",20,60.0,65.0,180,5.0,50.0);
+  h2cfd50VphCorr[0]=new TH2D("cfdVEcorr_0","stats",100,-.5,999.5,200,-100.5,99.5);
+  h2cfd50VphCorr[1]=new TH2D("cfdVEcorr_1","stats",100,-.5,999.5,200,-200.5,199.5);
   for(int i=0; i<3; i++){
     std::ostringstream rtime,ptime,cdf50time,csiRef,refcd50;
     std::ostringstream rtCorr,ptCorr,cdf50Corr;
@@ -95,7 +97,6 @@ Long_t covfefe::histos(){
     h1refpTimeDiff[i]=new TH1D(diffptime.str().c_str(),"stats",30,-15,15);
     h1refcdf50Diff[i]=new TH1D(diffcdf50.str().c_str(),"stats",180,-45,45);
     h1refCDF50[i]=new TH1D(refcd50.str().c_str(),"stats",44,39.5,50.5);
-    h2cfd50VphCorr[i]=new TH2D(cfdvEcorr.str().c_str(),"stats",100,-.5,999.5,84,30.5,50.5);
     h2rTvphCorr[i]=new TH2D(rtvEcorr.str().c_str(),"stats",100,-.5,999.5,244,-.5,60.5);
     h2cfd50VptCorr[i]=new TH2D(cfdvptcorr.str().c_str(),"stats",44,57.5,67.5,84,30.5,50.5);
   }
@@ -207,6 +208,8 @@ Long_t covfefe::process(){
       timeKmu2[2]=std::abs(treeTime->tpeak-refpkT[2]);
       h1kmu2[iclock][iFB][iUD][iModule]->Fill(treeTime->kmu2);
       h1time[iclock][iFB][iUD][iModule]->Fill(treeTime->rgaus[0]-treeTime->trise);
+      h2cfd50VphCorr[0]->Fill(treeTime->kmu2,(refcdf50[0]-treeTime->cdf50)*40-1.56785e+02);
+      h2cfd50VphCorr[1]->Fill(treeTime->kmu2,(refcdf50[1]-treeTime->cdf50)*40-1.56785e+02);
     }
     double tcalc=(treeTime->rgaus[0]-treeTime->cdf50)*40;
     if(treeTime->kmu2>500 && treeTime->kmu2<800){
@@ -236,7 +239,6 @@ Long_t covfefe::process(){
           h1rTime[n]->Fill((refrT[n]-treeTime->trise)*40-2.46849e+02);
           h1refCDF50[n]->Fill(refcdf50[n]);
           h1refgaus[n]->Fill(refgaus[n]);
-          h2cfd50VphCorr[n]->Fill(treeTime->kmu2,(refcdf50[n]-treeTime->cdf50)*40-1.56785e+02);
           h2rTvphCorr[n]->Fill(treeTime->kmu2,(refrT[n]-treeTime->trise)*40-2.46849e+02);
           h2cfd50VptCorr[n]->Fill(refpkT[n],(refcdf50[n]-treeTime->cdf50)*40-1.56785e+02);
         }

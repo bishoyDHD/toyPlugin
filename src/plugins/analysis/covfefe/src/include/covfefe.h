@@ -79,6 +79,7 @@ class covfefe:public Plugin{
   Long_t process_clust();
   Long_t finalize_clust();
   // histograms for cluster analysis
+  TH1D* h1Nkmu2,*h1Pgap;
   TH1D* E_pi0[3], *M_pi0[3]; // pi0 total energy
   TH1D* waveID[2], *clustM[3], *id1;
   TH1D* g1px[2], *g1py[2], *g1pz[2];
